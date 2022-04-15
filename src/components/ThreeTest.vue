@@ -1,0 +1,172 @@
+<template>
+    <div class="canvas-holder">
+        <canvas class="canvas-full" ref="canvas" tabindex="1" @keydown="onKeyDown"></canvas>
+        <div class="fps-counter" v-show="showFps">
+            <span>{{ Number(fps).toFixed(2) }} FPS, {{ objCount }} objects</span>
+        </div>
+    </div>
+</template>
+
+<script>
+
+import * as THREE from "three"
+
+
+export default {
+    name: 'ThreeTest',
+    components: {},
+    props: {},
+
+    data() {
+        return {
+            fps: 1.0,
+            showFps: true,
+            objCount: 0,
+        }
+    },
+
+    methods: {
+        onKeyDown(event) {
+            if (event.code === 'KeyR') {
+                this.resetCamera()
+            } else if (event.code === 'KeyD') {
+                this.showFps = !this.showFps
+            } else if (event.code === 'KeyH') {
+                console.log('help?')
+            }
+        },
+
+        resetCamera() {
+            this.controls.reset()
+        },
+
+        resizeRendererToDisplaySize() {
+            const renderer = this.renderer
+            const canvas = renderer.domElement;
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
+
+            const needResize = canvas.width !== width || canvas.height !== height;
+            if (needResize) {
+                renderer.setSize(width, height, false);
+            }
+
+            return needResize;
+        },
+
+        render(time) {
+            if (!this.lastCalledTime) {
+                this.lastCalledTime = time;
+                this.fps = 0;
+            } else {
+                const delta = (time - this.lastCalledTime);
+                this.lastCalledTime = time;
+                this.fps = 1000.0 / delta
+
+                this.cube.rotation.y += 0.005 * delta
+                this.cube.rotation.x += 0.01 * delta
+            }
+
+            this.resizeRendererToDisplaySize(this.renderer);
+
+            this.renderer.render(this.scene, this.camera)
+
+            requestAnimationFrame(this.render);
+        },
+
+        createCamera() {
+            this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight,
+                0.001, 1000);
+        },
+
+        makeRenderer(canvas) {
+            // Make renderer
+            let renderer = this.renderer = new THREE.WebGLRenderer({
+                canvas,
+                antialias: false
+            });
+
+            if (devicePixelRatio) {
+                console.log(`Renderer: Setting devicePixelRatio = ${devicePixelRatio}.`)
+                renderer.setPixelRatio(devicePixelRatio)
+            }
+            renderer.autoClearColor = true;
+        },
+
+        makeScene() {
+            const light = new THREE.DirectionalLight('hsl(0, 100%, 100%)')
+            const geometry = new THREE.BoxGeometry(1, 1, 1)
+            const material = new THREE.MeshStandardMaterial({
+                side: THREE.FrontSide,
+                color: 'hsl(0, 100%, 50%)',
+                wireframe: false
+            })
+            const cube = new THREE.Mesh(geometry, material)
+            const axes = new THREE.AxesHelper(5)
+
+            this.scene = new THREE.Scene();
+            this.scene.add(this.camera)
+            this.scene.add(cube)
+            this.scene.add(light)
+            this.scene.add(axes)
+
+            this.cube = cube
+
+            light.position.set(0, 0, 10)
+            this.camera.position.z = 5
+        }
+    },
+
+    mounted() {
+        // if (!WEBGL.isWebGLAvailable()) {
+        //     const warning = WEBGL.getWebGLErrorMessage();
+        //     this.showFps = false
+        //     document.getElementById('app').appendChild(warning);
+        //     return
+        // }
+
+        this.canvas = this.$refs.canvas
+
+        this.createCamera(this.canvas)
+        this.makeRenderer(this.canvas)
+        this.resizeRendererToDisplaySize()
+        this.makeScene()
+        requestAnimationFrame(this.render);
+    },
+
+    beforeUnmount() {
+    }
+}
+
+</script>
+
+<style>
+
+.canvas-full {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    outline: none;
+}
+
+.fps-counter {
+    text-align: left;
+    font-size: 14pt;
+    color: whitesmoke;
+    position: absolute;
+    margin: 10px;
+    left: 0;
+    top: 0;
+}
+
+.canvas-holder {
+    width: 100%;
+    height: 100%;
+}
+
+</style>
