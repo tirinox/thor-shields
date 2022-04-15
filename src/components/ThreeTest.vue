@@ -10,6 +10,9 @@
 <script>
 
 import * as THREE from "three"
+import {URLDataSource} from "@/helpers/URLDataSource";
+import {Config} from "@/config";
+import {NodeTracker} from "@/helpers/NodeTracker";
 
 
 export default {
@@ -22,6 +25,9 @@ export default {
             fps: 1.0,
             showFps: true,
             objCount: 0,
+
+            nodes: [],
+            prevNodes: [],
         }
     },
 
@@ -117,7 +123,15 @@ export default {
 
             light.position.set(0, 0, 10)
             this.camera.position.z = 5
-        }
+        },
+
+        handleData(nodes) {
+            this.prevNodes = this.nodes
+            this.nodes = nodes
+            const tracker = new NodeTracker(this.prevNodes, this.nodes)
+            const events = tracker.extractEvents()
+            console.log(events)
+        },
     },
 
     mounted() {
@@ -135,9 +149,16 @@ export default {
         this.resizeRendererToDisplaySize()
         this.makeScene()
         requestAnimationFrame(this.render);
+
+        this.dataSource = new URLDataSource(Config.DataSource.NodesURL, Config.DataSource.PollPeriod)
+        this.dataSource.callback = (data) => {
+            this.handleData(data)
+        }
+        this.dataSource.run()
     },
 
-    beforeUnmount() {
+    unmounted() {
+        this.dataSource.stop()
     }
 }
 

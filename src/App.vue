@@ -19,9 +19,8 @@ export default {
     },
     computed: {},
     created() {
-        window.title = 'THORShields'
-    },
-    unmounted() {
+        document.title = 'THORShields'
+
     },
     methods: {
     }
