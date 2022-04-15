@@ -2,7 +2,7 @@
     <div class="canvas-holder">
         <canvas class="canvas-full" ref="canvas" tabindex="1" @keydown="onKeyDown"></canvas>
         <div class="fps-counter" v-show="showFps">
-            <span>{{ Number(fps).toFixed(2) }} FPS, {{ objCount }} objects</span>
+            <span><strong>{{ Number(fps).toFixed(2) }}</strong> FPS, {{ objCount }} objects</span>
         </div>
     </div>
 </template>
@@ -66,8 +66,8 @@ export default {
                 this.lastCalledTime = time;
                 this.fps = 1000.0 / delta
 
-                this.cube.rotation.y += 0.005 * delta
-                this.cube.rotation.x += 0.01 * delta
+                this.cube.rotation.y += 0.0005 * delta
+                this.cube.rotation.x += 0.001 * delta
             }
 
             this.resizeRendererToDisplaySize(this.renderer);
