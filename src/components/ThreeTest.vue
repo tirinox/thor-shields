@@ -13,6 +13,9 @@ import * as THREE from "three"
 import {URLDataSource} from "@/helpers/URLDataSource";
 import {Config} from "@/config";
 import {NodeTracker} from "@/helpers/NodeTracker";
+// import {getRandomInt} from "@/helpers/MathUtil";
+import {NodeEvent} from "@/helpers/NodeEvent";
+import {NodeGroup} from "@/visual/NodeGroup";
 
 
 export default {
@@ -68,12 +71,10 @@ export default {
                 this.lastCalledTime = time;
                 this.fps = 0;
             } else {
-                const delta = (time - this.lastCalledTime);
+                const delta = (time - this.lastCalledTime) * 0.001;
                 this.lastCalledTime = time;
-                this.fps = 1000.0 / delta
-
-                this.cube.rotation.y += 0.0005 * delta
-                this.cube.rotation.x += 0.001 * delta
+                this.fps = 1.0 / delta
+                this.nodeGroup.update(delta)
             }
 
             this.resizeRendererToDisplaySize(this.renderer);
@@ -84,7 +85,7 @@ export default {
         },
 
         createCamera() {
-            this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight,
+            this.camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight,
                 0.001, 1000);
         },
 
@@ -104,34 +105,42 @@ export default {
 
         makeScene() {
             const light = new THREE.DirectionalLight('hsl(0, 100%, 100%)')
-            const geometry = new THREE.BoxGeometry(1, 1, 1)
-            const material = new THREE.MeshStandardMaterial({
-                side: THREE.FrontSide,
-                color: 'hsl(0, 100%, 50%)',
-                wireframe: false
-            })
-            const cube = new THREE.Mesh(geometry, material)
-            const axes = new THREE.AxesHelper(5)
 
             this.scene = new THREE.Scene();
             this.scene.add(this.camera)
-            this.scene.add(cube)
             this.scene.add(light)
-            this.scene.add(axes)
 
-            this.cube = cube
+            const ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
+            this.scene.add( ambientLight );
 
-            light.position.set(0, 0, 10)
-            this.camera.position.z = 5
+            this.nodeGroup = new NodeGroup(this.scene)
+
+            light.position.set(0, 10, 10)
+            this.camera.position.z = 500
+
+            // const no = new NodeObject()
+            // no.o.position.copy(new Vector3(0, 0, 0))
+            // this.scene.add(no.o)
         },
 
         handleData(nodes) {
+            console.info('Handle Data tick!')
             this.prevNodes = this.nodes
             this.nodes = nodes
             const tracker = new NodeTracker(this.prevNodes, this.nodes)
             const events = tracker.extractEvents()
-            console.log(events)
+
+            for (const event of events) {
+                if(event.node.node_address) {
+                    if (event.type === NodeEvent.EVENT_TYPE.CREATE) {
+                        this.nodeGroup.createNewNode(event.node)
+                    } else if(event.type === NodeEvent.EVENT_TYPE.DESTROY) {
+                        this.nodeGroup.destroyNode(event.node)
+                    }
+                }
+            }
         },
+
     },
 
     mounted() {

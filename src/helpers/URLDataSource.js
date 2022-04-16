@@ -54,6 +54,7 @@ export class URLDataSource {
             }
         } catch (e) {
             console.error(`${this.toString()} tick failed: ${e}`)
+            throw e
         }
     }
 }
