@@ -3,6 +3,7 @@
         <canvas class="canvas-full" ref="canvas" tabindex="1" @keydown="onKeyDown"></canvas>
         <div class="fps-counter" v-show="showFps">
             <span><strong>{{ Number(fps).toFixed(2) }}</strong> FPS, {{ objCount }} objects</span>
+            <span class="activity" v-show="activityIndicator">•</span>
         </div>
     </div>
 </template>
@@ -31,10 +32,18 @@ export default {
 
             nodes: [],
             prevNodes: [],
+            activityIndicator: false,
         }
     },
 
     methods: {
+        pokeActivity() {
+            this.activityIndicator = true
+            setTimeout(() => {
+                this.activityIndicator = false
+            }, 100)
+        },
+
         onKeyDown(event) {
             if (event.code === 'KeyR') {
                 this.resetCamera()
@@ -85,8 +94,21 @@ export default {
         },
 
         createCamera() {
-            this.camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight,
+            this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
                 0.001, 1000);
+            // this.camera = new THREE.OrthographicCamera()
+        },
+
+        makeSkybox() {
+            const r = '/texture/skybox/star/';
+
+            const urls = [
+                r + 'right.png', r + 'left.png',
+                r + 'top.png', r + 'bottom.png',
+                r + 'back.png', r + 'front.png'
+            ];
+
+            this.scene.background = new THREE.CubeTextureLoader().load(urls)
         },
 
         makeRenderer(canvas) {
@@ -115,27 +137,31 @@ export default {
 
             this.nodeGroup = new NodeGroup(this.scene)
 
-            light.position.set(0, 10, 10)
-            this.camera.position.z = 500
+            light.position.set(0, 10,   1000)
+            this.camera.position.z = 1000
 
-            // const no = new NodeObject()
-            // no.o.position.copy(new Vector3(0, 0, 0))
-            // this.scene.add(no.o)
+            this.makeSkybox()
+
         },
 
         handleData(nodes) {
             console.info('Handle Data tick!')
+            this.pokeActivity()
+
             this.prevNodes = this.nodes
             this.nodes = nodes
             const tracker = new NodeTracker(this.prevNodes, this.nodes)
             const events = tracker.extractEvents()
 
             for (const event of events) {
-                if(event.node.node_address) {
+                const node = event.node
+                if(node.node_address) {
                     if (event.type === NodeEvent.EVENT_TYPE.CREATE) {
-                        this.nodeGroup.createNewNode(event.node)
+                        this.nodeGroup.createNewNode(node)
                     } else if(event.type === NodeEvent.EVENT_TYPE.DESTROY) {
-                        this.nodeGroup.destroyNode(event.node)
+                        this.nodeGroup.destroyNode(node)
+                    } else if(event.type === NodeEvent.EVENT_TYPE.SLASH) {
+                        this.nodeGroup.reactSlash(node)
                     }
                 }
             }

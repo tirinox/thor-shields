@@ -1,6 +1,14 @@
 import _ from "lodash";
 import {NodeEvent} from "@/helpers/NodeEvent";
 
+export const NodeStatus = {
+    Standby: 'Standby',
+    Whitelisted: 'Whitelisted',
+    Disabled: 'Disabled',
+    Active: 'Active',
+    Unknown: 'Unknown',
+}
+
 export class NodeTracker {
     constructor(prevNodeList, currNodeList) {
         this.prev = NodeTracker.prepareNodeList(prevNodeList)
@@ -15,6 +23,7 @@ export class NodeTracker {
             bond: BigInt(n.bond),
             ip_address: n.ip_address,
             current_award: BigInt(n.current_award),
+            slash_points: n.slash_points,
             observe_chains: _.sortBy(n.observe_chains, ['chain']),
             requested_to_leave: Boolean(n.requested_to_leave),
             forced_to_leave: Boolean(n.forced_to_leave),

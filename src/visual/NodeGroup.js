@@ -9,8 +9,8 @@ export class NodeGroup {
         this._currentIdent = 0
 
         this.bounds = {
-            xMin: -600, xMax: 600,
-            yMin: -400, yMax: 400,
+            xMin: -60, xMax: 60,
+            yMin: -40, yMax: 40,
             zMin: 0, zMax: 0,
         }
     }
@@ -42,9 +42,6 @@ export class NodeGroup {
         this.parent.add(nodeObject.o)
         this._placeNodeObject(nodeObject)
         this._tracker[ident] = nodeObject
-
-        const force = nodeObject.o.position.clone().normalize()
-        nodeObject.force.copy(force.multiplyScalar(-200.0))
     }
 
     destroyNode(node) {
@@ -56,7 +53,7 @@ export class NodeGroup {
         }
 
         console.info(`Create node ${nodeAddress}.`)
-
+        nodeObject.dispose()
         this.parent.remove(nodeObject.o)
         delete this._tracker[nodeAddress]
     }
@@ -66,8 +63,31 @@ export class NodeGroup {
             return
         }
 
-        for (const node of _.values(this._tracker)) {
-            node.update(dt)
+        const radius = 300.0
+
+        for (const obj of _.values(this._tracker)) {
+            // set force
+
+            const distance = obj.o.position.length()
+
+            if(distance > radius) {
+                const force = obj.o.position.clone()
+                obj.force.copy(force.multiplyScalar(-2.0))
+                obj.friction = 0.0
+            } else {
+                obj.force.set(0, 0, 0)
+                obj.friction = 0.02
+            }
+
+            // update
+            obj.update(dt)
         }
+    }
+
+    reactSlash(node) {
+        console.info('slash')
+        const obj = this.findNodeObject(node.node_address)
+        const velocity = obj.o.position.clone().normalize().multiplyScalar(100)
+        obj.velocity.copy(velocity)
     }
 }
