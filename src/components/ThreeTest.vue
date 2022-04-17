@@ -9,10 +9,11 @@
             @mouseenter="onMouseEnter"
             @mouseleave="onMouseLeave">
         </canvas>
-        <div class="fps-counter" v-show="showFps">
-            <span><strong>{{ Number(fps).toFixed(2) }}</strong> FPS, {{ objCount }} objects</span>
-            <span class="activity" v-show="activityIndicator">•</span>
-        </div>
+        <FPSCounter
+            v-show="showFps"
+            ref="fps"
+        >
+        </FPSCounter>
     </div>
 </template>
 
@@ -24,27 +25,24 @@ import {Config} from "@/config";
 import {NodeTracker} from "@/helpers/NodeTracker";
 import {NodeEvent} from "@/helpers/NodeEvent";
 import {NodeGroup} from "@/visual/NodeGroup";
-import {countObjects} from "@/helpers/3D";
 import {TWEEN} from "three/examples/jsm/libs/tween.module.min";
 import CameraControls from "camera-controls";
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass";
+import FPSCounter from "@/components/parts/FPSCounter";
 
 export default {
     name: 'ThreeTest',
-    components: {},
+    components: {FPSCounter},
     props: {},
 
     data() {
         return {
-            fps: 1.0,
             showFps: true,
-            objCount: 0,
 
             nodes: [],
             prevNodes: [],
-            activityIndicator: false,
 
             mouseEnterX: 0,
             mouseEnterY: 0,
@@ -52,12 +50,7 @@ export default {
     },
 
     methods: {
-        pokeActivity() {
-            this.activityIndicator = true
-            setTimeout(() => {
-                this.activityIndicator = false
-            }, 100)
-        },
+
 
         onKeyDown(event) {
             if (event.code === 'KeyR') {
@@ -120,17 +113,11 @@ export default {
 
         render() {
             const delta = this.clock.getDelta();
+            this.$refs.fps.update(delta, this.scene)
             this.controls.update(delta);
-
-            if (delta > 0) {
-                this.fps = 1.0 / delta
-                this.nodeGroup.update(delta)
-            }
-
+            this.nodeGroup.update(delta)
             TWEEN.update(delta)
-
             this.resizeRendererToDisplaySize(this.renderer);
-
             this.composer.render(delta)
 
             requestAnimationFrame(this.render);
@@ -237,10 +224,8 @@ export default {
             }
 
             if (events.length) {
-                this.pokeActivity()
+                this.$refs.fps.pokeActivity()
             }
-
-            this.objCount = countObjects(this.scene)
         },
 
     },
@@ -290,16 +275,6 @@ export default {
     left: 0;
     top: 0;
     outline: none;
-}
-
-.fps-counter {
-    text-align: left;
-    font-size: 14pt;
-    color: whitesmoke;
-    position: absolute;
-    margin: 10px;
-    left: 0;
-    top: 0;
 }
 
 .canvas-holder {

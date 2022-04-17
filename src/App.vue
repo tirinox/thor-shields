@@ -55,10 +55,15 @@ export default {
     src: local('Norse-Bold'), url('../public/fonts/NorseBold-2Kge.otf') format('opentype');
 }
 
+@font-face {
+    font-family: 'EXO2';
+    src: url('../public/fonts/Exo2-VariableFont_wght.ttf') format('truetype');
+}
+
 html, body {
     margin: 0;
     height: 100%;
-    font-family: 'Norse', monospace;
+    font-family: 'EXO2', monospace;
 }
 
 canvas {

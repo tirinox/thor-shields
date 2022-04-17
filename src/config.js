@@ -4,7 +4,8 @@ export const Config = {
         PollPeriod: 3, // sec
     },
     Font: {
-        Main: 'fonts/NorseBold-2Kge.otf'
+        // Main: 'fonts/NorseBold-2Kge.otf'
+        Main: 'fonts/Exo2-VariableFont_wght.ttf'
     },
     Effects: {
         Bloom: {
