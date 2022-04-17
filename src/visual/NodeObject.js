@@ -5,7 +5,7 @@ import {NodeStatus} from "@/helpers/NodeTracker";
 import {Text} from 'troika-three-text'
 
 // const geometry = new THREE.SphereGeometry(1, 32, 32)
-const geometry = new THREE.SphereGeometry(1, 10, 10)
+const geometry = new THREE.IcosahedronGeometry(1, 1)
 
 export class NodeObject {
     constructor(node) {
@@ -25,7 +25,7 @@ export class NodeObject {
         }
         this.o = new THREE.Group()
 
-        this.material = new THREE.MeshLambertMaterial({color});
+        this.material = new THREE.MeshStandardMaterial({color, flatShading:true});
         this.mesh = new THREE.Mesh(geometry, this.material);
 
         const scale = Util.clamp(
@@ -43,7 +43,7 @@ export class NodeObject {
             const nameTextObj = this.nameTextObj = new Text()
             nameTextObj.text = node.node_address.slice(-4)
             nameTextObj.fontSize = 15
-            nameTextObj.position.z = 100
+            nameTextObj.position.z = 30
             nameTextObj.color = 0xFFFFFF
             nameTextObj.sync()
             nameTextObj.anchorX = 'center'

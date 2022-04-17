@@ -1,6 +1,14 @@
 <template>
     <div class="canvas-holder">
-        <canvas class="canvas-full" ref="canvas" tabindex="1" @keydown="onKeyDown"></canvas>
+        <canvas
+            class="canvas-full"
+            ref="canvas"
+            tabindex="1"
+            @keydown="onKeyDown"
+            @mousemove="onMouseMove"
+            @mouseenter="onMouseEnter"
+            @mouseleave="onMouseLeave">
+        </canvas>
         <div class="fps-counter" v-show="showFps">
             <span><strong>{{ Number(fps).toFixed(2) }}</strong> FPS, {{ objCount }} objects</span>
             <span class="activity" v-show="activityIndicator">•</span>
@@ -18,6 +26,7 @@ import {NodeEvent} from "@/helpers/NodeEvent";
 import {NodeGroup} from "@/visual/NodeGroup";
 import {countObjects} from "@/helpers/3D";
 import {TWEEN} from "three/examples/jsm/libs/tween.module.min";
+import CameraControls from "camera-controls";
 
 
 export default {
@@ -34,6 +43,9 @@ export default {
             nodes: [],
             prevNodes: [],
             activityIndicator: false,
+
+            mouseEnterX: 0,
+            mouseEnterY: 0,
         }
     },
 
@@ -53,6 +65,27 @@ export default {
             } else if (event.code === 'KeyH') {
                 console.log('help?')
             }
+        },
+
+        onMouseMove(event) {
+            const x = event.clientX
+            const y = event.clientY
+            if (!this.mouseEnterX) {
+                this.mouseEnterX = x
+                this.mouseEnterY = y
+                return
+            }
+            const dx = this.mouseEnterX - x
+            const dy = this.mouseEnterY - y
+            console.log(dx, dy)
+        },
+
+        onMouseEnter(event) {
+            this.mouseEnterX = event.clientX
+            this.mouseEnterY = event.clientY
+        },
+
+        onMouseLeave() {
         },
 
         resetCamera() {
@@ -76,17 +109,15 @@ export default {
             return needResize;
         },
 
-        render(time) {
-            if (!this.lastCalledTime) {
-                this.lastCalledTime = time;
-                this.fps = 0;
-            } else {
-                const delta = (time - this.lastCalledTime) * 0.001;
-                this.lastCalledTime = time;
+        render() {
+            const delta = this.clock.getDelta();
+            this.controls.update(delta);
+
+            if (delta > 0) {
                 this.fps = 1.0 / delta
                 this.nodeGroup.update(delta)
             }
-
+            
             TWEEN.update()
 
             this.resizeRendererToDisplaySize(this.renderer);
@@ -98,8 +129,25 @@ export default {
 
         createCamera() {
             this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
-                0.001, 1000);
+                0.001, 2000);
             // this.camera = new THREE.OrthographicCamera()
+            this.camera.position.z = 1000
+
+            const controls = this.controls = new CameraControls(this.camera, this.renderer.domElement);
+            // controls.enabled = false
+            controls.minDistance = 1000;
+            controls.maxDistance = 1000;
+
+            // controls.enableZoom = false
+            // controls.enablePan = false
+            //
+            // controls.minAzimuthAngle = -10
+            // controls.maxAzimuthAngle = 10
+            //
+            // controls.minPolarAngle = -20
+            // controls.maxPolarAngle = 20
+
+            controls.update(0)
         },
 
         makeSkybox() {
@@ -118,7 +166,8 @@ export default {
             // Make renderer
             let renderer = this.renderer = new THREE.WebGLRenderer({
                 canvas,
-                antialias: false
+                antialias: false,
+                logarithmicDepthBuffer: true,
             });
 
             if (devicePixelRatio) {
@@ -135,13 +184,12 @@ export default {
             this.scene.add(this.camera)
             this.scene.add(light)
 
-            const ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
-            this.scene.add( ambientLight );
+            const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+            this.scene.add(ambientLight);
 
             this.nodeGroup = new NodeGroup(this.scene)
 
-            light.position.set(0, 10,   1000)
-            this.camera.position.z = 1000
+            light.position.set(0, 10, 1000)
 
             this.makeSkybox()
         },
@@ -156,20 +204,20 @@ export default {
 
             for (const event of events) {
                 const node = event.node
-                if(node.node_address) {
+                if (node.node_address) {
                     if (event.type === NodeEvent.EVENT_TYPE.CREATE) {
                         this.nodeGroup.createNewNode(node)
-                    } else if(event.type === NodeEvent.EVENT_TYPE.DESTROY) {
+                    } else if (event.type === NodeEvent.EVENT_TYPE.DESTROY) {
                         this.nodeGroup.destroyNode(node)
-                    } else if(event.type === NodeEvent.EVENT_TYPE.SLASH) {
+                    } else if (event.type === NodeEvent.EVENT_TYPE.SLASH) {
                         this.nodeGroup.reactSlash(node)
-                    } else if(event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
+                    } else if (event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
                         this.nodeGroup.reactChain(node)
                     }
                 }
             }
 
-            if(events.length) {
+            if (events.length) {
                 this.pokeActivity()
             }
 
@@ -188,11 +236,12 @@ export default {
 
         this.canvas = this.$refs.canvas
 
-        this.createCamera(this.canvas)
+        this.clock = new THREE.Clock()
+
         this.makeRenderer(this.canvas)
+        this.createCamera(this.canvas)
         this.resizeRendererToDisplaySize()
         this.makeScene()
-
 
         this.dataSource = new URLDataSource(Config.DataSource.NodesURL, Config.DataSource.PollPeriod)
         this.dataSource.callback = (data) => {
@@ -205,6 +254,7 @@ export default {
 
     unmounted() {
         this.dataSource.stop()
+        this.controls.dispose()
     }
 }
 

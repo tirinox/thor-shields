@@ -76,7 +76,8 @@ export class NodeGroup {
                 obj.force.copy(force.multiplyScalar(-2.0))
                 obj.friction = 0.0
             } else {
-                obj.force.set(0, 0, 0)
+                const v = Random.randomVector({}).normalize().multiplyScalar(100)
+                obj.force.set(v.x, v.y, 0)
                 obj.friction = 0.02
             }
 
