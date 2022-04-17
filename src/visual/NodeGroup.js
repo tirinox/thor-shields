@@ -1,7 +1,8 @@
 import {Random} from "@/helpers/MathUtil";
 import {NodeObject} from "@/visual/NodeObject";
 import _ from "lodash";
-import {TWEEN} from "three/examples/jsm/libs/tween.module.min";
+import {NodeStatus} from "@/helpers/NodeTracker";
+import {NodeEvent} from "@/helpers/NodeEvent";
 
 export class NodeGroup {
     constructor(parent) {
@@ -59,63 +60,78 @@ export class NodeGroup {
         delete this._tracker[nodeAddress]
     }
 
+    _repelForceCalculation(obj) {
+        const forceMult = 100
+        for(const otherObj of _.values(this._tracker)) {
+            if(otherObj !== obj) {
+                const d = obj.o.position.distanceTo(otherObj.o.position)
+                const minDistance = obj.radius + otherObj.radius
+                if(d < minDistance) {
+                    // console.log(d, minDistance)
+                    const lineDir = obj.o.position
+                        .clone()
+                        .sub(otherObj.o.position)
+                        .normalize()
+                        .multiplyScalar(forceMult)
+                    obj.force.add(lineDir)
+                    otherObj.force.add(lineDir.negate())
+                }
+            }
+        }
+    }
+
     update(dt) {
         if (isNaN(dt)) {
             return
         }
 
-        const radius = 300.0
+        const circleRadius = 350.0
 
         for (const obj of _.values(this._tracker)) {
             // set force
 
             const distance = obj.o.position.length()
 
-            if(distance > radius) {
-                const force = obj.o.position.clone()
-                obj.force.copy(force.multiplyScalar(-2.0))
+            const toCenter = obj.o.position.clone().normalize()
+            if(distance > circleRadius) {
+                // outside the circle everybody want to go back in
+                obj.force.copy(toCenter.multiplyScalar(-200.0))
                 obj.friction = 0.0
             } else {
-                const v = Random.randomVector({}).normalize().multiplyScalar(100)
-                obj.force.set(v.x, v.y, 0)
+                obj.force.set(0, 0, 0)
                 obj.friction = 0.02
+                if(obj.node.status === NodeStatus.Active) {
+                    // active tends to the center
+                    obj.force.add(toCenter.multiplyScalar(-10.0 * obj.normalizedBond))
+                } else {
+                    // other one seeks to go to the frontier
+                    obj.force.add(toCenter.multiplyScalar(50.0))
+                }
             }
+
+            this._repelForceCalculation(obj)
 
             // update
             obj.update(dt)
         }
+
+        // todo: remove
+        if(Math.random() > 0.9) {
+            const obj = Random.getRandomSample(_.values(this._tracker))
+            if(obj) {
+                obj.reactChain()
+            }
+        }
     }
 
-    reactSlash(node) {
-        console.info('slash')
-        const obj = this.findNodeObject(node.node_address)
-        const velocity = obj.o.position.clone().normalize().multiplyScalar(100)
-        obj.velocity.copy(velocity)
-    }
-
-    reactChain(node) {
-        console.info(`${node.node_address} chain`)
-
-        const obj = this.findNodeObject(node.node_address)
-
-        new TWEEN.Tween(obj.o.scale)
-            .to(
-                {
-                    x: 1.1,
-                    y: 1.1,
-                    z: 1.1
-                },
-                300
-            )
-            .to( {
-                x: 1.0,
-                y: 1.0,
-                z: 1.0
-            }, 300)
-            //.delay (1000)
-            .easing(TWEEN.Easing.Cubic.Out)
-            //.onUpdate(() => render())
-            .start()
-
+    reactEvent(event) {
+        const obj = this.findNodeObject(event.node.node_address)
+        if(obj) {
+            if(event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
+                obj.reactChain()
+            } else if(event.type === NodeEvent.EVENT_TYPE.SLASH) {
+                obj.reactSlash()
+            }
+        }
     }
 }

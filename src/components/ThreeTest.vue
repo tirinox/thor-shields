@@ -27,7 +27,9 @@ import {NodeGroup} from "@/visual/NodeGroup";
 import {countObjects} from "@/helpers/3D";
 import {TWEEN} from "three/examples/jsm/libs/tween.module.min";
 import CameraControls from "camera-controls";
-
+import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass";
 
 export default {
     name: 'ThreeTest',
@@ -75,9 +77,12 @@ export default {
                 this.mouseEnterY = y
                 return
             }
+            const scale = 0.0005
             const dx = this.mouseEnterX - x
             const dy = this.mouseEnterY - y
-            console.log(dx, dy)
+            this.mouseEnterX = x
+            this.mouseEnterY = y
+            this.controls.rotate(dx * scale, dy * scale)
         },
 
         onMouseEnter(event) {
@@ -104,6 +109,10 @@ export default {
             const needResize = canvas.width !== width || canvas.height !== height;
             if (needResize) {
                 renderer.setSize(width, height, false);
+                if (this.bloomPass) {
+                    this.bloomPass.setSize(width, height);
+                }
+                this.composer.setSize(width, height);
             }
 
             return needResize;
@@ -117,12 +126,12 @@ export default {
                 this.fps = 1.0 / delta
                 this.nodeGroup.update(delta)
             }
-            
-            TWEEN.update()
+
+            TWEEN.update(delta)
 
             this.resizeRendererToDisplaySize(this.renderer);
 
-            this.renderer.render(this.scene, this.camera)
+            this.composer.render(delta)
 
             requestAnimationFrame(this.render);
         },
@@ -132,20 +141,20 @@ export default {
                 0.001, 2000);
             // this.camera = new THREE.OrthographicCamera()
             this.camera.position.z = 1000
+        },
 
+        createCameraControl() {
             const controls = this.controls = new CameraControls(this.camera, this.renderer.domElement);
-            // controls.enabled = false
-            controls.minDistance = 1000;
-            controls.maxDistance = 1000;
+            const cfg = Config.Controls
 
-            // controls.enableZoom = false
-            // controls.enablePan = false
-            //
-            // controls.minAzimuthAngle = -10
-            // controls.maxAzimuthAngle = 10
-            //
-            // controls.minPolarAngle = -20
-            // controls.maxPolarAngle = 20
+            controls.minDistance = cfg.Distance
+            controls.maxDistance = cfg.Distance
+
+            controls.minAzimuthAngle = THREE.MathUtils.degToRad(-cfg.AzimuthAngleLimit)
+            controls.maxAzimuthAngle = THREE.MathUtils.degToRad(cfg.AzimuthAngleLimit)
+
+            controls.minPolarAngle = THREE.MathUtils.degToRad(-cfg.PolarAngleLimit + 90)
+            controls.maxPolarAngle = THREE.MathUtils.degToRad(cfg.PolarAngleLimit + 90)
 
             controls.update(0)
         },
@@ -163,7 +172,6 @@ export default {
         },
 
         makeRenderer(canvas) {
-            // Make renderer
             let renderer = this.renderer = new THREE.WebGLRenderer({
                 canvas,
                 antialias: false,
@@ -174,13 +182,26 @@ export default {
                 console.log(`Renderer: Setting devicePixelRatio = ${devicePixelRatio}.`)
                 renderer.setPixelRatio(devicePixelRatio)
             }
-            renderer.autoClearColor = true;
+
+            const renderScene = new RenderPass(this.scene, this.camera);
+
+            this.composer = new EffectComposer(renderer);
+            this.composer.addPass(renderScene);
+
+            const bloomCfg = Config.Effects.Bloom
+            if (bloomCfg.Enabled) {
+                this.bloomPass = new UnrealBloomPass(
+                    new THREE.Vector2(window.innerWidth, window.innerHeight),
+                    bloomCfg.Strength,
+                    bloomCfg.Radius,
+                    bloomCfg.Threshold)
+                this.composer.addPass(this.bloomPass);
+            }
         },
 
-        makeScene() {
+        buildScene() {
             const light = new THREE.DirectionalLight('hsl(0, 100%, 100%)')
 
-            this.scene = new THREE.Scene();
             this.scene.add(this.camera)
             this.scene.add(light)
 
@@ -209,10 +230,8 @@ export default {
                         this.nodeGroup.createNewNode(node)
                     } else if (event.type === NodeEvent.EVENT_TYPE.DESTROY) {
                         this.nodeGroup.destroyNode(node)
-                    } else if (event.type === NodeEvent.EVENT_TYPE.SLASH) {
-                        this.nodeGroup.reactSlash(node)
-                    } else if (event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
-                        this.nodeGroup.reactChain(node)
+                    } else {
+                        this.nodeGroup.reactEvent(event)
                     }
                 }
             }
@@ -237,11 +256,13 @@ export default {
         this.canvas = this.$refs.canvas
 
         this.clock = new THREE.Clock()
+        this.scene = new THREE.Scene()
 
-        this.makeRenderer(this.canvas)
         this.createCamera(this.canvas)
+        this.makeRenderer(this.canvas)
+        this.createCameraControl()
         this.resizeRendererToDisplaySize()
-        this.makeScene()
+        this.buildScene()
 
         this.dataSource = new URLDataSource(Config.DataSource.NodesURL, Config.DataSource.PollPeriod)
         this.dataSource.callback = (data) => {

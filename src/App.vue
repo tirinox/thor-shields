@@ -6,6 +6,8 @@
 <script>
 // import THORWorld from "@/components/THORWorld";
 import ThreeTest from "@/components/ThreeTest";
+import {preloadFont} from "troika-three-text";
+import {Config} from "@/config";
 
 export default {
     name: 'App',
@@ -19,9 +21,21 @@ export default {
     computed: {},
     created() {
         document.title = 'THORViz'
-
+        this.preloading()
     },
-    methods: {}
+    methods: {
+        preloading() {
+            preloadFont(
+                {
+                    font: Config.Font.Main,
+                    characters: 'abcdefghijklmnopqrstuvwxyz1234567890'
+                },
+                () => {
+                    console.log('font loading done')
+                }
+            )
+        }
+    }
 }
 </script>
 
