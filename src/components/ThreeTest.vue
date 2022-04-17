@@ -14,7 +14,6 @@ import * as THREE from "three"
 import {URLDataSource} from "@/helpers/URLDataSource";
 import {Config} from "@/config";
 import {NodeTracker} from "@/helpers/NodeTracker";
-// import {getRandomInt} from "@/helpers/MathUtil";
 import {NodeEvent} from "@/helpers/NodeEvent";
 import {NodeGroup} from "@/visual/NodeGroup";
 import {countObjects} from "@/helpers/3D";
@@ -194,7 +193,6 @@ export default {
         this.resizeRendererToDisplaySize()
         this.makeScene()
 
-        this.matterEngine = Matter.Engine
 
         this.dataSource = new URLDataSource(Config.DataSource.NodesURL, Config.DataSource.PollPeriod)
         this.dataSource.callback = (data) => {
