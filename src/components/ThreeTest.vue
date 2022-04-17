@@ -17,6 +17,8 @@ import {NodeTracker} from "@/helpers/NodeTracker";
 // import {getRandomInt} from "@/helpers/MathUtil";
 import {NodeEvent} from "@/helpers/NodeEvent";
 import {NodeGroup} from "@/visual/NodeGroup";
+import {countObjects} from "@/helpers/3D";
+import {TWEEN} from "three/examples/jsm/libs/tween.module.min";
 
 
 export default {
@@ -86,6 +88,8 @@ export default {
                 this.nodeGroup.update(delta)
             }
 
+            TWEEN.update()
+
             this.resizeRendererToDisplaySize(this.renderer);
 
             this.renderer.render(this.scene, this.camera)
@@ -141,12 +145,10 @@ export default {
             this.camera.position.z = 1000
 
             this.makeSkybox()
-
         },
 
         handleData(nodes) {
             console.info('Handle Data tick!')
-            this.pokeActivity()
 
             this.prevNodes = this.nodes
             this.nodes = nodes
@@ -162,9 +164,17 @@ export default {
                         this.nodeGroup.destroyNode(node)
                     } else if(event.type === NodeEvent.EVENT_TYPE.SLASH) {
                         this.nodeGroup.reactSlash(node)
+                    } else if(event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
+                        this.nodeGroup.reactChain(node)
                     }
                 }
             }
+
+            if(events.length) {
+                this.pokeActivity()
+            }
+
+            this.objCount = countObjects(this.scene)
         },
 
     },
@@ -183,13 +193,16 @@ export default {
         this.makeRenderer(this.canvas)
         this.resizeRendererToDisplaySize()
         this.makeScene()
-        requestAnimationFrame(this.render);
+
+        this.matterEngine = Matter.Engine
 
         this.dataSource = new URLDataSource(Config.DataSource.NodesURL, Config.DataSource.PollPeriod)
         this.dataSource.callback = (data) => {
             this.handleData(data)
         }
         this.dataSource.run()
+
+        requestAnimationFrame(this.render);
     },
 
     unmounted() {

@@ -1,6 +1,7 @@
 import {Random} from "@/helpers/MathUtil";
 import {NodeObject} from "@/visual/NodeObject";
 import _ from "lodash";
+import {TWEEN} from "three/examples/jsm/libs/tween.module.min";
 
 export class NodeGroup {
     constructor(parent) {
@@ -89,5 +90,31 @@ export class NodeGroup {
         const obj = this.findNodeObject(node.node_address)
         const velocity = obj.o.position.clone().normalize().multiplyScalar(100)
         obj.velocity.copy(velocity)
+    }
+
+    reactChain(node) {
+        console.info(`${node.node_address} chain`)
+
+        const obj = this.findNodeObject(node.node_address)
+
+        new TWEEN.Tween(obj.o.scale)
+            .to(
+                {
+                    x: 1.1,
+                    y: 1.1,
+                    z: 1.1
+                },
+                300
+            )
+            .to( {
+                x: 1.0,
+                y: 1.0,
+                z: 1.0
+            }, 300)
+            //.delay (1000)
+            .easing(TWEEN.Easing.Cubic.Out)
+            //.onUpdate(() => render())
+            .start()
+
     }
 }
