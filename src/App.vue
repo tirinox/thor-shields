@@ -14,29 +14,18 @@ export default {
         // THORWorld
     },
     data() {
-        return {
-        }
+        return {}
     },
     computed: {},
     created() {
-        document.title = 'THORShields'
+        document.title = 'THORViz'
 
     },
-    methods: {
-    }
+    methods: {}
 }
 </script>
 
 <style>
-html, body {
-    margin: 0;
-    height: 100%;
-    font-family: 'Norse';
-}
-
-canvas {
-    display: block;
-}
 
 @font-face {
     font-family: 'Norse';
@@ -50,6 +39,16 @@ canvas {
     font-style: normal;
     font-weight: bold;
     src: local('Norse-Bold'), url('../public/fonts/NorseBold-2Kge.otf') format('opentype');
+}
+
+html, body {
+    margin: 0;
+    height: 100%;
+    font-family: 'Norse', monospace;
+}
+
+canvas {
+    display: block;
 }
 
 </style>

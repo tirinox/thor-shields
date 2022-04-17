@@ -1,4 +1,4 @@
-# thor-shields
+# thorviz
 
 ## Project setup
 ```
