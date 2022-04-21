@@ -8,8 +8,14 @@ import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import {Config} from "@/config";
 
+export const NodeGroupModes = Object.freeze({
+    Normal: 'normal',
+    Status: 'status'
+})
+
 export class NodeGroup {
     constructor(parent) {
+        this.mode = NodeGroupModes.Normal
         this.parent = parent
         this._tracker = {}
         this._currentIdent = 0
@@ -21,9 +27,18 @@ export class NodeGroup {
         }
 
         this._circleRadius = 350.0
-        this._attractorGlobal = new Attractor(new THREE.Vector3(), 200.0)
-        this._attractorStandby = new Attractor(new THREE.Vector3(), -50.0)
-        this._attractorActive = new Attractor(new THREE.Vector3(), 10.0)
+
+        this.modeAttractors = {
+            [NodeGroupModes.Normal]: {
+                global: new Attractor(new THREE.Vector3(), 200.0),
+                standByOuter: new Attractor(new THREE.Vector3(), -50.0),
+            },
+            [NodeGroupModes.Status]: {
+                [NodeStatus.Active]: new Attractor(new THREE.Vector3(-250.0, 0, 0), 200.0),
+                [NodeStatus.Standby]: new Attractor(new THREE.Vector3(280.0, 200, 0), 200.0),
+                '*': new Attractor(new THREE.Vector3(280.0, -200, 0), 200.0),
+            }
+        }
     }
 
     genIdent(node) {
@@ -79,39 +94,55 @@ export class NodeGroup {
         }
     }
 
+    _handleNormalMode(obj, attractors) {
+        const distance = obj.o.position.length()
+        // const toCenter = obj.o.position.clone().normalize()
+        if (distance > this._circleRadius) {
+            // outside the circle everybody want to go back in
+            obj.friction = 0.0
+            obj.attractors = [attractors.global]
+        } else {
+            obj.attractors = []
+            obj.friction = 0.02
+            if (obj.node.status !== NodeStatus.Active) {
+                obj.attractors = [attractors.standByOuter]
+            }
+        }
+    }
+
+    _handleStatusMode(obj, attractors) {
+        obj.attractors = []
+        obj.friction = 0.02
+
+        const bestAttactor = attractors[obj.node.status]
+        if(bestAttactor) {
+            obj.attractors = [bestAttactor]
+        } else {
+            obj.attractors = [attractors['*']]
+        }
+    }
+
+    _updateObject(obj, delta) {
+        obj.nullifyForce()
+
+        const attractors = this.modeAttractors[this.mode]
+        if(this.mode === NodeGroupModes.Normal) {
+            this._handleNormalMode(obj, attractors)
+        } else if(this.mode === NodeGroupModes.Status) {
+            this._handleStatusMode(obj, attractors)
+        }
+
+        this._repelForceCalculation(obj)
+
+        // update
+        obj.update(delta)
+    }
+
     update(dt) {
         if (isNaN(dt)) {
             return
         }
-
-        for (const obj of _.values(this._tracker)) {
-            obj.nullifyForce()
-
-            const distance = obj.o.position.length()
-            const toCenter = obj.o.position.clone().normalize()
-            if (distance > this._circleRadius) {
-                // outside the circle everybody want to go back in
-                obj.friction = 0.0
-                obj.attractors = [this._attractorGlobal]
-            } else {
-                obj.attractors = []
-                obj.friction = 0.02
-                if (obj.node.status === NodeStatus.Active) {
-                    // obj.attractors = [this._attractorActive]
-                    // active tends to the center
-                    // obj.force.add(toCenter.multiplyScalar(10.0 * obj.normalizedBond))
-                    +toCenter
-                } else {
-                    // other one seeks to go to the frontier
-                    obj.attractors = [this._attractorStandby]
-                }
-            }
-
-            this._repelForceCalculation(obj)
-
-            // update
-            obj.update(dt)
-        }
+        _.forEach(_.values(this._tracker), obj => this._updateObject(obj, dt))
     }
 
     reactEvent(event) {

@@ -1,3 +1,4 @@
+
 /* Headers */
 
 h2 {
@@ -8,6 +9,7 @@ h2 {
 /* Buttons */
 
 button {
+    font-family: 'EXO2', monospace;
     margin: 4px;
     background: transparent;
     border: 1px solid #afd;

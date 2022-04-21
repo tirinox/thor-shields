@@ -15,10 +15,10 @@
         >
         </FPSCounter>
         <div class="control-panel">
-            <button @click="sceneMode='normal'">NORMAL</button>
-            <button @click="sceneMode='status'">STATUS</button>
-            <button @click="sceneMode='provider'">PROVIDER</button>
-            <button @click="sceneMode='bond'">BOND</button>
+            <button @click="setSceneMode('normal')">NORMAL</button>
+            <button @click="setSceneMode('status')">STATUS</button>
+            <button @click="setSceneMode('provider')">PROVIDER</button>
+            <button @click="setSceneMode('bond')">BOND</button>
         </div>
     </div>
 </template>
@@ -204,6 +204,13 @@ export default {
             this.content = new MainScene(this.scene, this)
             // this.content = new TrailTestScene(this.scene, this)
         },
+
+        setSceneMode(mode) {
+            this.sceneMode = mode
+            if(this.content.nodeGroup) {
+                this.content.nodeGroup.mode = mode
+            }
+        }
     },
 
     mounted() {
