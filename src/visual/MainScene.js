@@ -2,7 +2,7 @@ import * as THREE from "three";
 import {NodeGroup} from "@/visual/NodeGroup";
 import {NodeTracker} from "@/helpers/NodeTracker";
 import {NodeEvent} from "@/helpers/NodeEvent";
-import {URLDataSource} from "@/helpers/URLDataSource";
+import {URLDataSource} from "@/helpers/data/URLDataSource";
 import {Config} from "@/config";
 import {clearObject} from "@/helpers/3D";
 
