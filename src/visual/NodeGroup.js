@@ -27,16 +27,27 @@ export class NodeGroup {
         }
 
         this._circleRadius = 350.0
+        const force = 500.0
 
         this.modeAttractors = {
             [NodeGroupModes.Normal]: {
-                global: new Attractor(new THREE.Vector3(), 200.0),
-                standByOuter: new Attractor(new THREE.Vector3(), -50.0),
+                global: new Attractor(new THREE.Vector3(),
+                    force, 0, 0, 0, this._circleRadius),
+                standByOuter: new Attractor(new THREE.Vector3(),
+                    -0.25 * force),
             },
             [NodeGroupModes.Status]: {
-                [NodeStatus.Active]: new Attractor(new THREE.Vector3(-250.0, 0, 0), 200.0),
-                [NodeStatus.Standby]: new Attractor(new THREE.Vector3(280.0, 200, 0), 200.0),
-                '*': new Attractor(new THREE.Vector3(280.0, -200, 0), 200.0),
+                [NodeStatus.Active]: [
+                    new Attractor(new THREE.Vector3(-250.0, 0, 0), force, 0, 0, 0, this._circleRadius),
+                ],
+                [NodeStatus.Standby]: [
+                    new Attractor(new THREE.Vector3(380.0, 200, 0), force, 0, 0, 0, this._circleRadius * 0.3),
+                    new Attractor(new THREE.Vector3(380.0, 200, 0), force * 0.02),
+                ],
+                '*': [
+                    new Attractor(new THREE.Vector3(380.0, -200, 0), force, 0, 0, 0, this._circleRadius * 0.3),
+                    new Attractor(new THREE.Vector3(380.0, -200, 0), force * 0.02),
+                ],
             }
         }
     }
@@ -65,7 +76,7 @@ export class NodeGroup {
         console.info(`Create node ${ident}.`)
 
         const nodeObject = new NodeObject(node)
-        nodeObject.attractor = this._attractor
+        nodeObject.friction = 0.02
         this.parent.add(nodeObject.o)
         this._placeNodeObject(nodeObject)
         this._tracker[ident] = nodeObject
@@ -99,11 +110,9 @@ export class NodeGroup {
         // const toCenter = obj.o.position.clone().normalize()
         if (distance > this._circleRadius) {
             // outside the circle everybody want to go back in
-            obj.friction = 0.0
             obj.attractors = [attractors.global]
         } else {
             obj.attractors = []
-            obj.friction = 0.02
             if (obj.node.status !== NodeStatus.Active) {
                 obj.attractors = [attractors.standByOuter]
             }
@@ -112,13 +121,12 @@ export class NodeGroup {
 
     _handleStatusMode(obj, attractors) {
         obj.attractors = []
-        obj.friction = 0.02
 
-        const bestAttactor = attractors[obj.node.status]
-        if(bestAttactor) {
-            obj.attractors = [bestAttactor]
+        const bestAttractors = attractors[obj.node.status]
+        if (bestAttractors) {
+            obj.attractors = bestAttractors
         } else {
-            obj.attractors = [attractors['*']]
+            obj.attractors = attractors['*']
         }
     }
 
@@ -126,9 +134,9 @@ export class NodeGroup {
         obj.nullifyForce()
 
         const attractors = this.modeAttractors[this.mode]
-        if(this.mode === NodeGroupModes.Normal) {
+        if (this.mode === NodeGroupModes.Normal) {
             this._handleNormalMode(obj, attractors)
-        } else if(this.mode === NodeGroupModes.Status) {
+        } else if (this.mode === NodeGroupModes.Status) {
             this._handleStatusMode(obj, attractors)
         }
 
