@@ -5,6 +5,7 @@ import {NodeEvent} from "@/helpers/NodeEvent";
 import {URLDataSource} from "@/helpers/data/URLDataSource";
 import {Config} from "@/config";
 import {clearObject} from "@/helpers/3D";
+import {IPAddressInfoLoader} from "@/helpers/data/IPAddressInfo";
 
 export class MainScene {
     constructor(scene, vueComp) {
@@ -26,6 +27,8 @@ export class MainScene {
         }
 
         this.dataSource.run()
+
+        this.ipAddressLoader = new IPAddressInfoLoader()
     }
 
     _makeSomeLight() {
@@ -35,6 +38,14 @@ export class MainScene {
 
         const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
         this.scene.add(ambientLight);
+    }
+
+    async _loadAdditionalInfoAbout(obj) {
+        const ipAddress = obj.node.ip_address
+        if(ipAddress) {
+            // todo: request limit => use own API
+            obj.ipInfo = await this.ipAddressLoader.load(ipAddress)
+        }
     }
 
     handleData(nodes) {
@@ -51,7 +62,8 @@ export class MainScene {
             const node = event.node
             if (node.node_address) {
                 if (event.type === NodeEvent.EVENT_TYPE.CREATE) {
-                    this.nodeGroup.createNewNode(node)
+                    const obj = this.nodeGroup.createNewNode(node)
+                    this._loadAdditionalInfoAbout(obj).then()
                 } else if (event.type === NodeEvent.EVENT_TYPE.DESTROY) {
                     this.nodeGroup.destroyNode(node)
                 } else {

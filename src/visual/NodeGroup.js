@@ -7,15 +7,17 @@ import {clearObject} from "@/helpers/3D";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import {Config} from "@/config";
+import CirclePacker from "circlepacker";
 
 export const NodeGroupModes = Object.freeze({
     Normal: 'normal',
-    Status: 'status'
+    Status: 'status',
+    Provider: 'provider',
 })
 
 export class NodeGroup {
     constructor(parent) {
-        this.mode = NodeGroupModes.Normal
+        this._mode = NodeGroupModes.Normal
         this.parent = parent
         this._tracker = {}
         this._currentIdent = 0
@@ -28,6 +30,8 @@ export class NodeGroup {
 
         this._circleRadius = 350.0
         const force = 500.0
+
+        this._attractorBanish = new Attractor(new THREE.Vector3(), -100.0)
 
         this.modeAttractors = {
             [NodeGroupModes.Normal]: {
@@ -48,7 +52,8 @@ export class NodeGroup {
                     new Attractor(new THREE.Vector3(380.0, -200, 0), force, 0, 0, 0, this._circleRadius * 0.3),
                     new Attractor(new THREE.Vector3(380.0, -200, 0), force * 0.02),
                 ],
-            }
+            },
+            [NodeGroupModes.Provider]: {},
         }
     }
 
@@ -68,9 +73,10 @@ export class NodeGroup {
 
     createNewNode(node) {
         const ident = this.genIdent(node)
-        if (this.findNodeObject(ident)) {
+        const existing = this.findNodeObject(ident)
+        if (existing) {
             console.warn('NodeObject already exists. No nothing')
-            return
+            return existing
         }
 
         console.info(`Create node ${ident}.`)
@@ -80,6 +86,7 @@ export class NodeGroup {
         this.parent.add(nodeObject.o)
         this._placeNodeObject(nodeObject)
         this._tracker[ident] = nodeObject
+        return nodeObject
     }
 
     destroyNode(node) {
@@ -98,7 +105,7 @@ export class NodeGroup {
 
     _repelForceCalculation(obj) {
         const forceMult = 101.0
-        for (const otherObj of _.values(this._tracker)) {
+        for (const otherObj of this.nodeObjList) {
             if (otherObj !== obj) {
                 obj.repel(otherObj, forceMult)
             }
@@ -130,14 +137,96 @@ export class NodeGroup {
         }
     }
 
+    _handleProviderMode(obj, attractors) {
+        if (!obj) {
+            return;
+        }
+
+        if (!obj.ipInfo || !obj.ipInfo.asname) {
+            obj.attractors = [this._attractorBanish]
+            return
+        }
+
+        const attractor = attractors[obj.ipInfo.asname]
+        if (attractor) {
+            obj.attractors = [attractor]
+        } else {
+            obj.attractors = [this._attractorBanish]
+        }
+
+    }
+
+    get defaultAttractor() {
+        return this.modeAttractors[NodeGroupModes.Normal].global
+    }
+
+    set mode(newMode) {
+        this._mode = newMode
+        if (this._mode === NodeGroupModes.Provider) {
+            this._updateProviderAttractors()
+        }
+    }
+
+    _updateProviderAttractors() {
+        const attractors = this.modeAttractors[NodeGroupModes.Provider] = {}
+
+        const providers = {}
+        for (const nodeObj of this.nodeObjList) {
+            const ipInfo = nodeObj.ipInfo
+            if (ipInfo) {
+                const provider = ipInfo.asname
+                const current = providers[provider] ?? 0
+                providers[provider] = current + 1
+            }
+        }
+
+        const cx = 400
+        const cy = 400
+
+        const circles = []
+        for (const [name, count] of _.entries(providers)) {
+            circles.push(
+                {
+                    id: name,
+                    radius: Math.sqrt(count) * 30,
+                    position: {x: Random.getRandomFloat(0, cx * 2), y: Random.getRandomFloat(0, cy * 2)},
+                    isPulledToCenter: true,
+                    isPinned: false
+                },
+            )
+        }
+
+        console.log(circles)
+
+        const packer = new CirclePacker({
+            collisionPasses: 100,
+            centeringPasses: 500,
+
+            target: {x: cx, y: cy},
+            bounds: {width: cx * 2, height: cy * 2},
+            continuousMode: false,
+            circles,
+            onMove: (poses) => {
+                for (const [name, circle] of _.entries(poses)) {
+                    const target = new THREE.Vector3(circle.position.x - cx, circle.position.y - cy, 0.0)
+                    attractors[name] = new Attractor(target,
+                        800.0, 0, 0, 0.0, circle.radius)
+                }
+            }
+        })
+        packer.update()
+    }
+
     _updateObject(obj, delta) {
         obj.nullifyForce()
 
-        const attractors = this.modeAttractors[this.mode]
-        if (this.mode === NodeGroupModes.Normal) {
+        const attractors = this.modeAttractors[this._mode]
+        if (this._mode === NodeGroupModes.Normal) {
             this._handleNormalMode(obj, attractors)
-        } else if (this.mode === NodeGroupModes.Status) {
+        } else if (this._mode === NodeGroupModes.Status) {
             this._handleStatusMode(obj, attractors)
+        } else if (this._mode === NodeGroupModes.Provider) {
+            this._handleProviderMode(obj, attractors)
         }
 
         this._repelForceCalculation(obj)
@@ -150,7 +239,11 @@ export class NodeGroup {
         if (isNaN(dt)) {
             return
         }
-        _.forEach(_.values(this._tracker), obj => this._updateObject(obj, dt))
+        _.forEach(this.nodeObjList, obj => this._updateObject(obj, dt))
+    }
+
+    get nodeObjList() {
+        return _.values(this._tracker)
     }
 
     reactEvent(event) {
@@ -169,7 +262,7 @@ export class NodeGroup {
 
     dispose() {
         clearObject(this.parent)
-        for (const otherObj of _.values(this._tracker)) {
+        for (const otherObj of this.nodeObjList) {
             otherObj.dispose()
         }
         this._tracker = {}

@@ -8,7 +8,6 @@
 import MainScreen from "@/components/MainScreen";
 import {preloadFont} from "troika-three-text";
 import {Config} from "@/config";
-import {IPAddressInfoLoader} from "@/helpers/data/IPAddressInfo";
 
 export default {
     name: 'App',

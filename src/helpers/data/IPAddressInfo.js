@@ -19,7 +19,7 @@ export class IPAddressInfo {
 }
 
 export class IPAddressInfoLoader {
-    constructor(expireMinutes=10) {
+    constructor(expireMinutes = 24 * 60) {
         this.expireMinutes = expireMinutes
     }
 
@@ -38,7 +38,7 @@ export class IPAddressInfoLoader {
     }
 
     saveToCache(data) {
-        if(!data || !data.ipAddress) {
+        if (!data || !data.ipAddress) {
             console.warn('no data to save!')
             return
         }
@@ -48,7 +48,7 @@ export class IPAddressInfoLoader {
 
     async load(ip) {
         let data = this.loadFromCache(ip)
-        if(data) {
+        if (data) {
             return data
         }
         data = await this.loadFromService(ip)
