@@ -1,18 +1,18 @@
 <template>
     <!--    <THORWorld msg="Hello"/>-->
-    <ThreeTest></ThreeTest>
+    <MainScreen></MainScreen>
 </template>
 
 <script>
 // import THORWorld from "@/components/THORWorld";
-import ThreeTest from "@/components/ThreeTest";
+import MainScreen from "@/components/MainScreen";
 import {preloadFont} from "troika-three-text";
 import {Config} from "@/config";
 
 export default {
     name: 'App',
     components: {
-        ThreeTest,
+        MainScreen,
         // THORWorld
     },
     data() {

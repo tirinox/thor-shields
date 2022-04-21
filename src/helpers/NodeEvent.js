@@ -1,4 +1,4 @@
-const EVENT_TYPE = {
+const EVENT_TYPE = Object.freeze({
     CREATE: 'create',
     DESTROY: 'destroy',
 
@@ -12,7 +12,7 @@ const EVENT_TYPE = {
     BOND_CHANGE: 'bond',
     OBSERVE_CHAIN: 'observe_chains',
     ACTIVE_BLOCK_HEIGHT: 'active_block_height',
-}
+})
 
 export class NodeEvent {
     constructor(type, node, prevNode, currValue, prevValue) {

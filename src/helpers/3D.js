@@ -5,3 +5,9 @@ export function countObjects(parent) {
     });
     return numOfMeshes
 }
+
+export function clearObject(obj) {
+    if(obj) {
+        obj.remove.apply(obj, obj.children);
+    }
+}

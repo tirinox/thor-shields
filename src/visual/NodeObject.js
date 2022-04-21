@@ -4,6 +4,7 @@ import {Random, Util} from "@/helpers/MathUtil";
 import {NodeStatus} from "@/helpers/NodeTracker";
 import {Text} from 'troika-three-text'
 import {Colors, Config} from "@/config";
+import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
 
 // const geometry = new THREE.SphereGeometry(1, 32, 32)
 const geometry = new THREE.IcosahedronGeometry(1, 1)
@@ -11,11 +12,24 @@ const geometry = new THREE.IcosahedronGeometry(1, 1)
 const minScale = 8.0
 const maxScale = 52.0
 
-export class NodeObject {
+export class NodeObject extends PhysicalObject {
     constructor(node) {
+        super()
+
         this.node = node
+
+        this.o = new THREE.Group()
+
+        this._attractor = null
+
+        this._makeSphere()
+        this._makeLabel()
+    }
+
+    _makeSphere() {
+        // color
         let color = 0x111111;
-        const st = node.status
+        const st = this.node.status
         if (st === NodeStatus.Standby) {
             color = 0x167a56
         } else if (st === NodeStatus.Active) {
@@ -30,29 +44,26 @@ export class NodeObject {
         } else if (st === NodeStatus.Unknown) {
             color = 0x111144
         }
-        this.o = new THREE.Group()
 
-        this.material = new THREE.MeshStandardMaterial({color, flatShading: true});
-        this.mesh = new THREE.Mesh(geometry, this.material);
-
-        // 1 = 1 million Rune
-        this.normalizedBond = (Number(node.bond / 10_000_000n)) * 0.0000001
+        // Size (scale): 1 = 1 million Rune
+        this.normalizedBond = (Number(this.node.bond / 10_000_000n)) * 0.0000001
         const scale = Util.clamp(this.normalizedBond * maxScale * 0.8,
             minScale, maxScale)
 
+        this.material = new THREE.MeshStandardMaterial({color, flatShading: true});
+        this.mesh = new THREE.Mesh(geometry, this.material);
         this.mesh.scale.setScalar(scale)
         this.o.add(this.mesh)
+    }
 
-        this.mass = 1.0
-        this.force = new Vector3()
-        this.velocity = new Vector3()
-        this.friction = 0.0
-
-        if (node.node_address && node.node_address.length >= 4) {
+    _makeLabel() {
+        const address = this.node.node_address
+        if (address && address.length >= 4) {
             const nameTextObj = this.nameTextObj = new Text()
 
-            nameTextObj.text = node.node_address.slice(-4)
+            nameTextObj.text = address.slice(-4)
             nameTextObj.font = Config.Font.Main
+            nameTextObj.fontWeight = 900
             nameTextObj.fontSize = 15
             nameTextObj.position.z = 40
             nameTextObj.color = 0xFFFFFF
@@ -74,10 +85,10 @@ export class NodeObject {
     }
 
     update(dt) {
-        const acceleration = this.force.multiplyScalar(this.mass)
-        this.velocity.copy(this.velocity.clone().add(acceleration.multiplyScalar(dt)))
-        this.velocity.multiplyScalar(Util.clamp(1.0 - this.friction, 0.0, 1.0))
-        this.o.position.copy(this.o.position.clone().add(this.velocity.clone().multiplyScalar(dt)))
+        if(this._attractor) {
+            this._attractor.applyForce(this)
+        }
+        super.update(dt)
     }
 
     reactChain() {

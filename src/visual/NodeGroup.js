@@ -3,6 +3,9 @@ import {NodeObject} from "@/visual/NodeObject";
 import _ from "lodash";
 import {NodeStatus} from "@/helpers/NodeTracker";
 import {NodeEvent} from "@/helpers/NodeEvent";
+import {clearObject} from "@/helpers/3D";
+import {Attractor} from "@/helpers/physics/Attractor";
+import * as THREE from "three";
 
 export class NodeGroup {
     constructor(parent) {
@@ -15,6 +18,8 @@ export class NodeGroup {
             yMin: -40, yMax: 40,
             zMin: 0, zMax: 0,
         }
+
+        this._attractor = new Attractor(new THREE.Vector3(), 1.0)
     }
 
     genIdent(node) {
@@ -54,28 +59,17 @@ export class NodeGroup {
             return
         }
 
-        console.info(`Create node ${nodeAddress}.`)
+        console.info(`Destroy node ${nodeAddress}.`)
         nodeObject.dispose()
         this.parent.remove(nodeObject.o)
         delete this._tracker[nodeAddress]
     }
 
     _repelForceCalculation(obj) {
-        const forceMult = 100
+        const forceMult = 101.0
         for(const otherObj of _.values(this._tracker)) {
-            if(otherObj !== obj) {
-                const d = obj.o.position.distanceTo(otherObj.o.position)
-                const minDistance = obj.radius + otherObj.radius
-                if(d < minDistance) {
-                    // console.log(d, minDistance)
-                    const lineDir = obj.o.position
-                        .clone()
-                        .sub(otherObj.o.position)
-                        .normalize()
-                        .multiplyScalar(forceMult)
-                    obj.force.add(lineDir)
-                    otherObj.force.add(lineDir.negate())
-                }
+            if (otherObj !== obj) {
+                obj.repel(otherObj, forceMult)
             }
         }
     }
@@ -133,5 +127,13 @@ export class NodeGroup {
                 obj.reactSlash()
             }
         }
+    }
+
+    dispose() {
+        clearObject(this.parent)
+        for(const otherObj of _.values(this._tracker)) {
+            otherObj.dispose()
+        }
+        this._tracker = {}
     }
 }

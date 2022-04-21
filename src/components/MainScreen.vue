@@ -19,21 +19,21 @@
 
 <script>
 
+import "@/css/common.css"
 import * as THREE from "three"
-import {URLDataSource} from "@/helpers/URLDataSource";
 import {Config} from "@/config";
-import {NodeTracker} from "@/helpers/NodeTracker";
-import {NodeEvent} from "@/helpers/NodeEvent";
-import {NodeGroup} from "@/visual/NodeGroup";
 import {TWEEN} from "three/examples/jsm/libs/tween.module.min";
 import CameraControls from "camera-controls";
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import FPSCounter from "@/components/parts/FPSCounter";
+import {MainScene} from "@/visual/MainScene";
+import _ from "lodash";
+// import {TrailTestScene} from "@/visual/TrailTestScene";
 
 export default {
-    name: 'ThreeTest',
+    name: 'MainScreen',
     components: {FPSCounter},
     props: {},
 
@@ -50,8 +50,6 @@ export default {
     },
 
     methods: {
-
-
         onKeyDown(event) {
             if (event.code === 'KeyR') {
                 this.resetCamera()
@@ -112,12 +110,15 @@ export default {
         },
 
         render() {
+            this.resizeRendererToDisplaySize(this.renderer)
+
             const delta = this.clock.getDelta();
             this.$refs.fps.update(delta, this.scene)
             this.controls.update(delta);
-            this.nodeGroup.update(delta)
+            this.content.update(delta)
+
             TWEEN.update(delta)
-            this.resizeRendererToDisplaySize(this.renderer);
+
             this.composer.render(delta)
 
             requestAnimationFrame(this.render);
@@ -147,13 +148,13 @@ export default {
         },
 
         makeSkybox() {
-            const r = '/texture/skybox/star/';
+            const baseURL = Config.Scene.Sky.SkyBox
 
-            const urls = [
-                r + 'right.png', r + 'left.png',
-                r + 'top.png', r + 'bottom.png',
-                r + 'back.png', r + 'front.png'
-            ];
+            const urls = _.map([
+                'right.png', 'left.png',
+                'top.png', 'bottom.png',
+                'back.png', 'front.png'
+            ], (name) => `${baseURL}/${name}`);
 
             this.scene.background = new THREE.CubeTextureLoader().load(urls)
         },
@@ -187,57 +188,15 @@ export default {
         },
 
         buildScene() {
-            const light = new THREE.DirectionalLight('hsl(0, 100%, 100%)')
-
             this.scene.add(this.camera)
-            this.scene.add(light)
-
-            const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
-            this.scene.add(ambientLight);
-
-            this.nodeGroup = new NodeGroup(this.scene)
-
-            light.position.set(0, 10, 1000)
-
             this.makeSkybox()
+
+            this.content = new MainScene(this.scene, this)
+            // this.content = new TrailTestScene(this.scene, this)
         },
-
-        handleData(nodes) {
-            console.info('Handle Data tick!')
-
-            this.prevNodes = this.nodes
-            this.nodes = nodes
-            const tracker = new NodeTracker(this.prevNodes, this.nodes)
-            const events = tracker.extractEvents()
-
-            for (const event of events) {
-                const node = event.node
-                if (node.node_address) {
-                    if (event.type === NodeEvent.EVENT_TYPE.CREATE) {
-                        this.nodeGroup.createNewNode(node)
-                    } else if (event.type === NodeEvent.EVENT_TYPE.DESTROY) {
-                        this.nodeGroup.destroyNode(node)
-                    } else {
-                        this.nodeGroup.reactEvent(event)
-                    }
-                }
-            }
-
-            if (events.length) {
-                this.$refs.fps.pokeActivity()
-            }
-        },
-
     },
 
     mounted() {
-        // if (!WEBGL.isWebGLAvailable()) {
-        //     const warning = WEBGL.getWebGLErrorMessage();
-        //     this.showFps = false
-        //     document.getElementById('app').appendChild(warning);
-        //     return
-        // }
-
         this.canvas = this.$refs.canvas
 
         this.clock = new THREE.Clock()
@@ -249,17 +208,11 @@ export default {
         this.resizeRendererToDisplaySize()
         this.buildScene()
 
-        this.dataSource = new URLDataSource(Config.DataSource.NodesURL, Config.DataSource.PollPeriod)
-        this.dataSource.callback = (data) => {
-            this.handleData(data)
-        }
-        this.dataSource.run()
-
         requestAnimationFrame(this.render);
     },
 
     unmounted() {
-        this.dataSource.stop()
+        this.content.dispose()
         this.controls.dispose()
     }
 }
