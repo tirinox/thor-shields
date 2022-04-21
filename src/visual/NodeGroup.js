@@ -6,6 +6,7 @@ import {NodeEvent} from "@/helpers/NodeEvent";
 import {clearObject} from "@/helpers/3D";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
+import {Config} from "@/config";
 
 export class NodeGroup {
     constructor(parent) {
@@ -71,7 +72,7 @@ export class NodeGroup {
 
     _repelForceCalculation(obj) {
         const forceMult = 101.0
-        for(const otherObj of _.values(this._tracker)) {
+        for (const otherObj of _.values(this._tracker)) {
             if (otherObj !== obj) {
                 obj.repel(otherObj, forceMult)
             }
@@ -88,14 +89,14 @@ export class NodeGroup {
 
             const distance = obj.o.position.length()
             const toCenter = obj.o.position.clone().normalize()
-            if(distance > this._circleRadius) {
+            if (distance > this._circleRadius) {
                 // outside the circle everybody want to go back in
                 obj.friction = 0.0
                 obj.attractors = [this._attractorGlobal]
             } else {
                 obj.attractors = []
                 obj.friction = 0.02
-                if(obj.node.status === NodeStatus.Active) {
+                if (obj.node.status === NodeStatus.Active) {
                     // obj.attractors = [this._attractorActive]
                     // active tends to the center
                     // obj.force.add(toCenter.multiplyScalar(10.0 * obj.normalizedBond))
@@ -114,19 +115,22 @@ export class NodeGroup {
     }
 
     reactEvent(event) {
-        const obj = this.findNodeObject(event.node.node_address)
-        if(obj) {
-            if(event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
-                obj.reactChain()
-            } else if(event.type === NodeEvent.EVENT_TYPE.SLASH) {
-                obj.reactSlash()
+        const delay = Random.getRandomFloat(0, Config.DataSource.ReactRandomDelay * 1000.0)
+        setTimeout(() => {
+            const obj = this.findNodeObject(event.node.node_address)
+            if (obj) {
+                if (event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
+                    obj.reactChain()
+                } else if (event.type === NodeEvent.EVENT_TYPE.SLASH) {
+                    obj.reactSlash()
+                }
             }
-        }
+        }, delay)
     }
 
     dispose() {
         clearObject(this.parent)
-        for(const otherObj of _.values(this._tracker)) {
+        for (const otherObj of _.values(this._tracker)) {
             otherObj.dispose()
         }
         this._tracker = {}

@@ -2,6 +2,7 @@ export const Config = {
     DataSource: {
         NodesURL: 'https://thornode.ninerealms.com/thorchain/nodes',
         PollPeriod: 3, // sec
+        ReactRandomDelay: 2.5, // sec
     },
     Font: {
         // Main: 'fonts/NorseBold-2Kge.otf'
@@ -16,9 +17,16 @@ export const Config = {
         }
     },
     Controls: {
-        Distance: 1000,
-        AzimuthAngleLimit: 30,
-        PolarAngleLimit: 35,
+        Camera: {
+            Distance: {
+                Min: 800,
+                Max: 2500,
+                Start: 1000,
+            },
+            AzimuthAngleLimit: 30,
+            PolarAngleLimit: 35,
+        },
+
     },
     Scene: {
         Sky: {

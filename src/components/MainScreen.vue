@@ -14,6 +14,12 @@
             ref="fps"
         >
         </FPSCounter>
+        <div class="control-panel">
+            <button @click="sceneMode='normal'">NORMAL</button>
+            <button @click="sceneMode='status'">STATUS</button>
+            <button @click="sceneMode='provider'">PROVIDER</button>
+            <button @click="sceneMode='bond'">BOND</button>
+        </div>
     </div>
 </template>
 
@@ -46,6 +52,8 @@ export default {
 
             mouseEnterX: 0,
             mouseEnterY: 0,
+
+            sceneMode: 'normal',
         }
     },
 
@@ -126,17 +134,19 @@ export default {
 
         createCamera() {
             this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
-                0.001, 2000);
+                0.001, Config.Controls.Camera.Distance.Max * 2);
             // this.camera = new THREE.OrthographicCamera()
-            this.camera.position.z = 1000
+            this.camera.position.z = Config.Controls.Camera.Distance.Start
         },
 
         createCameraControl() {
             const controls = this.controls = new CameraControls(this.camera, this.renderer.domElement);
-            const cfg = Config.Controls
+            const cfg = Config.Controls.Camera
 
-            controls.minDistance = cfg.Distance
-            controls.maxDistance = cfg.Distance
+            controls.dragToOffset = true
+            controls.minDistance = cfg.Distance.Min
+            controls.maxDistance = cfg.Distance.Max
+            this.camera.position.z = cfg.Distance.Start
 
             controls.minAzimuthAngle = THREE.MathUtils.degToRad(-cfg.AzimuthAngleLimit)
             controls.maxAzimuthAngle = THREE.MathUtils.degToRad(cfg.AzimuthAngleLimit)
@@ -233,6 +243,12 @@ export default {
 .canvas-holder {
     width: 100%;
     height: 100%;
+}
+
+.control-panel {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
 }
 
 </style>
