@@ -19,7 +19,10 @@ export class NodeGroup {
             zMin: 0, zMax: 0,
         }
 
-        this._attractor = new Attractor(new THREE.Vector3(), 1.0)
+        this._circleRadius = 350.0
+        this._attractorGlobal = new Attractor(new THREE.Vector3(), 200.0)
+        this._attractorStandby = new Attractor(new THREE.Vector3(), -50.0)
+        this._attractorActive = new Attractor(new THREE.Vector3(), 10.0)
     }
 
     genIdent(node) {
@@ -46,6 +49,7 @@ export class NodeGroup {
         console.info(`Create node ${ident}.`)
 
         const nodeObject = new NodeObject(node)
+        nodeObject.attractor = this._attractor
         this.parent.add(nodeObject.o)
         this._placeNodeObject(nodeObject)
         this._tracker[ident] = nodeObject
@@ -79,27 +83,26 @@ export class NodeGroup {
             return
         }
 
-        const circleRadius = 350.0
-
         for (const obj of _.values(this._tracker)) {
-            // set force
+            obj.nullifyForce()
 
             const distance = obj.o.position.length()
-
             const toCenter = obj.o.position.clone().normalize()
-            if(distance > circleRadius) {
+            if(distance > this._circleRadius) {
                 // outside the circle everybody want to go back in
-                obj.force.copy(toCenter.multiplyScalar(-200.0))
                 obj.friction = 0.0
+                obj.attractors = [this._attractorGlobal]
             } else {
-                obj.force.set(0, 0, 0)
+                obj.attractors = []
                 obj.friction = 0.02
                 if(obj.node.status === NodeStatus.Active) {
+                    // obj.attractors = [this._attractorActive]
                     // active tends to the center
-                    obj.force.add(toCenter.multiplyScalar(-10.0 * obj.normalizedBond))
+                    // obj.force.add(toCenter.multiplyScalar(10.0 * obj.normalizedBond))
+                    +toCenter
                 } else {
                     // other one seeks to go to the frontier
-                    obj.force.add(toCenter.multiplyScalar(50.0))
+                    obj.attractors = [this._attractorStandby]
                 }
             }
 
@@ -107,14 +110,6 @@ export class NodeGroup {
 
             // update
             obj.update(dt)
-        }
-
-        // todo: remove
-        if(Math.random() > 0.9) {
-            const obj = Random.getRandomSample(_.values(this._tracker))
-            if(obj) {
-                obj.reactChain()
-            }
         }
     }
 

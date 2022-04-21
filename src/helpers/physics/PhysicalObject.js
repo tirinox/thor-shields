@@ -8,13 +8,18 @@ export class PhysicalObject {
         this.velocity = new Vector3()
         this.friction = 0.0
         this.o = null
+        this.attractors = []
     }
 
     update(dt) {
+        if(this.attractors.forEach) {
+            this.attractors.forEach(attr => attr.applyForce(this))
+        }
+
         const acceleration = this.force.multiplyScalar(this.mass)
         this.velocity.copy(this.velocity.clone().add(acceleration.multiplyScalar(dt)))
         this.velocity.multiplyScalar(Util.clamp(1.0 - this.friction, 0.0, 1.0))
-        this.realObject.position.copy(this.o.position.clone().add(this.velocity.clone().multiplyScalar(dt)))
+        this.realObject.position.add(this.velocity.clone().multiplyScalar(dt))
     }
 
     nullifyForce() {
@@ -27,6 +32,10 @@ export class PhysicalObject {
 
     get radius() {
         return 1.0
+    }
+
+    applyForceTo(direction, force) {
+        this.force.add(direction.copy().multiplyScalar(force))
     }
 
     repel(physObj, forceMult = 100.0) {

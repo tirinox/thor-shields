@@ -20,7 +20,7 @@ export class NodeObject extends PhysicalObject {
 
         this.o = new THREE.Group()
 
-        this._attractor = null
+        this.attractors = []
 
         this._makeSphere()
         this._makeLabel()
@@ -82,13 +82,6 @@ export class NodeObject extends PhysicalObject {
 
     get radius() {
         return this.mesh.scale.x
-    }
-
-    update(dt) {
-        if(this._attractor) {
-            this._attractor.applyForce(this)
-        }
-        super.update(dt)
     }
 
     reactChain() {
