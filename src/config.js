@@ -33,7 +33,7 @@ export const Config = {
         }
     },
     Physics: {
-        BaseForce: 1100.0,
+        BaseForce: 1500.0,
     }
 }
 

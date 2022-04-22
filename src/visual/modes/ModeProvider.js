@@ -3,6 +3,7 @@ import {CirclePackMy} from "@/helpers/physics/CirclePack";
 import _ from "lodash";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
+import {Config} from "@/config";
 
 const UNKNOWN = 'unknown'
 
@@ -10,6 +11,8 @@ export class ModeProvider extends ModeBase {
     constructor() {
         super();
         this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), -100.0)
+        this.attractors = {}
+        this.force = Config.Physics.BaseForce
     }
 
     updateProviderAttractors(objList) {

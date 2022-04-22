@@ -10,6 +10,7 @@ export class ModeStatus extends ModeBase {
     constructor() {
         super();
 
+        this._circleRadius = 350.0
         const force = Config.Physics.BaseForce
         this.attractors = {
             [NodeStatus.Active]: [
