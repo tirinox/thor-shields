@@ -7,7 +7,7 @@ import {clearObject} from "@/helpers/3D";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import {Config} from "@/config";
-import CirclePacker from "circlepacker";
+import {CirclePack} from "@/helpers/physics/CirclePack";
 
 export const NodeGroupModes = Object.freeze({
     Normal: 'normal',
@@ -153,7 +153,6 @@ export class NodeGroup {
         } else {
             obj.attractors = [this._attractorBanish]
         }
-
     }
 
     get defaultAttractor() {
@@ -168,8 +167,6 @@ export class NodeGroup {
     }
 
     _updateProviderAttractors() {
-        const attractors = this.modeAttractors[NodeGroupModes.Provider] = {}
-
         const providers = {}
         for (const nodeObj of this.nodeObjList) {
             const ipInfo = nodeObj.ipInfo
@@ -180,41 +177,19 @@ export class NodeGroup {
             }
         }
 
-        const cx = 400
-        const cy = 400
-
         const circles = []
-        for (const [name, count] of _.entries(providers)) {
-            circles.push(
-                {
-                    id: name,
-                    radius: Math.sqrt(count) * 30,
-                    position: {x: Random.getRandomFloat(0, cx * 2), y: Random.getRandomFloat(0, cy * 2)},
-                    isPulledToCenter: true,
-                    isPinned: false
-                },
-            )
+        for(const [name, count] of _.entries(providers)) {
+            circles.push({
+                name,
+                radius: Math.sqrt(count) * 20.0
+            })
         }
 
-        console.log(circles)
-
-        const packer = new CirclePacker({
-            collisionPasses: 100,
-            centeringPasses: 500,
-
-            target: {x: cx, y: cy},
-            bounds: {width: cx * 2, height: cy * 2},
-            continuousMode: false,
-            circles,
-            onMove: (poses) => {
-                for (const [name, circle] of _.entries(poses)) {
-                    const target = new THREE.Vector3(circle.position.x - cx, circle.position.y - cy, 0.0)
-                    attractors[name] = new Attractor(target,
-                        800.0, 0, 0, 0.0, circle.radius)
-                }
-            }
+        const packer = new CirclePack(circles)
+        packer.pack().then((r) => {
+            this.modeAttractors[NodeGroupModes.Provider] = r
+            console.log(JSON.stringify(r, null, 4))
         })
-        packer.update()
     }
 
     _updateObject(obj, delta) {
