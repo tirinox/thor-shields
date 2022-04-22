@@ -65,11 +65,12 @@ export class NodeObject extends PhysicalObject {
             nameTextObj.font = Config.Font.Main
             nameTextObj.fontWeight = 900
             nameTextObj.fontSize = 15
-            nameTextObj.position.z = 40
+            nameTextObj.position.z = 42
             nameTextObj.color = 0xFFFFFF
-            nameTextObj.sync()
             nameTextObj.anchorX = 'center'
             nameTextObj.anchorY = 'middle'
+            nameTextObj.outlineWidth = 2.0
+            nameTextObj.sync()
             this.o.add(nameTextObj)
         }
     }
@@ -81,7 +82,8 @@ export class NodeObject extends PhysicalObject {
     }
 
     get radius() {
-        return this.mesh.scale.x
+        // return this.mesh.scale.x
+        return Math.max(this.mesh.scale.x, 15)
     }
 
     reactChain() {

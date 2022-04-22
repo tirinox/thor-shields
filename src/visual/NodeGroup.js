@@ -29,9 +29,9 @@ export class NodeGroup {
         }
 
         this._circleRadius = 350.0
-        const force = 500.0
+        const force = 1500.0
 
-        this._attractorBanish = new Attractor(new THREE.Vector3(), -100.0)
+        this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), 100.0)
 
         this.modeAttractors = {
             [NodeGroupModes.Normal]: {
@@ -42,15 +42,15 @@ export class NodeGroup {
             },
             [NodeGroupModes.Status]: {
                 [NodeStatus.Active]: [
-                    new Attractor(new THREE.Vector3(-250.0, 0, 0), force, 0, 0, 0, this._circleRadius),
+                    new Attractor(new THREE.Vector3(0.0, 0, 0), force, 0, 0, 0, this._circleRadius),
                 ],
                 [NodeStatus.Standby]: [
-                    new Attractor(new THREE.Vector3(380.0, 200, 0), force, 0, 0, 0, this._circleRadius * 0.3),
-                    new Attractor(new THREE.Vector3(380.0, 200, 0), force * 0.02),
+                    new Attractor(new THREE.Vector3(-500.0, 0, 0), force, 0, 0, 0, this._circleRadius * 0.3),
+                    new Attractor(new THREE.Vector3(-500.0, 0, 0), force * 0.02),
                 ],
                 '*': [
-                    new Attractor(new THREE.Vector3(380.0, -200, 0), force, 0, 0, 0, this._circleRadius * 0.3),
-                    new Attractor(new THREE.Vector3(380.0, -200, 0), force * 0.02),
+                    new Attractor(new THREE.Vector3(500.0, 0, 0), force, 0, 0, 0, this._circleRadius * 0.3),
+                    new Attractor(new THREE.Vector3(500.0, 0, 0), force * 0.02),
                 ],
             },
             [NodeGroupModes.Provider]: {},

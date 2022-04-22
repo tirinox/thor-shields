@@ -7,8 +7,8 @@ export class CirclePack {
     constructor(circles, force=500, fieldSize=2000) {
         this.circles = circles
         this.fieldSize = fieldSize
-        this.centerPasses = 5000
-        this.collisionPasses = 100
+        this.centerPasses = 5
+        this.collisionPasses = 5
         this.force = force
         this.initalRaidus = fieldSize * 0.5 * 0.8
     }
@@ -61,6 +61,9 @@ export class CirclePack {
                 }
             })
             packer.update()
+            // for(let i = 0; i < 10; ++i) {
+            //     packer.update()
+            // }
         })
     }
 }

@@ -6,6 +6,7 @@ import {URLDataSource} from "@/helpers/data/URLDataSource";
 import {Config} from "@/config";
 import {clearObject} from "@/helpers/3D";
 import {IPAddressInfoLoader} from "@/helpers/data/IPAddressInfo";
+import {TitleLabel3D} from "@/visual/TitleLabel3D";
 
 export class MainScene {
     constructor(scene, vueComp) {
@@ -18,6 +19,11 @@ export class MainScene {
         this.nodeGroup = new NodeGroup(this.scene)
 
         this._runDataSource()
+
+        const title = new TitleLabel3D('Active')
+        title.position.z = 200
+        title.position.y = -400
+        this.scene.add(title)
     }
 
     _runDataSource() {
