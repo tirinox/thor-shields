@@ -7,7 +7,8 @@ import {clearObject} from "@/helpers/3D";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import {Config} from "@/config";
-import {CirclePack} from "@/helpers/physics/CirclePack";
+import {Simulation} from "@/helpers/physics/Simulation";
+import {CirclePackMy} from "@/helpers/physics/CirclePack";
 
 export const NodeGroupModes = Object.freeze({
     Normal: 'normal',
@@ -15,12 +16,12 @@ export const NodeGroupModes = Object.freeze({
     Provider: 'provider',
 })
 
-export class NodeGroup {
+export class NodeGroup extends Simulation {
     constructor(parent) {
+        super()
         this._mode = NodeGroupModes.Normal
-        this.parent = parent
-        this._tracker = {}
         this._currentIdent = 0
+        this.parent = parent
 
         this.bounds = {
             xMin: -60, xMax: 60,
@@ -29,7 +30,7 @@ export class NodeGroup {
         }
 
         this._circleRadius = 350.0
-        const force = 1500.0
+        const force = this.force = 1500.0
 
         this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), 100.0)
 
@@ -61,10 +62,6 @@ export class NodeGroup {
         return node.node_address ?? String(this._currentIdent++)
     }
 
-    findNodeObject(ident) {
-        return this._tracker[ident]
-    }
-
     _placeNodeObject(nodeObject) {
         const pos = Random.randomVector(this.bounds)
         nodeObject.o.position.copy(pos)
@@ -73,7 +70,7 @@ export class NodeGroup {
 
     createNewNode(node) {
         const ident = this.genIdent(node)
-        const existing = this.findNodeObject(ident)
+        const existing = this.getByName(ident)
         if (existing) {
             console.warn('NodeObject already exists. No nothing')
             return existing
@@ -82,16 +79,15 @@ export class NodeGroup {
         console.info(`Create node ${ident}.`)
 
         const nodeObject = new NodeObject(node)
-        nodeObject.friction = 0.02
         this.parent.add(nodeObject.o)
         this._placeNodeObject(nodeObject)
-        this._tracker[ident] = nodeObject
+        this.addObject(ident, nodeObject)
         return nodeObject
     }
 
     destroyNode(node) {
         const nodeAddress = node.node_address ?? node
-        const nodeObject = this.findNodeObject(nodeAddress)
+        const nodeObject = this.getByName(nodeAddress)
         if (!nodeObject) {
             console.error('node not found!')
             return
@@ -100,16 +96,7 @@ export class NodeGroup {
         console.info(`Destroy node ${nodeAddress}.`)
         nodeObject.dispose()
         this.parent.remove(nodeObject.o)
-        delete this._tracker[nodeAddress]
-    }
-
-    _repelForceCalculation(obj) {
-        const forceMult = 101.0
-        for (const otherObj of this.nodeObjList) {
-            if (otherObj !== obj) {
-                obj.repel(otherObj, forceMult)
-            }
-        }
+        super.removeObject(nodeAddress)
     }
 
     _handleNormalMode(obj, attractors) {
@@ -142,21 +129,17 @@ export class NodeGroup {
             return;
         }
 
-        if (!obj.ipInfo || !obj.ipInfo.asname) {
-            obj.attractors = [this._attractorBanish]
-            return
+        let groupName = 'unknown'
+        if (obj.ipInfo && obj.ipInfo.asname) {
+            groupName = obj.ipInfo.asname
         }
 
-        const attractor = attractors[obj.ipInfo.asname]
+        const attractor = attractors[groupName]
         if (attractor) {
             obj.attractors = [attractor]
         } else {
             obj.attractors = [this._attractorBanish]
         }
-    }
-
-    get defaultAttractor() {
-        return this.modeAttractors[NodeGroupModes.Normal].global
     }
 
     set mode(newMode) {
@@ -170,31 +153,26 @@ export class NodeGroup {
         const providers = {}
         for (const nodeObj of this.nodeObjList) {
             const ipInfo = nodeObj.ipInfo
-            if (ipInfo) {
-                const provider = ipInfo.asname
-                const current = providers[provider] ?? 0
-                providers[provider] = current + 1
-            }
+            const provider = ipInfo ? ipInfo.asname : 'unknown'
+            const current = providers[provider] ?? 0
+            providers[provider] = current + 1
         }
 
-        const circles = []
-        for(const [name, count] of _.entries(providers)) {
-            circles.push({
-                name,
-                radius: Math.sqrt(count) * 20.0
-            })
+        const packer = new CirclePackMy(1000, 2000, 5000)
+        for (const [name, count] of _.entries(providers)) {
+            packer.addCircle(name, Math.sqrt(+count) * 30.0)
         }
+        const packedPositions = packer.pack()
+        const attractors = {}
+        for (const [name, {position, radius}] of _.entries(packedPositions)) {
+            attractors[name] = new Attractor(position,
+                this.force, 0, 0, 0, radius * 0.7)
+        }
+        this.modeAttractors[NodeGroupModes.Provider] = attractors
 
-        const packer = new CirclePack(circles)
-        packer.pack().then((r) => {
-            this.modeAttractors[NodeGroupModes.Provider] = r
-            console.log(JSON.stringify(r, null, 4))
-        })
     }
 
     _updateObject(obj, delta) {
-        obj.nullifyForce()
-
         const attractors = this.modeAttractors[this._mode]
         if (this._mode === NodeGroupModes.Normal) {
             this._handleNormalMode(obj, attractors)
@@ -204,27 +182,13 @@ export class NodeGroup {
             this._handleProviderMode(obj, attractors)
         }
 
-        this._repelForceCalculation(obj)
-
-        // update
-        obj.update(delta)
-    }
-
-    update(dt) {
-        if (isNaN(dt)) {
-            return
-        }
-        _.forEach(this.nodeObjList, obj => this._updateObject(obj, dt))
-    }
-
-    get nodeObjList() {
-        return _.values(this._tracker)
+        super._updateObject(obj, delta)
     }
 
     reactEvent(event) {
         const delay = Random.getRandomFloat(0, Config.DataSource.ReactRandomDelay * 1000.0)
         setTimeout(() => {
-            const obj = this.findNodeObject(event.node.node_address)
+            const obj = this.getByName(event.node.node_address)
             if (obj) {
                 if (event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
                     obj.reactChain()
@@ -236,10 +200,10 @@ export class NodeGroup {
     }
 
     dispose() {
+        super.dispose()
         clearObject(this.parent)
         for (const otherObj of this.nodeObjList) {
             otherObj.dispose()
         }
-        this._tracker = {}
     }
 }

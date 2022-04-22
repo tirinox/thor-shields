@@ -7,7 +7,6 @@ export class PhysicalObject {
         this.force = new Vector3()
         this.velocity = new Vector3()
         this.friction = 0.0
-        this.o = null
         this.attractors = []
     }
 
@@ -26,16 +25,16 @@ export class PhysicalObject {
         this.force.set(0.0, 0.0, 0.0)
     }
 
-    get realObject() {
-        return this.o
-    }
-
     get radius() {
         return 1.0
     }
 
     applyForceTo(direction, force) {
         this.force.add(direction.copy().multiplyScalar(force))
+    }
+
+    get realObject() {
+        return this
     }
 
     repel(physObj, forceMult = 100.0) {

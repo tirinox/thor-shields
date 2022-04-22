@@ -17,10 +17,13 @@ export class NodeObject extends PhysicalObject {
         super()
 
         this.node = node
+        this.normalizedBond = (Number(this.node.bond / 10_000_000n)) * 0.0000001
 
         this.o = new THREE.Group()
 
         this.attractors = []
+        // this.mass = this.normalizedBond * 2.0
+        this.friction = 0.02
 
         this._makeSphere()
         this._makeLabel()
@@ -46,7 +49,6 @@ export class NodeObject extends PhysicalObject {
         }
 
         // Size (scale): 1 = 1 million Rune
-        this.normalizedBond = (Number(this.node.bond / 10_000_000n)) * 0.0000001
         const scale = Util.clamp(this.normalizedBond * maxScale * 0.8,
             minScale, maxScale)
 
@@ -54,6 +56,10 @@ export class NodeObject extends PhysicalObject {
         this.mesh = new THREE.Mesh(geometry, this.material);
         this.mesh.scale.setScalar(scale)
         this.o.add(this.mesh)
+    }
+
+    get realObject() {
+        return this.o
     }
 
     _makeLabel() {

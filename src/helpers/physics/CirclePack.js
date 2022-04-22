@@ -1,69 +1,73 @@
-import _ from "lodash";
-import CirclePacker from "circlepacker";
 import * as THREE from "three";
+import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
 import {Attractor} from "@/helpers/physics/Attractor";
+import {Simulation} from "@/helpers/physics/Simulation";
+import _ from "lodash";
 
-export class CirclePack {
-    constructor(circles, force=500, fieldSize=2000) {
-        this.circles = circles
-        this.fieldSize = fieldSize
-        this.centerPasses = 5
-        this.collisionPasses = 5
+
+class VirtualObject extends PhysicalObject {
+    constructor(x, y, r, name, attractor) {
+        super();
+        this.name = name
+        this.position = new THREE.Vector3(x, y, 0)
+        this._radius = r
+        this.attractors = [attractor]
+    }
+
+    get radius() {
+        return this._radius
+    }
+}
+
+export class CirclePackMy {
+    constructor(force, boundRadius, iterSteps = 1000) {
         this.force = force
-        this.initalRaidus = fieldSize * 0.5 * 0.8
+        this.boundRadius = boundRadius
+        this.cicles = []
+        this.iterSteps = iterSteps
+        this.dt = 0.05
+    }
+
+    addCircle(name, radius) {
+        this.cicles.push({
+            name, radius
+        })
     }
 
     pack() {
-        if(!this.circles.length) {
-            return []
+        if (!this.cicles.length) {
+            return
         }
 
-        const center = this.fieldSize * 0.5
-        const deltaAngle = 3.1415 * 2 / this.circles.length
-        let angle = 0.0
+        const deltaAngle = Math.PI * 2 / this.cicles.length
+        const r = this.boundRadius * 0.5 * 0.8
 
-        const circles = []
-        for (const circle of this.circles) {
-            circles.push(
-                {
-                    id: circle.name,
-                    radius: circle.radius,
-                    position: {
-                        x: center + this.initalRaidus * Math.cos(angle),
-                        y: center +this.initalRaidus * Math.sin(angle)
-                    },
-                    isPulledToCenter: false,
-                    isPinned: false
-                },
+        let angle = 0.0
+        const attractor = new Attractor(new THREE.Vector3(), this.force, 0, 0, -1, 0)
+        const simulation = new Simulation()
+        for (const {name, radius} of this.cicles) {
+            simulation.addObject(
+                name,
+                new VirtualObject(
+                    r * Math.cos(angle),
+                    r * Math.sin(angle),
+                    radius,
+                    name,
+                    attractor
+                )
             )
             angle += deltaAngle
         }
 
-        console.log(circles)
+        simulation.doNSteps(this.iterSteps, this.dt)
 
-        return new Promise((resolve) => {
-            const packer = new CirclePacker({
-                collisionPasses: this.collisionPasses,
-                centeringPasses: this.centerPasses,
-                target: {x: center, y: center},
-                bounds: {width: this.fieldSize, height: this.fieldSize},
-                continuousMode: false,
-                circles,
-                onMove: (poses) => {
-                    const attractors = {}
-                    for (const [name, circle] of _.entries(poses)) {
-                        const target = new THREE.Vector3(circle.position.x - center, circle.position.y - center, 0.0)
-                        attractors[name] = new Attractor(target,
-                            this.force, 0, 0, 0.0, circle.radius)
-                        attractors[name].name = name
-                    }
-                    resolve(attractors)
-                }
-            })
-            packer.update()
-            // for(let i = 0; i < 10; ++i) {
-            //     packer.update()
-            // }
-        })
+        const results = {}
+        for(const [name, obj] of _.entries(simulation.objects)) {
+            results[name] = {
+                position: obj.position,
+                radius: obj.radius
+            }
+        }
+        return results
     }
 }
