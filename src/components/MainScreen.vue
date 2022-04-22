@@ -18,7 +18,7 @@
             <button @click="setSceneMode('normal')">NORMAL</button>
             <button @click="setSceneMode('status')">STATUS</button>
             <button @click="setSceneMode('provider')">PROVIDER</button>
-            <button @click="setSceneMode('bond')">BOND</button>
+<!--            <button @click="setSceneMode('bond')">BOND</button>-->
         </div>
     </div>
 </template>

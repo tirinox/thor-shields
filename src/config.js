@@ -26,12 +26,14 @@ export const Config = {
             AzimuthAngleLimit: 30,
             PolarAngleLimit: 35,
         },
-
     },
     Scene: {
         Sky: {
             SkyBox: '/texture/skybox/star'
         }
+    },
+    Physics: {
+        BaseForce: 1100.0,
     }
 }
 

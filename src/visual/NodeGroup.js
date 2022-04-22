@@ -1,14 +1,12 @@
 import {Random} from "@/helpers/MathUtil";
 import {NodeObject} from "@/visual/NodeObject";
-import _ from "lodash";
-import {NodeStatus} from "@/helpers/NodeTracker";
 import {NodeEvent} from "@/helpers/NodeEvent";
 import {clearObject} from "@/helpers/3D";
-import {Attractor} from "@/helpers/physics/Attractor";
-import * as THREE from "three";
 import {Config} from "@/config";
 import {Simulation} from "@/helpers/physics/Simulation";
-import {CirclePackMy} from "@/helpers/physics/CirclePack";
+import {ModeNormal} from "@/visual/modes/ModeNormal";
+import {ModeStatus} from "@/visual/modes/ModeStatus";
+import {ModeProvider} from "@/visual/modes/ModeProvider";
 
 export const NodeGroupModes = Object.freeze({
     Normal: 'normal',
@@ -19,42 +17,21 @@ export const NodeGroupModes = Object.freeze({
 export class NodeGroup extends Simulation {
     constructor(parent) {
         super()
-        this._mode = NodeGroupModes.Normal
+
         this._currentIdent = 0
         this.parent = parent
 
-        this.bounds = {
+        this._modeNormal = new ModeNormal()
+        this._modeStatus = new ModeStatus()
+        this._modeProvider = new ModeProvider()
+
+        this._selectedModeHandler = this._modeNormal
+        this.mode = NodeGroupModes.Normal
+
+        this._startPositionBounds = {
             xMin: -60, xMax: 60,
             yMin: -40, yMax: 40,
             zMin: 0, zMax: 0,
-        }
-
-        this._circleRadius = 350.0
-        const force = this.force = 1500.0
-
-        this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), 100.0)
-
-        this.modeAttractors = {
-            [NodeGroupModes.Normal]: {
-                global: new Attractor(new THREE.Vector3(),
-                    force, 0, 0, 0, this._circleRadius),
-                standByOuter: new Attractor(new THREE.Vector3(),
-                    -0.25 * force),
-            },
-            [NodeGroupModes.Status]: {
-                [NodeStatus.Active]: [
-                    new Attractor(new THREE.Vector3(0.0, 0, 0), force, 0, 0, 0, this._circleRadius),
-                ],
-                [NodeStatus.Standby]: [
-                    new Attractor(new THREE.Vector3(-500.0, 0, 0), force, 0, 0, 0, this._circleRadius * 0.3),
-                    new Attractor(new THREE.Vector3(-500.0, 0, 0), force * 0.02),
-                ],
-                '*': [
-                    new Attractor(new THREE.Vector3(500.0, 0, 0), force, 0, 0, 0, this._circleRadius * 0.3),
-                    new Attractor(new THREE.Vector3(500.0, 0, 0), force * 0.02),
-                ],
-            },
-            [NodeGroupModes.Provider]: {},
         }
     }
 
@@ -63,7 +40,7 @@ export class NodeGroup extends Simulation {
     }
 
     _placeNodeObject(nodeObject) {
-        const pos = Random.randomVector(this.bounds)
+        const pos = Random.randomVector(this._startPositionBounds)
         nodeObject.o.position.copy(pos)
         this.parent.add(nodeObject.o)
     }
@@ -99,89 +76,22 @@ export class NodeGroup extends Simulation {
         super.removeObject(nodeAddress)
     }
 
-    _handleNormalMode(obj, attractors) {
-        const distance = obj.o.position.length()
-        // const toCenter = obj.o.position.clone().normalize()
-        if (distance > this._circleRadius) {
-            // outside the circle everybody want to go back in
-            obj.attractors = [attractors.global]
-        } else {
-            obj.attractors = []
-            if (obj.node.status !== NodeStatus.Active) {
-                obj.attractors = [attractors.standByOuter]
-            }
-        }
-    }
-
-    _handleStatusMode(obj, attractors) {
-        obj.attractors = []
-
-        const bestAttractors = attractors[obj.node.status]
-        if (bestAttractors) {
-            obj.attractors = bestAttractors
-        } else {
-            obj.attractors = attractors['*']
-        }
-    }
-
-    _handleProviderMode(obj, attractors) {
-        if (!obj) {
-            return;
-        }
-
-        let groupName = 'unknown'
-        if (obj.ipInfo && obj.ipInfo.asname) {
-            groupName = obj.ipInfo.asname
-        }
-
-        const attractor = attractors[groupName]
-        if (attractor) {
-            obj.attractors = [attractor]
-        } else {
-            obj.attractors = [this._attractorBanish]
-        }
-    }
-
     set mode(newMode) {
         this._mode = newMode
-        if (this._mode === NodeGroupModes.Provider) {
-            this._updateProviderAttractors()
-        }
-    }
 
-    _updateProviderAttractors() {
-        const providers = {}
-        for (const nodeObj of this.nodeObjList) {
-            const ipInfo = nodeObj.ipInfo
-            const provider = ipInfo ? ipInfo.asname : 'unknown'
-            const current = providers[provider] ?? 0
-            providers[provider] = current + 1
+        if (this._mode === NodeGroupModes.Normal) {
+            this._selectedModeHandler = this._modeNormal
+        } else if(this._mode === NodeGroupModes.Status) {
+            this._selectedModeHandler = this._modeStatus
+        } else if(this._mode === NodeGroupModes.Provider) {
+            this._modeProvider.updateProviderAttractors(this.nodeObjList)
+            this._selectedModeHandler = this._modeProvider
         }
-
-        const packer = new CirclePackMy(1000, 2000, 5000)
-        for (const [name, count] of _.entries(providers)) {
-            packer.addCircle(name, Math.sqrt(+count) * 30.0)
-        }
-        const packedPositions = packer.pack()
-        const attractors = {}
-        for (const [name, {position, radius}] of _.entries(packedPositions)) {
-            attractors[name] = new Attractor(position,
-                this.force, 0, 0, 0, radius * 0.7)
-        }
-        this.modeAttractors[NodeGroupModes.Provider] = attractors
-
+        console.log(`Set Mode: ${newMode}`)
     }
 
     _updateObject(obj, delta) {
-        const attractors = this.modeAttractors[this._mode]
-        if (this._mode === NodeGroupModes.Normal) {
-            this._handleNormalMode(obj, attractors)
-        } else if (this._mode === NodeGroupModes.Status) {
-            this._handleStatusMode(obj, attractors)
-        } else if (this._mode === NodeGroupModes.Provider) {
-            this._handleProviderMode(obj, attractors)
-        }
-
+        this._selectedModeHandler.handleObject(obj)
         super._updateObject(obj, delta)
     }
 
