@@ -40,7 +40,8 @@ export class NodeGroup extends Simulation {
     }
 
     _placeNodeObject(nodeObject) {
-        const pos = Random.randomVector(this._startPositionBounds)
+        // const pos = Random.randomVector(this._startPositionBounds)
+        const pos = Random.randomOnCircle(2000.0)
         nodeObject.o.position.copy(pos)
         this.parent.add(nodeObject.o)
     }

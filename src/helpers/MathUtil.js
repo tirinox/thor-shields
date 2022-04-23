@@ -1,4 +1,5 @@
 import {Vector3} from "three";
+import _ from "lodash";
 
 export function defaultValue(x, defaultValue) {
     return x === undefined ? defaultValue : x
@@ -44,11 +45,114 @@ export class Random {
             Random.getRandomFloat(zMin, zMax),
         )
     }
+
+    static randomOnCircle(r = 100, cx = 0, cy = 0) {
+        const phase = Random.getRandomFloat(0, 2 * Math.PI)
+        return new Vector3(
+            cx + r * Math.cos(phase),
+            cy + r * Math.sin(phase)
+        )
+    }
+}
+
+export class Section {
+    constructor(p1, p2) {
+        this.p1 = p1
+        this.p2 = p2
+    }
+
+    get dx() {
+        return this.p2.x - this.p1.x
+    }
+
+    get dy() {
+        return this.p2.y - this.p1.y
+    }
+
+    whichSide(x, y) {
+        const A = x - this.p1.x;
+        const B = y - this.p1.y;
+        const C = this.dx;
+        const D = this.dy;
+        return Math.sign(A * C - B * D);
+    }
+
+    get center() {
+        return {
+            x: 0.5 * (this.p1.x + this.p2.x),
+            y: 0.5 * (this.p1.y + this.p2.y)
+        }
+    }
+
+    nearestPoint(x, y) {
+        const A = x - this.p1.x;
+        const B = y - this.p1.y;
+        const C = this.dx;
+        const D = this.dy;
+
+        const dot = A * C + B * D;
+        const len_sq = C * C + D * D;
+        let param = -1;
+        if (len_sq !== 0) {
+            param = dot / len_sq;
+        }
+
+        if (param < 0) {
+            x = this.p1.x
+            y = this.p1.y
+        } else if (param > 1) {
+            x = this.p2.x
+            y = this.p2.y
+        } else {
+            x = this.p1.x + param * C;
+            y = this.p1.y + param * D;
+        }
+        return {x, y}
+    }
+
+    pDistance(xo, yo) {
+        const nearestPoint1 = this.nearestPoint(xo, yo)
+        return new Section(nearestPoint1, {x: xo, y: yo}).length
+    }
+
+    get length() {
+        const dx = this.dx
+        const dy = this.dy
+        return Math.sqrt(dx * dx + dy * dy)
+    }
 }
 
 export class Util {
     static clamp(x, xMin, xMax) {
         return Math.min(+xMax, Math.max(+xMin, +x))
+    }
+
+    static centerOf(group) {
+        if (!group || !group.length) {
+            return
+        }
+        let sumX = _.sumBy(group, item => item.x)
+        let sumY = _.sumBy(group, item => item.y)
+        return {
+            x: sumX / group.length,
+            y: sumY / group.length
+        }
+    }
+
+    static _signHelper(p1, p2, p3) {
+        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+    }
+
+    static pointInTriangle(pt, threePts) {
+        const [v1, v2, v3] = threePts
+        const d1 = Util._signHelper(pt, v1, v2);
+        const d2 = Util._signHelper(pt, v2, v3);
+        const d3 = Util._signHelper(pt, v3, v1);
+
+        const hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+        const hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+        return !(hasNeg && hasPos);
     }
 }
 
