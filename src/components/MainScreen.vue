@@ -15,9 +15,9 @@
         >
         </FPSCounter>
         <div class="control-panel">
-            <button @click="setSceneMode('normal')">NORMAL</button>
-            <button @click="setSceneMode('status')">STATUS</button>
-            <button @click="setSceneMode('provider')">PROVIDER</button>
+            <button @click="setSceneMode('normal')" :class="isButtonSelectedClass('normal')">NORMAL</button>
+            <button @click="setSceneMode('status')" :class="isButtonSelectedClass('status')">STATUS</button>
+            <button @click="setSceneMode('provider')"  :class="isButtonSelectedClass('provider')">PROVIDER</button>
 <!--            <button @click="setSceneMode('bond')">BOND</button>-->
         </div>
     </div>
@@ -28,7 +28,6 @@
 import "@/css/common.css"
 import * as THREE from "three"
 import {Config} from "@/config";
-import {TWEEN} from "three/examples/jsm/libs/tween.module.min";
 import CameraControls from "camera-controls";
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -36,6 +35,7 @@ import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass
 import FPSCounter from "@/components/parts/FPSCounter";
 import {MainScene} from "@/visual/MainScene";
 import _ from "lodash";
+import TWEEN from "tween";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
 export default {
@@ -125,7 +125,7 @@ export default {
             this.controls.update(delta);
             this.content.update(delta)
 
-            TWEEN.update(delta)
+            TWEEN.update()
 
             this.composer.render(delta)
 
@@ -210,6 +210,12 @@ export default {
             if(this.content.nodeGroup) {
                 this.content.nodeGroup.mode = mode
             }
+        },
+
+        isButtonSelectedClass(modeName) {
+            return {
+                'button-selected': this.sceneMode === modeName
+            }
         }
     },
 
@@ -256,6 +262,11 @@ export default {
     position: absolute;
     bottom: 4px;
     right: 4px;
+}
+
+.button-selected {
+    border-width: 2px;
+    opacity: 1.0;
 }
 
 </style>
