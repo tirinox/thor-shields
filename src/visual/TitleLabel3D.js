@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import {Text} from 'troika-three-text'
 import {Config} from "@/config";
+import TWEEN from "tween";
 
 export class TitleLabel3D extends THREE.Object3D {
-    constructor(text, scale=20) {
+    constructor(text, scale = 20, rotAngle = -45) {
         super();
         this.text = text
         const t = this.label = new Text()
@@ -16,10 +17,39 @@ export class TitleLabel3D extends THREE.Object3D {
         t.anchorY = 'middle'
         t.text = text
         t.sync()
-        t.rotateX(-1)
+        t.rotateX(THREE.MathUtils.degToRad(rotAngle))
+        this.t = t
         this.add(t)
+        this.animDuration = 500
+        this.animDistance = 1500
+        this.easeType = TWEEN.Easing.Back.Out
     }
 
-    animateIn() {}
-    animateOut() {}
+    animateIn() {
+        this.t.position.z = this.animDistance
+        this.t.material.opacity = 0.0
+
+        new TWEEN.Tween(this.t.position)
+            .to({z: 0}, this.animDuration)
+            .easing(this.easeType)
+            .start()
+
+        new TWEEN.Tween(this.t.material)
+            .to({opacity: 1.0}, this.animDuration)
+            .easing(this.easeType)
+            .start()
+    }
+
+    animateOut() {
+        const expandedDuration = this.animDuration * 5
+        new TWEEN.Tween(this.t.position)
+            .to({z: -this.animDistance * 5}, expandedDuration)
+            .easing(this.easeType)
+            .start()
+
+        new TWEEN.Tween(this.t.material)
+            .to({opacity: 0.0}, expandedDuration)
+            .easing(this.easeType)
+            .start()
+    }
 }

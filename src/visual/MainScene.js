@@ -24,6 +24,8 @@ export class MainScene {
         title.position.z = 200
         title.position.y = -400
         this.scene.add(title)
+        title.animateIn()
+        setTimeout(() => title.animateOut(), 2000)
     }
 
     _runDataSource() {
