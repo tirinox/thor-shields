@@ -7,8 +7,8 @@ import {Config} from "@/config";
 const ANY_STATUS = '*'
 
 export class ModeStatus extends ModeBase {
-    constructor() {
-        super();
+    constructor(scene) {
+        super(scene);
 
         this._circleRadius = 350.0
         const force = Config.Physics.BaseForce

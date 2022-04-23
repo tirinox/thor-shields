@@ -1,9 +1,13 @@
 export class ModeBase {
-    constructor() {
-
+    constructor(scene) {
+        this.scene = scene
     }
 
     handleObject(physObj) {
         +physObj // do nothing
+    }
+
+    update(dt) {
+        +dt
     }
 }

@@ -21,9 +21,9 @@ export class NodeGroup extends Simulation {
         this._currentIdent = 0
         this.parent = parent
 
-        this._modeNormal = new ModeNormal()
-        this._modeStatus = new ModeStatus()
-        this._modeProvider = new ModeProvider()
+        this._modeNormal = new ModeNormal(this.parent)
+        this._modeStatus = new ModeStatus(this.parent)
+        this._modeProvider = new ModeProvider(this.parent)
 
         this._selectedModeHandler = this._modeNormal
         this.mode = NodeGroupModes.Normal
@@ -84,7 +84,7 @@ export class NodeGroup extends Simulation {
         } else if(this._mode === NodeGroupModes.Status) {
             this._selectedModeHandler = this._modeStatus
         } else if(this._mode === NodeGroupModes.Provider) {
-            this._modeProvider.updateProviderAttractors(this.nodeObjList)
+            this._modeProvider.createProviderAttractors(this.nodeObjList)
             this._selectedModeHandler = this._modeProvider
         }
         console.log(`Set Mode: ${newMode}`)
@@ -107,6 +107,11 @@ export class NodeGroup extends Simulation {
                 }
             }
         }, delay)
+    }
+
+    update(dt) {
+        this._selectedModeHandler.update(dt)
+        return super.update(dt);
     }
 
     dispose() {

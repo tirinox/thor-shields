@@ -5,8 +5,8 @@ import {Config} from "@/config";
 import {NodeStatus} from "@/helpers/NodeTracker";
 
 export class ModeNormal extends ModeBase {
-    constructor() {
-        super();
+    constructor(scene) {
+        super(scene);
 
         this._circleRadius = 350.0
         const force = Config.Physics.BaseForce

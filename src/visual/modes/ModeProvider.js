@@ -1,5 +1,5 @@
 import {ModeBase} from "@/visual/modes/ModeBase";
-import {CirclePackMy} from "@/helpers/physics/CirclePack";
+import {CirclePack} from "@/helpers/physics/CirclePack";
 import _ from "lodash";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
@@ -8,14 +8,15 @@ import {Config} from "@/config";
 const UNKNOWN = 'unknown'
 
 export class ModeProvider extends ModeBase {
-    constructor() {
-        super();
+    constructor(scene) {
+        super(scene);
         this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), -100.0)
         this.attractors = {}
         this.force = Config.Physics.BaseForce
+        this.circlePacker = new CirclePack(this.force, 1200, 300, 0.02, 1)
     }
 
-    updateProviderAttractors(objList) {
+    createProviderAttractors(objList) {
         const providers = {}
         for (const nodeObj of objList) {
             const ipInfo = nodeObj.ipInfo
@@ -24,16 +25,35 @@ export class ModeProvider extends ModeBase {
             providers[provider] = current + 1
         }
 
-        const packer = new CirclePackMy(1000, 2000, 5000)
-        for (const [name, count] of _.entries(providers)) {
-            packer.addCircle(name, Math.sqrt(+count) * 30.0)
-        }
-        const packedPositions = packer.pack()
+        this.circlePacker.clear()
         this.attractors = {}
-        for (const [name, {position, radius}] of _.entries(packedPositions)) {
-            this.attractors[name] = new Attractor(position,
-                this.force, 0, 0, 0, radius * 0.7)
+        for (const [name, count] of _.entries(providers)) {
+            const circleRadius = Math.sqrt(+count) * 100.0
+            console.log(name, circleRadius)
+
+            this.circlePacker.addCircle(name, circleRadius)
+            this.attractors[name] = new Attractor(new THREE.Vector3(),
+                this.force, 0, 0, 0, Math.sqrt(+count) * 20)
         }
+        this.circlePacker.arrangeAroundCenter()
+        this._transferAttractorsPositionFromPacker()
+    }
+
+    _transferAttractorsPositionFromPacker() {
+        const packedPositions = this.circlePacker.getResults()
+        for (const [name, {position}] of _.entries(packedPositions)) {
+            const attr = this.attractors[name]
+            if (attr) {
+                attr.position.copy(position)
+            } else {
+                console.warn(`no attr for ${name}`)
+            }
+        }
+    }
+
+    update() {
+        // this.circlePacker.pack(dt)
+        this._transferAttractorsPositionFromPacker()
     }
 
     handleObject(physObj) {
@@ -43,16 +63,7 @@ export class ModeProvider extends ModeBase {
             return;
         }
 
-        let groupName = UNKNOWN
-        if (physObj.ipInfo && physObj.ipInfo.asname) {
-            groupName = physObj.ipInfo.asname
-        }
-
-        const attractor = this.attractors[groupName]
-        if (attractor) {
-            physObj.attractors = [attractor]
-        } else {
-            physObj.attractors = [this._attractorBanish]
-        }
+        let groupName = (physObj.ipInfo && physObj.ipInfo.asname) ? physObj.ipInfo.asname : UNKNOWN
+        physObj.attractors = [(this.attractors[groupName] ?? this._attractorBanish)]
     }
 }
