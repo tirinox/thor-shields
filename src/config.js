@@ -21,7 +21,7 @@ export const Config = {
             Distance: {
                 Min: 800,
                 Max: 2500,
-                Start: 1000,
+                Start: 1500,
             },
             AzimuthAngleLimit: 30,
             PolarAngleLimit: 35,
