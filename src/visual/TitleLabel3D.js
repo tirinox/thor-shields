@@ -40,7 +40,7 @@ export class TitleLabel3D extends THREE.Object3D {
             .start()
     }
 
-    animateOut() {
+    animateOut(kill=false) {
         const expandedDuration = this.animDuration * 5
         new TWEEN.Tween(this.t.position)
             .to({z: -this.animDistance * 5}, expandedDuration)
@@ -50,6 +50,10 @@ export class TitleLabel3D extends THREE.Object3D {
         new TWEEN.Tween(this.t.material)
             .to({opacity: 0.0}, expandedDuration)
             .easing(this.easeType)
-            .start()
+            .start().onComplete(() => {
+            if(kill) {
+                this.parent.remove(this)
+            }
+        })
     }
 }

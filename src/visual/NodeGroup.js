@@ -79,6 +79,8 @@ export class NodeGroup extends Simulation {
     set mode(newMode) {
         this._mode = newMode
 
+        this._selectedModeHandler.onLeave()
+
         if (this._mode === NodeGroupModes.Normal) {
             this._selectedModeHandler = this._modeNormal
         } else if(this._mode === NodeGroupModes.Status) {
@@ -87,6 +89,9 @@ export class NodeGroup extends Simulation {
             this._modeProvider.createProviderAttractors(this.nodeObjList)
             this._selectedModeHandler = this._modeProvider
         }
+
+        this._selectedModeHandler.onEnter()
+
         console.log(`Set Mode: ${newMode}`)
     }
 

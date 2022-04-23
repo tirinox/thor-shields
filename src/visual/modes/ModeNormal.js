@@ -32,4 +32,9 @@ export class ModeNormal extends ModeBase {
             }
         }
     }
+
+    onEnter() {
+        this.makeLabel('THORChain', new THREE.Vector3(0, -420, 0), 18)
+        super.onEnter();
+    }
 }

@@ -4,8 +4,9 @@ import _ from "lodash";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import {Config} from "@/config";
+import {providerShortName} from "@/helpers/THORUtil";
 
-const UNKNOWN = 'unknown'
+const UNKNOWN = 'UNKNOWN'
 
 export class ModeProvider extends ModeBase {
     constructor(scene) {
@@ -20,7 +21,7 @@ export class ModeProvider extends ModeBase {
         const providers = {}
         for (const nodeObj of objList) {
             const ipInfo = nodeObj.ipInfo
-            const provider = ipInfo ? ipInfo.asname : UNKNOWN
+            const provider = providerShortName(ipInfo ? ipInfo.asname : UNKNOWN)
             const current = providers[provider] ?? 0
             providers[provider] = current + 1
         }
@@ -37,6 +38,14 @@ export class ModeProvider extends ModeBase {
         }
         this.circlePacker.arrangeAroundCenter()
         this._transferAttractorsPositionFromPacker()
+        this._makeLabels()
+    }
+
+    _makeLabels() {
+        const packedPositions = this.circlePacker.getResults()
+        for (const [name, {position}] of _.entries(packedPositions)) {
+            this.makeLabel(name, new THREE.Vector3(position.x, position.y - 150.0, 200.0), 5)
+        }
     }
 
     _transferAttractorsPositionFromPacker() {
@@ -63,7 +72,9 @@ export class ModeProvider extends ModeBase {
             return;
         }
 
-        let groupName = (physObj.ipInfo && physObj.ipInfo.asname) ? physObj.ipInfo.asname : UNKNOWN
+        let groupName = providerShortName(
+            (physObj.ipInfo && physObj.ipInfo.asname) ? physObj.ipInfo.asname : UNKNOWN
+        )
         physObj.attractors = [(this.attractors[groupName] ?? this._attractorBanish)]
     }
 }

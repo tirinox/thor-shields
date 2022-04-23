@@ -216,6 +216,10 @@ export default {
             return {
                 'button-selected': this.sceneMode === modeName
             }
+        },
+
+        pokeActivity() {
+            this.$refs.fps.pokeActivity()
         }
     },
 
