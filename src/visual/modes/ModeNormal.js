@@ -10,7 +10,7 @@ export class ModeNormal extends ModeBase {
 
         this._circleRadius = 350.0
         const force = Config.Physics.BaseForce
-        this.tcAttractor = new AttractorShape(THORChainLogoShape.triangles(0, 42, 1.8), force)
+        this.tcAttractor = new AttractorShape(THORChainLogoShape.triangles(0, 100, 1.8), force)
     }
 
     handleObject(physObj) {

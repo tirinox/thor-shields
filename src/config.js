@@ -29,7 +29,8 @@ export const Config = {
     },
     Scene: {
         Sky: {
-            SkyBox: '/texture/skybox/star'
+            SkyBox: '/texture/skybox/nebula1',
+            SkyBoxExt: 'jpg',
         }
     },
     Physics: {

@@ -159,11 +159,12 @@ export default {
 
         makeSkybox() {
             const baseURL = Config.Scene.Sky.SkyBox
+            const ext = Config.Scene.Sky.SkyBoxExt
 
             const urls = _.map([
-                'right.png', 'left.png',
-                'top.png', 'bottom.png',
-                'back.png', 'front.png'
+                `right.${ext}`, `left.${ext}`,
+                `top.${ext}`, `bottom.${ext}`,
+                `front.${ext}`, `back.${ext}`
             ], (name) => `${baseURL}/${name}`);
 
             this.scene.background = new THREE.CubeTextureLoader().load(urls)

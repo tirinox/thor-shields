@@ -19,6 +19,7 @@ export class ModeBase {
         titleLabel.position.copy(position)
         this.scene.add(titleLabel)
         this.labels.push(titleLabel)
+        return titleLabel
     }
 
     onEnter() {
