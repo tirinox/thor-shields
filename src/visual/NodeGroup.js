@@ -7,11 +7,13 @@ import {Simulation} from "@/helpers/physics/Simulation";
 import {ModeNormal} from "@/visual/modes/ModeNormal";
 import {ModeStatus} from "@/visual/modes/ModeStatus";
 import {ModeProvider} from "@/visual/modes/ModeProvider";
+import {ModeVersion} from "@/visual/modes/ModeVersion";
 
 export const NodeGroupModes = Object.freeze({
     Normal: 'normal',
     Status: 'status',
     Provider: 'provider',
+    Version: 'version',
 })
 
 export class NodeGroup extends Simulation {
@@ -24,6 +26,7 @@ export class NodeGroup extends Simulation {
         this._modeNormal = new ModeNormal(this.parent)
         this._modeStatus = new ModeStatus(this.parent)
         this._modeProvider = new ModeProvider(this.parent)
+        this._modeVersion = new ModeVersion(this.parent)
 
         this._selectedModeHandler = this._modeNormal
         this.mode = NodeGroupModes.Normal
@@ -84,14 +87,15 @@ export class NodeGroup extends Simulation {
 
         if (this._mode === NodeGroupModes.Normal) {
             this._selectedModeHandler = this._modeNormal
-        } else if(this._mode === NodeGroupModes.Status) {
+        } else if (this._mode === NodeGroupModes.Status) {
             this._selectedModeHandler = this._modeStatus
-        } else if(this._mode === NodeGroupModes.Provider) {
-            this._modeProvider.createProviderAttractors(this.nodeObjList)
+        } else if (this._mode === NodeGroupModes.Provider) {
             this._selectedModeHandler = this._modeProvider
+        } else if(this._mode === NodeGroupModes.Version) {
+            this._selectedModeHandler = this._modeVersion
         }
 
-        this._selectedModeHandler.onEnter()
+        this._selectedModeHandler.onEnter(this.nodeObjList)
 
         console.log(`Set Mode: ${newMode}`)
     }

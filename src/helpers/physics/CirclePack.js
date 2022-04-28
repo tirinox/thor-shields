@@ -24,7 +24,6 @@ export class CirclePack {
     constructor(force, boundRadius, repelForce = 600, friction = 0.02, iterSteps = 1) {
         this.force = force
         this.boundRadius = boundRadius
-        this.cicles = []
         this.iterSteps = iterSteps
         this.dt = 0.05
         this.simulation = new Simulation()
@@ -36,44 +35,46 @@ export class CirclePack {
     }
 
     addCircle(name, radius) {
-        this.cicles.push({
-            name, radius
-        })
+        this.simulation.addObject(
+            name,
+            new VirtualObject(
+                0,
+                0,
+                radius,
+                name,
+                this.metaAttractor,
+                this.friction,
+            )
+        )
     }
 
     arrangeAroundCenter() {
-        if (!this.cicles.length) {
+        if (!this.simulation.size) {
             return this
         }
 
-        const deltaAngle = Math.PI * 2 / this.cicles.length
+        const deltaAngle = Math.PI * 2 / this.simulation.size
         const r = this.boundRadius * 0.5 * 0.8
         let angle = 0.0
 
-        for (const {name, radius} of this.cicles) {
-            this.simulation.addObject(
-                name,
-                new VirtualObject(
-                    r * Math.cos(angle),
-                    r * Math.sin(angle),
-                    radius,
-                    name,
-                    this.metaAttractor,
-                    this.friction,
-                )
-            )
+        for (const name of _.keys(this.simulation.objects)) {
+            const obj = this.simulation.getByName(name)
+            if(obj) {
+                obj.position.x = r * Math.cos(angle)
+                obj.position.y = r * Math.sin(angle)
+            }
+
             angle += deltaAngle
         }
         return this
     }
 
     clear() {
-        this.cicles = []
         this.simulation.dispose()
     }
 
     pack(dt, steps) {
-        if (!this.cicles.length) {
+        if (!this.simulation.size) {
             return this
         }
         dt = dt || this.dt

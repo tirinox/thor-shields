@@ -16,7 +16,28 @@ export class ModeProvider extends ModeBase {
         this.circlePacker = new CirclePack(this.force, 1200, 300, 0.02, 1)
     }
 
-    createProviderAttractors(objList) {
+    update() {
+        // this.circlePacker.pack(dt)
+        this._transferAttractorsPositionFromPacker()
+    }
+
+    handleObject(physObj) {
+        super.handleObject(physObj);
+
+        if (physObj) {
+            let groupName = IPAddressInfoLoader.refineProviderName(
+                (physObj.ipInfo && physObj.ipInfo.providerName) ? physObj.ipInfo.providerName : UNKNOWN
+            )
+            physObj.attractors = [(this.attractors[groupName] ?? this._attractorBanish)]
+        }
+    }
+
+    onEnter(objList) {
+        this._createProviderAttractors(objList)
+        super.onEnter();
+    }
+
+    _createProviderAttractors(objList) {
         const providers = {}
         for (const nodeObj of objList) {
             const ipInfo = nodeObj.ipInfo
@@ -57,23 +78,5 @@ export class ModeProvider extends ModeBase {
                 console.warn(`no attr for ${name}`)
             }
         }
-    }
-
-    update() {
-        // this.circlePacker.pack(dt)
-        this._transferAttractorsPositionFromPacker()
-    }
-
-    handleObject(physObj) {
-        super.handleObject(physObj);
-
-        if (!physObj) {
-            return;
-        }
-
-        let groupName = IPAddressInfoLoader.refineProviderName(
-            (physObj.ipInfo && physObj.ipInfo.providerName) ? physObj.ipInfo.providerName : UNKNOWN
-        )
-        physObj.attractors = [(this.attractors[groupName] ?? this._attractorBanish)]
     }
 }

@@ -17,8 +17,9 @@
         <div class="control-panel">
             <button @click="setSceneMode('normal')" :class="isButtonSelectedClass('normal')">NORMAL</button>
             <button @click="setSceneMode('status')" :class="isButtonSelectedClass('status')">STATUS</button>
-            <button @click="setSceneMode('provider')"  :class="isButtonSelectedClass('provider')">PROVIDER</button>
-<!--            <button @click="setSceneMode('bond')">BOND</button>-->
+            <button @click="setSceneMode('provider')" :class="isButtonSelectedClass('provider')">PROVIDER</button>
+            <button @click="setSceneMode('version')" :class="isButtonSelectedClass('version')">VERSION</button>
+            <!--            <button @click="setSceneMode('bond')">BOND</button>-->
         </div>
     </div>
 </template>
@@ -76,7 +77,7 @@ export default {
                 this.mouseEnterY = y
                 return
             }
-            const scale = 0.0005
+            const scale = Config.Controls.Camera.MouseMoveStrength
             const dx = this.mouseEnterX - x
             const dy = this.mouseEnterY - y
             this.mouseEnterX = x
@@ -208,7 +209,7 @@ export default {
 
         setSceneMode(mode) {
             this.sceneMode = mode
-            if(this.content.nodeGroup) {
+            if (this.content.nodeGroup) {
                 this.content.nodeGroup.mode = mode
             }
         },

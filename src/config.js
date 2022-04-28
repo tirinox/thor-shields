@@ -25,6 +25,7 @@ export const Config = {
             },
             AzimuthAngleLimit: 30,
             PolarAngleLimit: 35,
+            MouseMoveStrength: 0.0002
         },
     },
     Scene: {

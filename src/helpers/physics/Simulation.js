@@ -68,4 +68,8 @@ export class Simulation {
         // }
         this.objects = {}
     }
+
+    get size() {
+        return _.size(this.objects)
+    }
 }
