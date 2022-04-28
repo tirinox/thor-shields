@@ -4,9 +4,8 @@ import _ from "lodash";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import {Config} from "@/config";
-import {providerShortName} from "@/helpers/THORUtil";
+import {IPAddressInfoLoader, UNKNOWN} from "@/helpers/data/IPAddressInfo";
 
-const UNKNOWN = 'UNKNOWN'
 
 export class ModeProvider extends ModeBase {
     constructor(scene) {
@@ -21,7 +20,7 @@ export class ModeProvider extends ModeBase {
         const providers = {}
         for (const nodeObj of objList) {
             const ipInfo = nodeObj.ipInfo
-            const provider = providerShortName(ipInfo ? ipInfo.asname : UNKNOWN)
+            const provider = IPAddressInfoLoader.refineProviderName(ipInfo ? ipInfo.providerName : UNKNOWN)
             const current = providers[provider] ?? 0
             providers[provider] = current + 1
         }
@@ -72,8 +71,8 @@ export class ModeProvider extends ModeBase {
             return;
         }
 
-        let groupName = providerShortName(
-            (physObj.ipInfo && physObj.ipInfo.asname) ? physObj.ipInfo.asname : UNKNOWN
+        let groupName = IPAddressInfoLoader.refineProviderName(
+            (physObj.ipInfo && physObj.ipInfo.providerName) ? physObj.ipInfo.providerName : UNKNOWN
         )
         physObj.attractors = [(this.attractors[groupName] ?? this._attractorBanish)]
     }

@@ -3,38 +3,38 @@ import lscache from "lscache";
 
 export class IPAddressInfo {
     constructor(j) {
-        this.status = j['status']
-        this.ipAddress = j['query']
-        this.message = j['message']
-        this.countryCode = j['countryCode']
-        this.region = j['region']
-        this.regionName = j['regionName']
-        this.city = j['city']
-        this.lat = j['lat']
-        this.lon = j['lon']
-        this.isp = j['isp']
-        this.org = j['org']
-        this.asname = j['asname']
+        this.ipAddress = j['ip']
+        this.countryCode = j['country_code']
+        this.country = j['country']
+        this.latitude = j['latitude']
+        this.longitude = j['longitude']
+        this.providerName = j['org']
     }
 }
+
+
+export const UNKNOWN = 'UNKNOWN'
+
 
 export class IPAddressInfoLoader {
     constructor(expireMinutes = 24 * 60) {
         this.expireMinutes = expireMinutes
+        this._key = 'IPInfo2'
     }
 
     url(ip) {
-        return `http://ip-api.com/json/${ip}?fields=status,message,countryCode,region,regionName,city,lat,lon,isp,org,asname,query`
+        // return `http://ip-api.com/json/${ip}?fields=status,message,countryCode,region,regionName,city,lat,lon,isp,org,asname,query`
+        return `https://settings.thornode.org/api/node/ip/${ip}`
     }
 
     async loadFromService(ip) {
         const r = await axios.get(this.url(ip))
-        console.info(`Loaded IP info for (${ip}) => ${r.data.status}`)
+        console.info(`Loaded IP info for (${ip}) => ${r.status}`)
         return new IPAddressInfo(r.data)
     }
 
     loadFromCache(ip) {
-        return lscache.get('IPInfo:' + ip)
+        return lscache.get(`${this._key}:${ip}`)
     }
 
     saveToCache(data) {
@@ -43,7 +43,7 @@ export class IPAddressInfoLoader {
             return
         }
         const ip = data.ipAddress
-        lscache.set('IPInfo:' + ip, data, this.expireMinutes)
+        lscache.set(`${this._key}:${ip}`, data, this.expireMinutes)
     }
 
     async load(ip) {
@@ -54,5 +54,22 @@ export class IPAddressInfoLoader {
         data = await this.loadFromService(ip)
         this.saveToCache(data)
         return data
+    }
+
+    static refineProviderName(name) {
+        if(name === undefined) {
+            return UNKNOWN
+        }
+        const old = name + ''
+
+        name = name.toUpperCase()
+        for(const component of name.split('-')) {
+            if(component !== 'AS') {
+                return component
+            }
+        }
+        name = name.replace('ONLINE GMBH', '')
+        console.info(old, '=>', name)
+        return name
     }
 }
