@@ -55,16 +55,16 @@ export class CirclePack {
 
         const deltaAngle = Math.PI * 2 / this.simulation.size
         const r = this.boundRadius * 0.5 * 0.8
-        let angle = 0.0
+        let angle = Math.PI * 0.5
 
         for (const name of _.keys(this.simulation.objects)) {
             const obj = this.simulation.getByName(name)
-            if(obj) {
+            if (obj) {
                 obj.position.x = r * Math.cos(angle)
                 obj.position.y = r * Math.sin(angle)
             }
 
-            angle += deltaAngle
+            angle -= deltaAngle
         }
         return this
     }

@@ -4,6 +4,7 @@ import * as THREE from "three";
 import _ from "lodash";
 import {CirclePack} from "@/helpers/physics/CirclePack";
 import {Config} from "@/config";
+import {NodeObject} from "@/visual/NodeObject";
 
 export class ModeVersion extends ModeBase {
     constructor(scene) {
@@ -39,36 +40,41 @@ export class ModeVersion extends ModeBase {
 
     _createVersionAttractors(objList) {
         const versions = {}
-        let mostPopularVersion = '', mostPopularCount = 0
+        let mostPopularVersion = '', mostPopularList = []
         for (const nodeObj of objList) {
             const version = nodeObj.node.version
             if (version === '') {
                 continue
             }
 
-            const current = (versions[version] ?? 0) + 1
+            if(!versions[version]) {
+                versions[version] = []
+            }
 
-            if (current > mostPopularCount) {
-                mostPopularCount = current
+            const currentList = versions[version]
+            currentList.push(nodeObj)
+
+            if (currentList.length > mostPopularList.length) {
+                mostPopularList = currentList
                 mostPopularVersion = version
             }
-            versions[version] = current
         }
 
         this.circlePacker.clear()
         this.attractors = {}
-        for (const [version, count] of _.entries(versions)) {
-            const circleRadius = Math.sqrt(+count) * 130.0
+        for (const [version, items] of _.sortBy(_.entries(versions), [(o) => o[0]])) {
+            const circleRadius = NodeObject.estimateRadiusOfGroup(items)
+
+            this.attractors[version] = new Attractor(new THREE.Vector3(),
+                this.force, 0, 0, 0, circleRadius)
 
             if(version !== mostPopularVersion) {
                 this.circlePacker.addCircle(version, circleRadius)
             }
-            this.attractors[version] = new Attractor(new THREE.Vector3(),
-                this.force, 0, 0, 0, Math.sqrt(+count) * 20)
         }
         this.circlePacker.arrangeAroundCenter()
 
-        const popularRadius = Math.sqrt(+mostPopularCount) * 100.0
+        const popularRadius = NodeObject.estimateRadiusOfGroup(mostPopularList)
         this.circlePacker.addCircle(mostPopularVersion, popularRadius)
 
         this._transferAttractorsPositionFromPacker()
@@ -79,7 +85,12 @@ export class ModeVersion extends ModeBase {
         const packedPositions = this.circlePacker.getResults()
         for (const [version, {position}] of _.entries(packedPositions)) {
             const text = `v. ${version}`
-            this.makeLabel(text, new THREE.Vector3(position.x, position.y - 150.0, 200.0), 5)
+            const attr = this.attractors[version]
+            if(attr) {
+                this.makeLabel(text,
+                    new THREE.Vector3(position.x, position.y + attr.relaxRadius * 1.1, 200.0),
+                    2.5)
+            }
         }
     }
 

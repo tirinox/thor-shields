@@ -5,6 +5,7 @@ import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import {Config} from "@/config";
 import {IPAddressInfoLoader, UNKNOWN} from "@/helpers/data/IPAddressInfo";
+import {NodeObject} from "@/visual/NodeObject";
 
 
 export class ModeProvider extends ModeBase {
@@ -42,19 +43,22 @@ export class ModeProvider extends ModeBase {
         for (const nodeObj of objList) {
             const ipInfo = nodeObj.ipInfo
             const provider = IPAddressInfoLoader.refineProviderName(ipInfo ? ipInfo.providerName : UNKNOWN)
-            const current = providers[provider] ?? 0
-            providers[provider] = current + 1
+
+            if(!providers[provider]) {
+                providers[provider] = [provider]
+            } else {
+                providers[provider].push(provider)
+            }
         }
 
         this.circlePacker.clear()
         this.attractors = {}
-        for (const [name, count] of _.entries(providers)) {
-            const circleRadius = Math.sqrt(+count) * 100.0
-            console.log(name, circleRadius)
+        for (const [name, items] of _.entries(providers)) {
+            const circleRadius = NodeObject.estimateRadiusOfGroup(items)
 
             this.circlePacker.addCircle(name, circleRadius)
             this.attractors[name] = new Attractor(new THREE.Vector3(),
-                this.force, 0, 0, 0, Math.sqrt(+count) * 20)
+                this.force, 0, 0, 0, circleRadius)
         }
         this.circlePacker.arrangeAroundCenter()
         this._transferAttractorsPositionFromPacker()

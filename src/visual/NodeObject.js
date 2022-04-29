@@ -110,4 +110,15 @@ export class NodeObject extends PhysicalObject {
             this.material.color.set(savedColor)
         }, 100)
     }
+
+    static estimateRadiusOfGroup(nodeObjList) {
+        let r = 0.0
+        for(const nodeObj of nodeObjList) {
+            r += nodeObj.radius
+        }
+        const n = nodeObjList.length
+        const avgRadius = r > 0 ? r / n : 0.0
+        const fitRadius = avgRadius * Math.sqrt(n)
+        return Math.max(0.1, fitRadius)
+    }
 }
