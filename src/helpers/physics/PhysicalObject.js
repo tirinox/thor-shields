@@ -46,7 +46,7 @@ export class PhysicalObject {
         const otherPos = physObj.realObject.position
 
         const d = thisPos.distanceTo(otherPos)
-        const minDistance = this.radius + physObj.radius
+        const minDistance = (this.radius + physObj.radius)
         if (d < minDistance) {
             const lineDir = thisPos
                 .clone()

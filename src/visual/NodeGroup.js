@@ -36,6 +36,7 @@ export class NodeGroup extends Simulation {
             yMin: -40, yMax: 40,
             zMin: 0, zMax: 0,
         }
+        this.repelForce = Config.Physics.RepelForce
     }
 
     genIdent(node) {
@@ -121,6 +122,7 @@ export class NodeGroup extends Simulation {
 
     update(dt) {
         this._selectedModeHandler.update(dt)
+        NodeObject.material.uniforms.time.value += dt
         return super.update(dt);
     }
 

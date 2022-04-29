@@ -7,7 +7,7 @@ module.exports = defineConfig({
             rules: [
                 {
                     test: /\.(glsl|vs|fs|frag|vert)$/,
-                    use: 'ts-shader-loader'
+                    use: 'raw-loader'
                 }
             ]
         }

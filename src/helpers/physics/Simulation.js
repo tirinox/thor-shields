@@ -3,7 +3,7 @@ import _ from "lodash";
 export class Simulation {
     constructor() {
         this.objects = {}
-        this.repelForce = 101.0
+        this.repelForce = 501.0
     }
 
     getByName(name) {
