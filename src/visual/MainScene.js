@@ -17,6 +17,7 @@ export class MainScene {
         this._makeSomeLight()
         this.nodeGroup = new NodeGroup(this.scene)
 
+        this._firstTime = true
         this._runDataSource()
     }
 
@@ -43,7 +44,6 @@ export class MainScene {
     async _loadAdditionalInfoAbout(obj) {
         const ipAddress = obj.node.ip_address
         if(ipAddress) {
-            // todo: request limit => use own API
             obj.ipInfo = await this.ipAddressLoader.load(ipAddress)
         }
     }
@@ -70,6 +70,13 @@ export class MainScene {
                     this.nodeGroup.reactEvent(event)
                 }
             }
+        }
+
+        if(this._firstTime) {
+            for(let i = 0; i < Config.Physics.Startup.SimulationSteps; ++i) {
+                this.nodeGroup.update(Config.Physics.Startup.DeltaTime)
+            }
+            this._firstTime = false
         }
 
         if (events.length && this.vueComp) {

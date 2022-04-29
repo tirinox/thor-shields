@@ -45,16 +45,19 @@ export class ModeProvider extends ModeBase {
             const provider = IPAddressInfoLoader.refineProviderName(ipInfo ? ipInfo.providerName : UNKNOWN)
 
             if(!providers[provider]) {
-                providers[provider] = [provider]
+                providers[provider] = [nodeObj]
             } else {
-                providers[provider].push(provider)
+                providers[provider].push(nodeObj)
             }
         }
 
         this.circlePacker.clear()
         this.attractors = {}
-        for (const [name, items] of _.entries(providers)) {
-            const circleRadius = NodeObject.estimateRadiusOfGroup(items) * 2.0
+        const sortedEntries = _.sortBy(_.entries(providers), [(pair) => pair[1].length])
+        // const sortedEntries = _.entries(providers)
+        for (const [name, items] of sortedEntries) {
+            const circleRadius = NodeObject.estimateRadiusOfGroup(items) * 0.9
+            console.log('prov', name, circleRadius)
 
             this.circlePacker.addCircle(name, circleRadius)
             this.attractors[name] = new Attractor(new THREE.Vector3(),
@@ -68,7 +71,7 @@ export class ModeProvider extends ModeBase {
     _makeLabels() {
         const packedPositions = this.circlePacker.getResults()
         for (const [name, {position}] of _.entries(packedPositions)) {
-            this.makeLabel(name, new THREE.Vector3(position.x, position.y - 150.0, 200.0), 5)
+            this.makeLabel(name, new THREE.Vector3(position.x, position.y - 150.0, 60.0), 5)
         }
     }
 

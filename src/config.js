@@ -16,8 +16,8 @@ export const Config = {
     Effects: {
         Bloom: {
             Enabled: true,
-            Strength: 0.5,
-            Threshold: 0.5,
+            Strength: 0.62,
+            Threshold: 0.1,
             Radius: 0.5,
         }
     },
@@ -28,14 +28,14 @@ export const Config = {
                 Max: 2500,
                 Start: 1800,
             },
-            AzimuthAngleLimit: 30,
-            PolarAngleLimit: 35,
+            AzimuthAngleLimit: 60,
+            PolarAngleLimit: 60,
             MouseMoveStrength: 0.0002
         },
     },
     Scene: {
         Sky: {
-            SkyBox: '/texture/skybox/nebula1',
+            SkyBox: '/texture/skybox/star',
             SkyBoxExt: 'jpg',
         },
         NodeObject: {
@@ -47,6 +47,10 @@ export const Config = {
     Physics: {
         BaseForce: 1500.0,
         RepelForce: 200.0,
+        Startup: {
+            SimulationSteps: 400,
+            DeltaTime: 0.1
+        },
     },
 }
 

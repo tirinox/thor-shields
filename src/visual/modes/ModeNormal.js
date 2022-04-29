@@ -19,7 +19,7 @@ export class ModeNormal extends ModeBase {
     }
 
     onEnter() {
-        this.makeLabel('THORChain', new THREE.Vector3(0, -580, -100), 18)
+        this.makeLabel('THORChain', new THREE.Vector3(0, -580, -10), 18)
         super.onEnter();
     }
 }
