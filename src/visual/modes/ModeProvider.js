@@ -54,7 +54,7 @@ export class ModeProvider extends ModeBase {
         this.circlePacker.clear()
         this.attractors = {}
         for (const [name, items] of _.entries(providers)) {
-            const circleRadius = NodeObject.estimateRadiusOfGroup(items)
+            const circleRadius = NodeObject.estimateRadiusOfGroup(items) * 2.0
 
             this.circlePacker.addCircle(name, circleRadius)
             this.attractors[name] = new Attractor(new THREE.Vector3(),
