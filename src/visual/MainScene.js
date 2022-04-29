@@ -72,7 +72,7 @@ export class MainScene {
             }
         }
 
-        if (events.length) {
+        if (events.length && this.vueComp) {
             this.vueComp.pokeActivity()
         }
     }

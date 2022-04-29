@@ -1,6 +1,11 @@
+const Live = false
+
 export const Config = {
     DataSource: {
-        NodesURL: 'https://thornode.ninerealms.com/thorchain/nodes',
+        NodesURL: (Live ?
+                'https://thornode.ninerealms.com/thorchain/nodes' :
+                'http://localhost:8080/data/samplenodes.json'),
+
         PollPeriod: 3, // sec
         ReactRandomDelay: 2.5, // sec
     },
@@ -32,11 +37,17 @@ export const Config = {
         Sky: {
             SkyBox: '/texture/skybox/nebula1',
             SkyBoxExt: 'jpg',
+        },
+        NodeObject: {
+            PlaceScale: 1.0,
+            MaxScale: 84.0,
+            MinScale: 20.0,
         }
     },
     Physics: {
         BaseForce: 1500.0,
-    }
+        RepelForce: 200.0,
+    },
 }
 
 export const Colors = {
