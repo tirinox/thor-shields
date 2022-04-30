@@ -139,7 +139,7 @@ vec4 Shade(float distance)
 float RenderScene(vec3 position, out float distance)
 {
     float noise = Turbulence(position * NoiseFrequency + Animation*time, 0.1, 1.5, 0.03) * NoiseAmplitude;
-    noise = saturate(abs(noise));
+    noise = clamp(abs(noise), 0.0, 1.0);
     distance = SphereDist(position) - noise;
     return noise;
 }
@@ -176,6 +176,7 @@ void main()
     float rotx = 0.0;
     float roty = 0.0;
     float zoom = 4.2;
+
     // camera
     vec3 ro = zoom * normalize(vec3(cos(roty), cos(rotx), sin(roty)));
     vec3 ww = normalize(vec3(0.0, 0.0, 0.0) - ro);

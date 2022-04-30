@@ -1,5 +1,6 @@
 
 import BgShader from '@/visual/shader/bg_1.frag'
+// import BgShader from '@/visual/shader/bg_basic_swirl.frag'
 import ScreenQuad from "@/visual/ScreenQuad";
 
 export class Background {

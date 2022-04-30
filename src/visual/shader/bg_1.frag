@@ -45,7 +45,6 @@ float fbm(vec2 p) {
 
 //Fun start here
 void main() {
-    //change the animation speed
 
     vec2 uv = vUv;
     uv = uv * 3.0 - 51.0;

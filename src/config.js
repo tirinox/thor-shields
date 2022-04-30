@@ -1,4 +1,4 @@
-const Live = false
+const Live = process.env.NODE_ENV !== 'development'
 
 export const Config = {
     DataSource: {
@@ -16,7 +16,7 @@ export const Config = {
     Effects: {
         Bloom: {
             Enabled: true,
-            Strength: 0.62,
+            Strength: 0.3,
             Threshold: 0.1,
             Radius: 0.5,
         }
@@ -48,7 +48,7 @@ export const Config = {
         BaseForce: 1500.0,
         RepelForce: 200.0,
         Startup: {
-            SimulationSteps: 400,
+            SimulationSteps: 10,
             DeltaTime: 0.1
         },
     },
