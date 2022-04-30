@@ -5,7 +5,7 @@ import {Text} from 'troika-three-text'
 import {Colors, Config} from "@/config";
 import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
 import StdVertexShader from '@/visual/shader/standard.vert?raw'
-import FragShader1 from '@/visual/shader/node_obj_1.frag?raw'
+import FragShader1 from '@/visual/shader/node_obj_2.frag?raw'
 import {NodeStatus} from "@/helpers/NodeTracker";
 
 
@@ -55,7 +55,7 @@ export class NodeObject extends PhysicalObject {
         // material
         this.material = new THREE.ShaderMaterial({
             uniforms: {
-                "time": {value: 1.0},
+                "time": {value: Random.getRandomFloat(0.0, 100.0)},
                 "saturation": {value: 1.0},
                 "color": {value: colorObj},
             },
