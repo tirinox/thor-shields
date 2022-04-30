@@ -60,16 +60,15 @@ export class IPAddressInfoLoader {
         if(name === undefined) {
             return UNKNOWN
         }
-        const old = name + ''
 
         name = name.toUpperCase()
+        name = name.replace('ONLINE GMBH', '')
         for(const component of name.split('-')) {
             if(component !== 'AS') {
                 return component
             }
         }
-        name = name.replace('ONLINE GMBH', '')
-        console.info(old, '=>', name)
+
         return name
     }
 }

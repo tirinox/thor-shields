@@ -84,7 +84,7 @@ export class NodeGroup extends Simulation {
     set mode(newMode) {
         this._mode = newMode
 
-        this._selectedModeHandler.onLeave()
+        this._selectedModeHandler.onLeave(this.nodeObjList)
 
         if (this._mode === NodeGroupModes.Normal) {
             this._selectedModeHandler = this._modeNormal

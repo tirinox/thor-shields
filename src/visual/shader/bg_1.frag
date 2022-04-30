@@ -35,7 +35,7 @@ float noise(vec2 p) {
 //Fractal Brownian Motion
 float fbm(vec2 p) {
     float v = 0.0, f = 1.0, a = 0.5;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
         v += noise(p * f) * a;
         f *= 2.0;
         a *= 0.5;
@@ -48,8 +48,8 @@ void main() {
     //change the animation speed
 
     vec2 uv = vUv;
-    uv = uv * 2.0 - 1.0;
-    
+    uv = uv * 3.0 - 51.0;
+
     float p = fbm(vec2(noise(uv + time / 2.5), noise(uv * 2. + cos(time / 2.) / 2.)));
     //uncomment for more plasma/lighting/plastic effect..
 //    p = (1. - abs(p * 2.0 - 1.0))*.8;

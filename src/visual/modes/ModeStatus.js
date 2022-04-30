@@ -3,6 +3,7 @@ import {NodeStatus} from "@/helpers/NodeTracker";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import {Config} from "@/config";
+import _ from "lodash";
 
 const ANY_STATUS = '*'
 
@@ -42,10 +43,20 @@ export class ModeStatus extends ModeBase {
         }
     }
 
-    onEnter() {
+    onEnter(nodeObj) {
+        const statusesCounted = _.countBy(nodeObj, 'node.status')
+        const standbyCount = statusesCounted[NodeStatus.Standby]
+        const activeCount = statusesCounted[NodeStatus.Active]
+        const otherCount = nodeObj.length - (standbyCount + activeCount)
+
         this.makeLabel('Active', new THREE.Vector3(0, -500, 0), 20)
         this.makeLabel('Standby', new THREE.Vector3(-this._sideDistance, -400, 0), 12)
         this.makeLabel('Other', new THREE.Vector3(this._sideDistance, -400, 0), 12)
+
+        this.makeLabel(activeCount, new THREE.Vector3(0, -650, 0), 10, -45)
+        this.makeLabel(standbyCount, new THREE.Vector3(-this._sideDistance, -480, 0), 6, -45)
+        this.makeLabel(otherCount, new THREE.Vector3(this._sideDistance, -480, 0), 6, -45)
+
         super.onEnter();
     }
 }

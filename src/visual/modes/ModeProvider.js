@@ -40,9 +40,11 @@ export class ModeProvider extends ModeBase {
 
     _createProviderAttractors(objList) {
         const providers = {}
+
         for (const nodeObj of objList) {
             const ipInfo = nodeObj.ipInfo
-            const provider = IPAddressInfoLoader.refineProviderName(ipInfo ? ipInfo.providerName : UNKNOWN)
+            const nativeName = ipInfo ? ipInfo.providerName : UNKNOWN
+            const provider = IPAddressInfoLoader.refineProviderName(nativeName)
 
             if(!providers[provider]) {
                 providers[provider] = [nodeObj]
@@ -57,7 +59,7 @@ export class ModeProvider extends ModeBase {
         // const sortedEntries = _.entries(providers)
         for (const [name, items] of sortedEntries) {
             const circleRadius = NodeObject.estimateRadiusOfGroup(items) * 0.9
-            console.log('prov', name, circleRadius)
+            // console.log('prov', name, circleRadius)
 
             this.circlePacker.addCircle(name, circleRadius)
             this.attractors[name] = new Attractor(new THREE.Vector3(),
@@ -65,13 +67,15 @@ export class ModeProvider extends ModeBase {
         }
         this.circlePacker.arrangeAroundCenter()
         this._transferAttractorsPositionFromPacker()
-        this._makeLabels()
+        this._makeLabels(providers)
     }
 
-    _makeLabels() {
+    _makeLabels(providers) {
         const packedPositions = this.circlePacker.getResults()
         for (const [name, {position}] of _.entries(packedPositions)) {
-            this.makeLabel(name, new THREE.Vector3(position.x, position.y - 150.0, 60.0), 5)
+            const countNodes = providers[name].length
+            const title = `${name} (${countNodes})`
+            this.makeLabel(title, new THREE.Vector3(position.x, position.y - 150.0, 60.0), 5)
         }
     }
 
