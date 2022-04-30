@@ -28,8 +28,8 @@ export const Config = {
                 Max: 2500,
                 Start: 1800,
             },
-            AzimuthAngleLimit: 60,
-            PolarAngleLimit: 60,
+            AzimuthAngleLimit: 30,
+            PolarAngleLimit: 30,
             MouseMoveStrength: 0.0002
         },
     },

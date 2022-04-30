@@ -35,8 +35,8 @@ import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import FPSCounter from "@/components/parts/FPSCounter";
 import {MainScene} from "@/visual/MainScene";
-import _ from "lodash";
 import TWEEN from "tween";
+import {Background} from "@/visual/Background";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
 export default {
@@ -106,13 +106,16 @@ export default {
             this.camera.aspect = width / height;
             this.camera.updateProjectionMatrix();
 
-            const needResize = canvas.width !== width || canvas.height !== height;
+            const needResize = this.composer._width !== width || this.composer._height !== height;
             if (needResize) {
                 renderer.setSize(width, height, false);
                 if (this.bloomPass) {
                     this.bloomPass.setSize(width, height);
                 }
                 this.composer.setSize(width, height);
+                if(this.bg) {
+                    this.bg.setSize(width, height)
+                }
             }
 
             return needResize;
@@ -125,6 +128,8 @@ export default {
             this.$refs.fps.update(delta, this.scene)
             this.controls.update(delta);
             this.content.update(delta)
+
+            this.bg.update(delta);
 
             TWEEN.update()
 
@@ -159,16 +164,18 @@ export default {
         },
 
         makeSkybox() {
-            const baseURL = Config.Scene.Sky.SkyBox
-            const ext = Config.Scene.Sky.SkyBoxExt
-
-            const urls = _.map([
-                `right.${ext}`, `left.${ext}`,
-                `top.${ext}`, `bottom.${ext}`,
-                `front.${ext}`, `back.${ext}`
-            ], (name) => `${baseURL}/${name}`);
-
-            this.scene.background = new THREE.CubeTextureLoader().load(urls)
+            // const baseURL = Config.Scene.Sky.SkyBox
+            // const ext = Config.Scene.Sky.SkyBoxExt
+            //
+            // const urls = _.map([
+            //     `right.${ext}`, `left.${ext}`,
+            //     `top.${ext}`, `bottom.${ext}`,
+            //     `front.${ext}`, `back.${ext}`
+            // ], (name) => `${baseURL}/${name}`);
+            //
+            // this.scene.background = new THREE.CubeTextureLoader().load(urls)
+            this.bg = new Background(this.scene)
+            this.bg.install()
         },
 
         makeRenderer(canvas) {
