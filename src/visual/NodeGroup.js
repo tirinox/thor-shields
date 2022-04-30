@@ -122,7 +122,6 @@ export class NodeGroup extends Simulation {
 
     update(dt) {
         this._selectedModeHandler.update(dt)
-        NodeObject.material.uniforms.time.value += dt
         return super.update(dt);
     }
 

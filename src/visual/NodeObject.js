@@ -1,11 +1,12 @@
 import * as THREE from "three";
 import {Vector3} from "three";
-import {Util} from "@/helpers/MathUtil";
+import {Random, Util} from "@/helpers/MathUtil";
 import {Text} from 'troika-three-text'
-import {Config} from "@/config";
+import {Colors, Config} from "@/config";
 import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
 import StdVertexShader from '@/visual/shader/standard.vert?raw'
 import FragShader1 from '@/visual/shader/node_obj_1.frag?raw'
+import {NodeStatus} from "@/helpers/NodeTracker";
 
 
 // const geometry = new THREE.SphereGeometry(1, 32, 32)
@@ -15,15 +16,6 @@ const geometry = new THREE.PlaneGeometry(planeScale, planeScale)
 
 
 export class NodeObject extends PhysicalObject {
-    static material = new THREE.ShaderMaterial({
-        uniforms: {
-            "time": {value: 1.0}
-        },
-        vertexShader: StdVertexShader,
-        fragmentShader: FragShader1,
-        transparent: true,
-    })
-
     constructor(node) {
         super()
 
@@ -42,23 +34,35 @@ export class NodeObject extends PhysicalObject {
 
     _makeSphere() {
         // color
-        // let color = 0x111111;
-        // const st = this.node.status
-        // if (st === NodeStatus.Standby) {
-        //     color = 0x167a56
-        // } else if (st === NodeStatus.Active) {
-        //     color = Random.getRandomSample([
-        //         Colors.LightningBlue,
-        //         Colors.YggdrasilGreen
-        //     ])
-        // } else if (st === NodeStatus.Disabled) {
-        //     color = 0xee0000
-        // } else if (st === NodeStatus.Whitelisted) {
-        //     color = 0x444444
-        // } else if (st === NodeStatus.Unknown) {
-        //     color = 0x111144
-        // }
-        // console.log(color) // fixme
+        let color = 0x111111;
+        const st = this.node.status
+        if (st === NodeStatus.Standby) {
+            color = 0x167a56
+        } else if (st === NodeStatus.Active) {
+            color = Random.getRandomSample([
+                Colors.LightningBlue,
+                Colors.YggdrasilGreen
+            ])
+        } else if (st === NodeStatus.Disabled) {
+            color = 0xee0000
+        } else if (st === NodeStatus.Whitelisted) {
+            color = 0x444444
+        } else if (st === NodeStatus.Unknown) {
+            color = 0x111144
+        }
+        const colorObj = new THREE.Color(color)
+
+        // material
+        this.material = new THREE.ShaderMaterial({
+            uniforms: {
+                "time": {value: 1.0},
+                "saturation": {value: 1.0},
+                "color": {value: colorObj},
+            },
+            vertexShader: StdVertexShader,
+            fragmentShader: FragShader1,
+            transparent: true,
+        })
 
         // Size (scale): 1 = 1 million Rune
         const noCfg = Config.Scene.NodeObject
@@ -68,7 +72,7 @@ export class NodeObject extends PhysicalObject {
 
         // this.material = new THREE.MeshStandardMaterial({color, flatShading: true});
         // this.material = NodeObject.material
-        this.mesh = new THREE.Mesh(geometry, NodeObject.material);
+        this.mesh = new THREE.Mesh(geometry, this.material);
         this.mesh.scale.setScalar(scale)
         this.o.add(this.mesh)
     }
@@ -100,6 +104,7 @@ export class NodeObject extends PhysicalObject {
         if (this.nameTextObj) {
             this.nameTextObj.dispose()
         }
+        this.material.dispose()
     }
 
     get radius() {
@@ -135,5 +140,11 @@ export class NodeObject extends PhysicalObject {
         const avgRadius = r > 0 ? r / n : 0.0
         const fitRadius = avgRadius * Math.sqrt(n)
         return Math.max(0.1, fitRadius)
+    }
+
+    update(dt) {
+        super.update(dt);
+
+        this.material.uniforms.time.value += dt
     }
 }
