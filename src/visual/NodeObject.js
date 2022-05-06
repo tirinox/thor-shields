@@ -4,8 +4,9 @@ import {Random, Util} from "@/helpers/MathUtil";
 import {Text} from 'troika-three-text'
 import {Colors, Config} from "@/config";
 import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
-import StdVertexShader from '@/visual/shader/standard.vert?raw'
-import FragShader1 from '@/visual/shader/node_obj_2.frag?raw'
+import StdVertexShader from '@/visual/shader/standard.vert'
+import FragShader1 from '@/visual/shader/node_obj_2.frag'
+// import FragShader1 from '@/visual/shader/node_obj_3_rays.frag'
 import {NodeStatus} from "@/helpers/NodeTracker";
 
 

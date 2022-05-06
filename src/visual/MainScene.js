@@ -6,6 +6,7 @@ import {URLDataSource} from "@/helpers/data/URLDataSource";
 import {Config} from "@/config";
 import {clearObject} from "@/helpers/3D";
 import {IPAddressInfoLoader} from "@/helpers/data/IPAddressInfo";
+import {emitter, EventTypes} from "@/helpers/EventTypes";
 
 export class MainScene {
     constructor(scene, vueComp) {
@@ -50,6 +51,8 @@ export class MainScene {
 
     handleData(nodes) {
         console.info('Handle Data tick!')
+
+        emitter.emit(EventTypes.DataSourceTick, nodes)
 
         // Random.removeRandomItem(nodes)
 

@@ -2,6 +2,19 @@ varying vec2 vUv;
 
 #define PI 3.14159
 
+float swirlEffectRadius = .2;
+float swirlEffectAngle = 2.0;
+
+vec2 swirl(vec2 uv, vec2 center) {
+    // Ref: vec2 uv = fragCoord.xy / iResolution.xy - center;
+    // vUv = 0..1
+    uv = uv - center;
+    float len = length(uv);
+    float angle = atan(uv.y, uv.x) + swirlEffectAngle * smoothstep(swirlEffectRadius, 0., len);
+    float radius = length(uv);
+    return vec2(radius * cos(angle), radius * sin(angle)) + center;
+}
+
 
 vec4 checkboard(vec2 uv) {
     // makes a square
@@ -16,21 +29,8 @@ vec4 checkboard(vec2 uv) {
     }
 }
 
+
 void main() {
-    float effectRadius = .2;
-    float effectAngle = 2.0;
-
-    // Ref: vec2 uv = fragCoord.xy / iResolution.xy - center;
-    // vUv = 0..1
-    vec2 uv = vUv * vec2(2.0, 1.0);
-    vec2 center = vec2(1.0, .5);
-
-    uv = uv - center;
-    float len = length(uv);
-    float angle = atan(uv.y, uv.x) + effectAngle * smoothstep(effectRadius, 0., len);
-    float radius = length(uv);
-
-    uv = vec2(radius * cos(angle), radius * sin(angle)) + center;
-
+    vec2 uv = swirl(vUv, vec2(0.5, 0.5));
     gl_FragColor = checkboard(uv);
 }

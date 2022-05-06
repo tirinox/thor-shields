@@ -36,7 +36,8 @@ import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass
 import FPSCounter from "@/components/parts/FPSCounter";
 import {MainScene} from "@/visual/MainScene";
 import TWEEN from "tween";
-import {Background} from "@/visual/Background";
+import {Background} from "@/visual/helpers/Background";
+import {emitter, EventTypes} from "@/helpers/EventTypes";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
 export default {
@@ -55,6 +56,8 @@ export default {
             mouseEnterY: 0,
 
             sceneMode: 'normal',
+
+            fullyLoaded: false,
         }
     },
 
@@ -229,6 +232,10 @@ export default {
 
         pokeActivity() {
             this.$refs.fps.pokeActivity()
+        },
+
+        onFullyLoaded() {
+            console.log('fully loaded! removing loading screen...')
         }
     },
 
@@ -245,11 +252,13 @@ export default {
         this.buildScene()
 
         requestAnimationFrame(this.render);
+        emitter.on(EventTypes.FullyLoaded, this.onFullyLoaded)
     },
 
     unmounted() {
         this.content.dispose()
         this.controls.dispose()
+        emitter.off(EventTypes.FullyLoaded)
     }
 }
 

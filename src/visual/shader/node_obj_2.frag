@@ -15,7 +15,7 @@ varying vec2 vUv;
 #define MarchSteps 6
 // Scene Settings
 #define ExpPosition vec3(0.0)
-#define Radius 2.0
+#define Radius 1.0
 #define Background vec4(0.0, 0.0, 0.0, 0.0)
 // Noise Settings
 #define NoiseSteps 1
@@ -124,10 +124,10 @@ vec4 Shade(float distance)
     float c2 = clamp(distance*5.0, 0.0, 1.0);
     float c3 = clamp(distance*3.4 - 0.5, 0.0, 1.0);
 
-//    #define Color1 vec4(1.0, 1.0, 1.0, 1.0)   -- white
-//    #define Color2 vec4(0.2, 0.8, 1.0, 1.0) --- green
-//    #define Color3 vec4(0.2, 0.03, 1.0, 1.0)  -- blue
-//    #define Color4 vec4(0.05, 0.02, 0.02, 0.3) -- black transparent
+    //    #define Color1 vec4(1.0, 1.0, 1.0, 1.0)   -- white
+    //    #define Color2 vec4(0.2, 0.8, 1.0, 1.0) --- green
+    //    #define Color3 vec4(0.2, 0.03, 1.0, 1.0)  -- blue
+    //    #define Color4 vec4(0.05, 0.02, 0.02, 0.3) -- black transparent
 
     vec4 original = vec4(color, 1.0);
     vec4 a = mix(Color1, Color3, c1);

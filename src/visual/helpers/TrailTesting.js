@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import {TrailRenderer} from "@/visual/TrailRenderer";
+import {TrailRenderer} from "@/visual/helpers/TrailRenderer";
 import {Colors} from "@/config";
 
 export class TrailTesting {
