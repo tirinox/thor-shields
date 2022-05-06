@@ -1,4 +1,5 @@
-const Live = process.env.NODE_ENV !== 'development'
+// const Live = process.env.NODE_ENV !== 'development'
+const Live = true
 
 export const Config = {
     DataSource: {
@@ -52,6 +53,9 @@ export const Config = {
             DeltaTime: 0.1
         },
     },
+    Debug: {
+        ShowFPS: false,
+    }
 }
 
 export const Colors = {

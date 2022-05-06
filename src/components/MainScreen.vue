@@ -47,7 +47,7 @@ export default {
 
     data() {
         return {
-            showFps: true,
+            showFps: Config.Debug.ShowFPS,
 
             nodes: [],
             prevNodes: [],
@@ -65,7 +65,7 @@ export default {
         onKeyDown(event) {
             if (event.code === 'KeyR') {
                 this.resetCamera()
-            } else if (event.code === 'KeyD') {
+            } else if (event.code === 'KeyF') {
                 this.showFps = !this.showFps
             } else if (event.code === 'KeyH') {
                 console.log('help?')
