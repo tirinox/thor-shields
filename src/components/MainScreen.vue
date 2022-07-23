@@ -1,8 +1,8 @@
 <template>
     <div class="canvas-holder">
         <canvas
-            class="canvas-full"
             ref="canvas"
+            class="canvas-full"
             tabindex="1"
             @keydown="onKeyDown"
             @mousemove="onMouseMove"
@@ -127,7 +127,12 @@ export default {
         render() {
             this.resizeRendererToDisplaySize(this.renderer)
 
-            const delta = this.clock.getDelta();
+            let delta = this.clock.getDelta();
+
+            if(delta > 0.5) {
+                delta = 0.5
+            }
+
             this.$refs.fps.update(delta, this.scene)
             this.controls.update(delta);
             this.content.update(delta)
@@ -185,7 +190,7 @@ export default {
             let renderer = this.renderer = new THREE.WebGLRenderer({
                 canvas,
                 antialias: false,
-                logarithmicDepthBuffer: true,
+                logarithmicDepthBuffer: false,
             });
 
             if (devicePixelRatio) {
@@ -267,15 +272,20 @@ export default {
 <style>
 
 .canvas-full {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-    outline: none;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+canvas {
+    width: 100vw; height: 100vh;
+    display: block;
 }
 
 .canvas-holder {
+    margin: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
 }

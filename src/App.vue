@@ -60,14 +60,21 @@ export default {
     src: url('../public/fonts/Exo2-VariableFont_wght.ttf') format('truetype');
 }
 
-html, body {
-    margin: 0;
-    height: 100%;
-    font-family: 'EXO2', monospace;
+@supports(padding:max(0px)) {
+    body, header, footer {
+        padding-left: min(0vmin, env(safe-area-inset-left));
+        padding-right: min(0vmin, env(safe-area-inset-right));
+    }
 }
 
-canvas {
-    display: block;
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'EXO2', monospace;
+    background: black;
 }
 
 </style>

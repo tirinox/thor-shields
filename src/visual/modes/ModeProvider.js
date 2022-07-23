@@ -41,6 +41,9 @@ export class ModeProvider extends ModeBase {
     _createProviderAttractors(objList) {
         const providers = {}
 
+        let mostPopularProvider = null
+        let mostPupularCount = 0
+
         for (const nodeObj of objList) {
             const ipInfo = nodeObj.ipInfo
             const nativeName = ipInfo ? ipInfo.providerName : UNKNOWN
@@ -49,7 +52,12 @@ export class ModeProvider extends ModeBase {
             if(!providers[provider]) {
                 providers[provider] = [nodeObj]
             } else {
-                providers[provider].push(nodeObj)
+                const list = providers[provider]
+                list.push(nodeObj)
+                if(list.length > mostPupularCount) {
+                    mostPopularProvider = provider
+                    mostPupularCount = list.length
+                }
             }
         }
 
@@ -58,24 +66,49 @@ export class ModeProvider extends ModeBase {
         const sortedEntries = _.sortBy(_.entries(providers), [(pair) => pair[1].length])
         // const sortedEntries = _.entries(providers)
         for (const [name, items] of sortedEntries) {
-            const circleRadius = NodeObject.estimateRadiusOfGroup(items) * 0.9
-            // console.log('prov', name, circleRadius)
+            if(name === mostPopularProvider) {
+                continue
+            }
 
-            this.circlePacker.addCircle(name, circleRadius)
-            this.attractors[name] = new Attractor(new THREE.Vector3(),
-                this.force, 0, 0, 0, circleRadius)
+            this._makeAttractor(name, items, true)
         }
         this.circlePacker.arrangeAroundCenter()
         this._transferAttractorsPositionFromPacker()
-        this._makeLabels(providers)
+
+        if(mostPopularProvider) {
+            this._makeAttractor(mostPopularProvider, providers[mostPopularProvider], false)
+        }
+
+        this._makeLabels(providers, mostPopularProvider)
     }
 
-    _makeLabels(providers) {
+    _makeAttractor(name, items, addCircle) {
+        const circleRadius = NodeObject.estimateRadiusOfGroup(items) * 0.9
+        // console.log('prov', name, circleRadius)
+
+        if(addCircle) {
+            this.circlePacker.addCircle(name, circleRadius)
+        }
+
+        this.attractors[name] = new Attractor(new THREE.Vector3(),
+            this.force, 0, 0, 0, circleRadius)
+        return circleRadius
+    }
+
+    _makeLabelForGroup(providers, name, position) {
+        const countNodes = providers[name].length
+        const title = `${name} (${countNodes})`
+        this.makeLabel(title, new THREE.Vector3(position.x, position.y - 160.0, 60.0), 5)
+    }
+
+    _makeLabels(providers, mostPopularName) {
         const packedPositions = this.circlePacker.getResults()
         for (const [name, {position}] of _.entries(packedPositions)) {
-            const countNodes = providers[name].length
-            const title = `${name} (${countNodes})`
-            this.makeLabel(title, new THREE.Vector3(position.x, position.y - 150.0, 60.0), 5)
+            this._makeLabelForGroup(providers, name, position)
+        }
+
+        if(mostPopularName) {
+            this._makeLabelForGroup(providers, mostPopularName, new THREE.Vector3())
         }
     }
 

@@ -5,12 +5,14 @@ import {Text} from 'troika-three-text'
 import {Colors, Config} from "@/config";
 import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
 import StdVertexShader from '@/visual/shader/standard.vert'
+// import FragShader1 from '@/visual/shader/node_obj_1.frag'
 import FragShader1 from '@/visual/shader/node_obj_2.frag'
 // import FragShader1 from '@/visual/shader/node_obj_3_rays.frag'
 import {NodeStatus} from "@/helpers/NodeTracker";
+import {randFloat} from "three/src/math/MathUtils";
 
 
-// const geometry = new THREE.SphereGeometry(1, 32, 32)
+// const geometry = new THREE.SphereGeometry(0.5, 32, 32)
 // const geometry = new THREE.IcosahedronGeometry(1, 1)
 const planeScale = Config.Scene.NodeObject.PlaceScale
 const geometry = new THREE.PlaneGeometry(planeScale, planeScale)
@@ -63,6 +65,7 @@ export class NodeObject extends PhysicalObject {
             vertexShader: StdVertexShader,
             fragmentShader: FragShader1,
             transparent: true,
+            depthTest: false,
         })
 
         // Size (scale): 1 = 1 million Rune
@@ -75,6 +78,7 @@ export class NodeObject extends PhysicalObject {
         // this.material = NodeObject.material
         this.mesh = new THREE.Mesh(geometry, this.material);
         this.mesh.scale.setScalar(scale)
+        this.mesh.position.z = randFloat(-0.1, 0.1)
         this.o.add(this.mesh)
     }
 
