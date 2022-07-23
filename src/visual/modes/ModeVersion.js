@@ -88,7 +88,7 @@ export class ModeVersion extends ModeBase {
             const attr = this.attractors[version]
             if(attr) {
                 this.makeLabel(text,
-                    new THREE.Vector3(position.x, position.y + attr.relaxRadius * 1.1 + 20.0, 50.0),
+                    new THREE.Vector3(position.x, position.y - attr.relaxRadius * 1.1 - 20.0, 50.0),
                     2.5)
             }
         }
