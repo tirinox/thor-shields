@@ -18,7 +18,7 @@ export const Config = {
         Bloom: {
             Enabled: true,
             Strength: 0.4,
-            Threshold: 0.1,
+            Threshold: 0.5,
             Radius: 0.02,
         }
     },
@@ -36,8 +36,8 @@ export const Config = {
     },
     Scene: {
         Sky: {
-            SkyBox: '/texture/skybox/star',
-            SkyBoxExt: 'jpg',
+            SkyBox: 'texture/skybox/star',
+            SkyBoxExt: 'png',
         },
         NodeObject: {
             PlaceScale: 2.0,

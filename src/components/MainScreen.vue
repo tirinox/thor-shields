@@ -19,7 +19,7 @@
             <button @click="setSceneMode('status')" :class="isButtonSelectedClass('status')">STATUS</button>
             <button @click="setSceneMode('provider')" :class="isButtonSelectedClass('provider')">PROVIDER</button>
             <button @click="setSceneMode('version')" :class="isButtonSelectedClass('version')">VERSION</button>
-            <!--            <button @click="setSceneMode('bond')">BOND</button>-->
+            <button @click="setSceneMode('bond')" :class="isButtonSelectedClass('bond')">BOND</button>
         </div>
     </div>
 </template>
@@ -172,16 +172,8 @@ export default {
         },
 
         makeSkybox() {
-            // const baseURL = Config.Scene.Sky.SkyBox
-            // const ext = Config.Scene.Sky.SkyBoxExt
-            //
-            // const urls = _.map([
-            //     `right.${ext}`, `left.${ext}`,
-            //     `top.${ext}`, `bottom.${ext}`,
-            //     `front.${ext}`, `back.${ext}`
-            // ], (name) => `${baseURL}/${name}`);
-            //
-            // this.scene.background = new THREE.CubeTextureLoader().load(urls)
+            // this.bg = new Background(this.scene)
+            // this.bg = new BlackgroundStaticBox(this.scene, Config.Scene.Sky.SkyBox, Config.Scene.Sky.SkyBoxExt)
             this.bg = new Background(this.scene)
             this.bg.install()
         },
