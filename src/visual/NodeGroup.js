@@ -8,12 +8,14 @@ import {ModeNormal} from "@/visual/modes/ModeNormal";
 import {ModeStatus} from "@/visual/modes/ModeStatus";
 import {ModeProvider} from "@/visual/modes/ModeProvider";
 import {ModeVersion} from "@/visual/modes/ModeVersion";
+import {ModeBond} from "@/visual/modes/ModeBond";
 
 export const NodeGroupModes = Object.freeze({
     Normal: 'normal',
     Status: 'status',
     Provider: 'provider',
     Version: 'version',
+    Bond: 'bond',
 })
 
 export class NodeGroup extends Simulation {
@@ -27,6 +29,15 @@ export class NodeGroup extends Simulation {
         this._modeStatus = new ModeStatus(this.parent)
         this._modeProvider = new ModeProvider(this.parent)
         this._modeVersion = new ModeVersion(this.parent)
+        this._modeBond = new ModeBond(this.parent)
+
+        this._selector = {
+            [NodeGroupModes.Normal]: this._modeNormal,
+            [NodeGroupModes.Status]: this._modeStatus,
+            [NodeGroupModes.Provider]: this._modeProvider,
+            [NodeGroupModes.Version]: this._modeVersion,
+            [NodeGroupModes.Bond]: this._modeBond,
+        }
 
         this._selectedModeHandler = this._modeNormal
         this.mode = NodeGroupModes.Normal
@@ -82,20 +93,19 @@ export class NodeGroup extends Simulation {
     }
 
     set mode(newMode) {
-        this._mode = newMode
-
-        this._selectedModeHandler.onLeave(this.nodeObjList)
-
-        if (this._mode === NodeGroupModes.Normal) {
-            this._selectedModeHandler = this._modeNormal
-        } else if (this._mode === NodeGroupModes.Status) {
-            this._selectedModeHandler = this._modeStatus
-        } else if (this._mode === NodeGroupModes.Provider) {
-            this._selectedModeHandler = this._modeProvider
-        } else if(this._mode === NodeGroupModes.Version) {
-            this._selectedModeHandler = this._modeVersion
+        if(this._mode === newMode) {
+            return
         }
 
+        this._mode = newMode
+
+        // dispose old
+        this._selectedModeHandler.onLeave(this.nodeObjList)
+
+        // pick new
+        this._selectedModeHandler = this._selector[this._mode]
+
+        // enter the new one
         this._selectedModeHandler.onEnter(this.nodeObjList)
 
         console.log(`Set Mode: ${newMode}`)
