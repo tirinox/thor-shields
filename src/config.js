@@ -17,9 +17,9 @@ export const Config = {
     Effects: {
         Bloom: {
             Enabled: true,
-            Strength: 0.3,
+            Strength: 0.4,
             Threshold: 0.1,
-            Radius: 0.5,
+            Radius: 0.02,
         }
     },
     Controls: {
