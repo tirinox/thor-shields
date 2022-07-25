@@ -75,4 +75,12 @@ html, body {
     color: turquoise;
 }
 
+a {
+    color: turquoise;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
 </style>

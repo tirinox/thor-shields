@@ -7,6 +7,7 @@ export class NodeInfo {
                 status: 'Unknown',
                 jail: {},
                 bond_providers: {},
+                preflight_status: {},
             }
         }
 

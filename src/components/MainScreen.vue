@@ -42,6 +42,7 @@ import {Background} from "@/visual/helpers/Background";
 import {emitter, EventTypes} from "@/helpers/EventTypes";
 import ControlPanel from "@/components/parts/ControlPanel";
 import NodeDetailsWindow from "@/components/parts/NodeDetailsWindow";
+import {NodeInfo} from "@/helpers/data/NodeInfo";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
 export default {
@@ -64,7 +65,7 @@ export default {
             fullyLoaded: false,
 
             nodeDetailsVisible: false,
-            nodeToViewDetails: null,
+            nodeToViewDetails: new NodeInfo(),
         }
     },
 
