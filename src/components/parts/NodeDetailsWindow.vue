@@ -3,7 +3,7 @@
     <div class="window" :class="{'visible': visible}">
         <div class="close-button" @click="close"></div>
         <h1>Node details </h1>
-        <h3>{{ node ? node.node_address : '?' }}</h3>
+        <h3>{{ node ? node.address : '?' }}</h3>
         <p>
             <code>
                 {{ JSON.stringify(node) }}

@@ -51,7 +51,7 @@ export class NodeGroup extends Simulation {
     }
 
     genIdent(node) {
-        return node.node_address ?? String(this._currentIdent++)
+        return node.address ?? String(this._currentIdent++)
     }
 
     _placeNodeObject(nodeObject) {
@@ -79,7 +79,7 @@ export class NodeGroup extends Simulation {
     }
 
     destroyNode(node) {
-        const nodeAddress = node.node_address ?? node
+        const nodeAddress = node.address ?? node
         const nodeObject = this.getByName(nodeAddress)
         if (!nodeObject) {
             console.error('node not found!')
@@ -119,7 +119,7 @@ export class NodeGroup extends Simulation {
     reactEvent(event) {
         const delay = Random.getRandomFloat(0, Config.DataSource.ReactRandomDelay * 1000.0)
         setTimeout(() => {
-            const obj = this.getByName(event.node.node_address)
+            const obj = this.getByName(event.node.address)
             if (obj) {
                 if (event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
                     obj.reactChain()

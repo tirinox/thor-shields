@@ -41,9 +41,10 @@ export const Config = {
             SkyBoxExt: 'png',
         },
         NodeObject: {
-            PlaceScale: 2.0,
-            MaxScale: 84.0,
-            MinScale: 20.0,
+            PlaneScale: 1.0,
+            MaxScale: 80.0,
+            MinScale: 10.0,
+            ScaleFactor: 1.0,
         }
     },
     Physics: {

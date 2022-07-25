@@ -15,8 +15,7 @@ import {NodeGroupModes} from "@/visual/NodeGroup";
 export default {
     name: 'ControlPanel',
     emits: ['mode-selected'],
-    props: {
-    },
+    props: {},
     data() {
         return {
             selectedMode: NodeGroupModes.Normal
@@ -49,7 +48,7 @@ export default {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 .control-panel {
     position: absolute;
@@ -61,5 +60,6 @@ export default {
     border-width: 2px;
     opacity: 1;
 }
+
 
 </style>

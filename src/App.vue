@@ -72,6 +72,7 @@ html, body {
     overflow: hidden;
     font-family: 'EXO2', monospace;
     background: black;
+    color: turquoise;
 }
 
 </style>

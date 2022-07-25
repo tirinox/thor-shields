@@ -1,3 +1,4 @@
+export const SEC_PER_BLOCK = 6.0
 
 export const THOR_DECIMAL = Math.pow(10, 8)
 export const THOR_DECIMAL_INV = 1.0 / THOR_DECIMAL

@@ -7,13 +7,14 @@ import {Config} from "@/config";
 import {clearObject} from "@/helpers/3D";
 import {IPAddressInfoLoader} from "@/helpers/data/IPAddressInfo";
 import {emitter, EventTypes} from "@/helpers/EventTypes";
+import {NodeSet} from "@/helpers/data/NodeSet";
 
 export class MainScene {
     constructor(scene, vueComp) {
         this.scene = scene
         this.vueComp = vueComp
-        this.prevNodes = []
-        this.nodes = []
+        this.prevNodes = new NodeSet([])
+        this.nodes = new NodeSet([])
 
         this._makeSomeLight()
         this.nodeGroup = new NodeGroup(this.scene)
@@ -24,9 +25,7 @@ export class MainScene {
 
     _runDataSource() {
         this.dataSource = new URLDataSource(Config.DataSource.NodesURL, Config.DataSource.PollPeriod)
-        this.dataSource.callback = (data) => {
-            this.handleData(data)
-        }
+        this.dataSource.callback = this.handleData.bind(this)
 
         this.dataSource.run()
 
@@ -43,14 +42,17 @@ export class MainScene {
     }
 
     async _loadAdditionalInfoAbout(obj) {
-        const ipAddress = obj.node.ip_address
+        const ipAddress = obj.node.IPAddress
         if(ipAddress) {
             obj.ipInfo = await this.ipAddressLoader.load(ipAddress)
         }
     }
 
     handleData(nodes) {
-        console.info('Handle Data tick!')
+        if(!nodes) {
+            console.error('No nodes to handle!')
+            return
+        }
 
         emitter.emit(EventTypes.DataSourceTick, nodes)
 
@@ -61,9 +63,11 @@ export class MainScene {
         const tracker = new NodeTracker(this.prevNodes, this.nodes)
         const events = tracker.extractEvents()
 
+        console.info(`Handle Data tick! Total: ${events.length} events.`)
+
         for (const event of events) {
             const node = event.node
-            if (node.node_address) {
+            if (node.address) {
                 if (event.type === NodeEvent.EVENT_TYPE.CREATE) {
                     const obj = this.nodeGroup.createNewNode(node)
                     this._loadAdditionalInfoAbout(obj).then()
@@ -98,7 +102,7 @@ export class MainScene {
     }
 
     findNodeByAddress(address) {
-        return this.nodes.find((node) => node.node_address === address)
+        return this.nodes.byAddress[address]
     }
 
     pick(name) {

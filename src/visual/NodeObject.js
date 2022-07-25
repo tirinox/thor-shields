@@ -12,10 +12,11 @@ import {NodeStatus} from "@/helpers/NodeTracker";
 import {randFloat} from "three/src/math/MathUtils";
 
 
+const noCfg = Config.Scene.NodeObject
+
 // const geometry = new THREE.SphereGeometry(0.5, 32, 32)
 // const geometry = new THREE.IcosahedronGeometry(1, 1)
-const planeScale = Config.Scene.NodeObject.PlaceScale
-const geometry = new THREE.PlaneGeometry(planeScale, planeScale)
+const geometry = new THREE.PlaneGeometry(noCfg.PlaneScale, noCfg.PlaneScale)
 
 
 export class NodeObject extends PhysicalObject {
@@ -23,7 +24,7 @@ export class NodeObject extends PhysicalObject {
         super()
 
         this.node = node
-        this.normalizedBond = (Number(this.node.bond / 10_000_000n)) * 0.0000001
+        this.normalizedBond = this.node.bond / 1_000_000  // millions of Rune
 
         this.o = new THREE.Group()
 
@@ -38,6 +39,7 @@ export class NodeObject extends PhysicalObject {
     _makeSphere() {
         // color
         let color = 0x111111;
+        let z = randFloat(-0.1, 0.1)
         const st = this.node.status
         if (st === NodeStatus.Standby) {
             color = 0x167a56
@@ -46,6 +48,7 @@ export class NodeObject extends PhysicalObject {
                 Colors.LightningBlue,
                 Colors.YggdrasilGreen
             ])
+            z -= 0.3
         } else if (st === NodeStatus.Disabled) {
             color = 0xee0000
         } else if (st === NodeStatus.Whitelisted) {
@@ -69,18 +72,20 @@ export class NodeObject extends PhysicalObject {
         })
 
         // Size (scale): 1 = 1 million Rune
-        const noCfg = Config.Scene.NodeObject
-        const scale = Util.clamp(
-            this.normalizedBond * noCfg.MaxScale * 0.8,
-            noCfg.MinScale, noCfg.MaxScale)
+        const scale = this.calculateScale
 
         // this.material = new THREE.MeshStandardMaterial({color, flatShading: true});
         // this.material = NodeObject.material
         this.mesh = new THREE.Mesh(geometry, this.material);
         this.mesh.scale.setScalar(scale)
-        this.mesh.position.z = randFloat(-0.1, 0.1)
-        this.mesh.name = this.node.node_address
+        this.mesh.position.z = z
+        this.mesh.name = this.node.address
         this.o.add(this.mesh)
+    }
+
+    get calculateScale() {
+        const scale = this.normalizedBond * noCfg.MaxScale
+        return Util.clamp(scale, noCfg.MinScale, noCfg.MaxScale)
     }
 
     get realObject() {
@@ -88,7 +93,7 @@ export class NodeObject extends PhysicalObject {
     }
 
     _makeLabel() {
-        const address = this.node.node_address
+        const address = this.node.address
         if (address && address.length >= 4) {
             const nameTextObj = this.nameTextObj = new Text()
 
@@ -102,7 +107,7 @@ export class NodeObject extends PhysicalObject {
             nameTextObj.anchorY = 'middle'
             nameTextObj.outlineWidth = 2.0
             nameTextObj.sync()
-            nameTextObj.name = this.node.node_address
+            nameTextObj.name = this.node.address
             this.o.add(nameTextObj)
         }
     }
@@ -115,8 +120,7 @@ export class NodeObject extends PhysicalObject {
     }
 
     get radius() {
-        // return this.mesh.scale.x
-        return Math.max(this.mesh.scale.x * 0.5, 12.0)
+        return Math.max(12, this.mesh.scale.x * noCfg.PlaneScale * 0.5)
     }
 
     reactChain() {
@@ -127,15 +131,15 @@ export class NodeObject extends PhysicalObject {
     }
 
     reactSlash() {
-        // const velocity = obj.o.position.clone().normalize().multiplyScalar(100)
-        // obj.velocity.copy(velocity)
-        //
-        // const savedColor = this.material.color.clone()
-        // this.velocity.set(Random.getRandomFloat(-100, 100), Random.getRandomFloat(-100, 100), 0.0)
-        // this.material.color.set(0xff0000)
-        // setTimeout(() => {
-        //     this.material.color.set(savedColor)
-        // }, 100)
+        const velocity = this.o.position.clone().normalize().multiplyScalar(100)
+        this.velocity.copy(velocity)
+
+        const savedColor = this.material.color.clone()
+        this.velocity.set(Random.getRandomFloat(-100, 100), Random.getRandomFloat(-100, 100), 0.0)
+        this.material.color.set(0xff3300)
+        setTimeout(() => {
+            this.material.color.set(savedColor)
+        }, 100)
     }
 
     static estimateRadiusOfGroup(nodeObjList) {

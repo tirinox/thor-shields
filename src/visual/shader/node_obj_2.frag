@@ -12,7 +12,7 @@ varying vec2 vUv;
 #define saturate(oo) clamp(oo, 0.0, 1.0)
 
 // Quality Settings
-#define MarchSteps 6
+#define MarchSteps 5
 // Scene Settings
 #define ExpPosition vec3(0.0)
 #define Radius 1.0
@@ -29,6 +29,8 @@ varying vec2 vUv;
 #define Color2 vec4(0.2, 0.8, 1.0, 1.0)
 #define Color3 vec4(0.2, 0.03, 1.0, 1.0)
 #define Color4 vec4(0.05, 0.02, 0.02, 0.3)
+
+const float zoom = 2.8f; // 2.5 full
 
 // Description : Array and textureless GLSL 2D/3D/4D simplex
 //               noise functions.
@@ -175,7 +177,6 @@ void main()
 
     float rotx = 0.0;
     float roty = 0.0;
-    float zoom = 4.2;
 
     // camera
     vec3 ro = zoom * normalize(vec3(cos(roty), cos(rotx), sin(roty)));

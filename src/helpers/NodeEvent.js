@@ -21,11 +21,11 @@ export class NodeEvent {
         this.prevNode = prevNode
         this.currValue = currValue
         this.prevValue = prevValue
-        this.isTramp = node ? node.node_address === '' : false
+        this.isTramp = node ? node.address === '' : false
     }
 
     toString() {
-        const addr = this.node ? this.node.node_address : '?'
+        const addr = this.node ? this.node.address : '?'
         return `NodeEvent(${this.type}, ${addr}, ${this.currValue} => ${this.prevValue})`
     }
 }

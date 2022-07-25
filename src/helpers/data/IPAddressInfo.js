@@ -1,6 +1,7 @@
 import axios from "axios";
 import lscache from "lscache";
 
+
 export class IPAddressInfo {
     constructor(j) {
         this.ipAddress = j['ip']
@@ -9,6 +10,15 @@ export class IPAddressInfo {
         this.latitude = j['latitude']
         this.longitude = j['longitude']
         this.providerName = j['org']
+        this.flag = IPAddressInfo.getFlagEmoji(this.countryCode)
+    }
+
+    static getFlagEmoji(countryCode) {
+        const codePoints = countryCode
+            .toUpperCase()
+            .split('')
+            .map(char => 127397 + char.charCodeAt());
+        return String.fromCodePoint(...codePoints);
     }
 }
 
@@ -57,14 +67,14 @@ export class IPAddressInfoLoader {
     }
 
     static refineProviderName(name) {
-        if(name === undefined) {
+        if (name === undefined) {
             return UNKNOWN
         }
 
         name = name.toUpperCase()
         name = name.replace('ONLINE GMBH', '')
-        for(const component of name.split('-')) {
-            if(component !== 'AS') {
+        for (const component of name.split('-')) {
+            if (component !== 'AS') {
                 return component
             }
         }

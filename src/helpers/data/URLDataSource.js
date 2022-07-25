@@ -1,4 +1,8 @@
 import axios from "axios";
+import {NodeSet} from "@/helpers/data/NodeSet";
+import {NodeInfo} from "@/helpers/data/NodeInfo";
+import _ from "lodash";
+
 
 export class URLDataSource {
     constructor(url, period) {
@@ -50,7 +54,11 @@ export class URLDataSource {
                 }
             })
             if (this.callback) {
-                this.callback(data.data)
+                const rawData = data.data
+                const nodeSet = new NodeSet(
+                    _.map(rawData, json => new NodeInfo(json))
+                )
+                this.callback(nodeSet)
             }
         } catch (e) {
             console.error(`${this.toString()} tick failed: ${e}`)
