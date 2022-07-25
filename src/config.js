@@ -1,5 +1,6 @@
 // const Live = process.env.NODE_ENV !== 'development'
-const Live = true
+const Live = process.env.USE_LOCAL_DATA !== "1"
+
 
 export const Config = {
     DataSource: {

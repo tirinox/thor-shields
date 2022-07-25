@@ -79,6 +79,7 @@ export class NodeObject extends PhysicalObject {
         this.mesh = new THREE.Mesh(geometry, this.material);
         this.mesh.scale.setScalar(scale)
         this.mesh.position.z = randFloat(-0.1, 0.1)
+        this.mesh.name = this.node.node_address
         this.o.add(this.mesh)
     }
 
@@ -101,6 +102,7 @@ export class NodeObject extends PhysicalObject {
             nameTextObj.anchorY = 'middle'
             nameTextObj.outlineWidth = 2.0
             nameTextObj.sync()
+            nameTextObj.name = this.node.node_address
             this.o.add(nameTextObj)
         }
     }

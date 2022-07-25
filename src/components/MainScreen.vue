@@ -7,21 +7,23 @@
             @keydown="onKeyDown"
             @mousemove="onMouseMove"
             @mouseenter="onMouseEnter"
-            @mouseleave="onMouseLeave">
+            @mouseleave="onMouseLeave"
+            @click="onClick"
+        >
         </canvas>
         <FPSCounter
             v-show="showFps"
             ref="fps"
         >
         </FPSCounter>
-        <div class="control-panel">
-            <button @click="setSceneMode('normal')" :class="isButtonSelectedClass('normal')">NORMAL</button>
-            <button @click="setSceneMode('status')" :class="isButtonSelectedClass('status')">STATUS</button>
-            <button @click="setSceneMode('provider')" :class="isButtonSelectedClass('provider')">PROVIDER</button>
-            <button @click="setSceneMode('version')" :class="isButtonSelectedClass('version')">VERSION</button>
-            <button @click="setSceneMode('bond')" :class="isButtonSelectedClass('bond')">BOND</button>
-        </div>
+        <NodeDetailsWindow
+            :visible="nodeDetailsVisible"
+            :node="nodeToViewDetails"
+            @close="nodeDetailsVisible = false">
+        </NodeDetailsWindow>
+        <ControlPanel @mode-selected="setSceneMode"></ControlPanel>
     </div>
+
 </template>
 
 <script>
@@ -38,11 +40,13 @@ import {MainScene} from "@/visual/MainScene";
 import TWEEN from "tween";
 import {Background} from "@/visual/helpers/Background";
 import {emitter, EventTypes} from "@/helpers/EventTypes";
+import ControlPanel from "@/components/parts/ControlPanel";
+import NodeDetailsWindow from "@/components/parts/NodeDetailsWindow";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
 export default {
     name: 'MainScreen',
-    components: {FPSCounter},
+    components: {NodeDetailsWindow, ControlPanel, FPSCounter},
     props: {},
 
     data() {
@@ -58,6 +62,9 @@ export default {
             sceneMode: 'normal',
 
             fullyLoaded: false,
+
+            nodeDetailsVisible: false,
+            nodeToViewDetails: null,
         }
     },
 
@@ -94,6 +101,41 @@ export default {
         },
 
         onMouseLeave() {
+        },
+
+        onClick(event) {
+            const pickPosition = this.getCanvasRelativePosition(event)
+
+            // cast a ray through the frustum
+            this.raycaster.setFromCamera(pickPosition, this.camera);
+            // get the list of objects the ray intersected
+            const intersectedObjects = this.raycaster.intersectObjects(this.scene.children);
+            if (intersectedObjects.length) {
+                // pick the first object. It's the closest one
+                const pickedObject = intersectedObjects[0].object
+                const nodeAddress = pickedObject.name
+                if(nodeAddress && nodeAddress.startsWith('thor')) {
+                    console.log('Picked node:', nodeAddress)
+                    this.content.pick(nodeAddress)
+
+                    this.nodeDetailsVisible = true
+                    this.nodeToViewDetails = this.content.findNodeByAddress(nodeAddress)
+                }
+            } else {
+                this.nodeDetailsVisible = false
+            }
+        },
+
+        getCanvasRelativePosition(event) {
+            const rect = this.canvas.getBoundingClientRect()
+            const pos = {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top,
+            }
+            return  {
+                x: (pos.x / this.canvas.clientWidth ) *  2 - 1,
+                y: -(pos.y / this.canvas.clientHeight) * 2 + 1
+            }
         },
 
         resetCamera() {
@@ -221,12 +263,6 @@ export default {
             }
         },
 
-        isButtonSelectedClass(modeName) {
-            return {
-                'button-selected': this.sceneMode === modeName
-            }
-        },
-
         pokeActivity() {
             this.$refs.fps.pokeActivity()
         },
@@ -247,6 +283,8 @@ export default {
         this.createCameraControl()
         this.resizeRendererToDisplaySize()
         this.buildScene()
+
+        this.raycaster = new THREE.Raycaster()
 
         requestAnimationFrame(this.render);
         emitter.on(EventTypes.FullyLoaded, this.onFullyLoaded)
@@ -282,15 +320,5 @@ canvas {
     height: 100%;
 }
 
-.control-panel {
-    position: absolute;
-    bottom: 4px;
-    right: 4px;
-}
-
-.button-selected {
-    border-width: 2px;
-    opacity: 1.0;
-}
 
 </style>

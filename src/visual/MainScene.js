@@ -96,4 +96,13 @@ export class MainScene {
         this.nodeGroup.dispose()
         clearObject(this.scene)
     }
+
+    findNodeByAddress(address) {
+        return this.nodes.find((node) => node.node_address === address)
+    }
+
+    pick(name) {
+        const node = this.findNodeByAddress(name)
+        console.log(node)
+    }
 }
