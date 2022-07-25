@@ -14,11 +14,13 @@ import {NodeGroupModes} from "@/visual/NodeGroup";
 
 export default {
     name: 'ControlPanel',
+    components: {},
     emits: ['mode-selected'],
     props: {},
     data() {
         return {
-            selectedMode: NodeGroupModes.Normal
+            selectedMode: NodeGroupModes.Normal,
+            activeOnly: false,
         }
     },
     computed: {
@@ -61,5 +63,8 @@ export default {
     opacity: 1;
 }
 
+.float-right {
+    float: right;
+}
 
 </style>
