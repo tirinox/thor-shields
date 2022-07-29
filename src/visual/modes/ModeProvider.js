@@ -14,7 +14,7 @@ export class ModeProvider extends ModeBase {
         this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), -100.0)
         this.attractors = {}
         this.force = Config.Physics.BaseForce
-        this.circlePacker = new CirclePack(this.force, 1200, 300, 0.02, 1)
+        this.circlePacker = new CirclePack(this.force, 1400, 300, 0.02, 1)
     }
 
     update() {
@@ -98,7 +98,7 @@ export class ModeProvider extends ModeBase {
     _makeLabelForGroup(providers, name, position) {
         const countNodes = providers[name].length
         const title = `${name} (${countNodes})`
-        this.makeLabel(title, new THREE.Vector3(position.x, position.y - 160.0, 60.0), 5)
+        this.makeLabel(title, new THREE.Vector3(position.x, position.y - 180.0, 60.0), 5)
     }
 
     _makeLabels(providers, mostPopularName) {

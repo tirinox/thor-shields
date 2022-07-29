@@ -18,10 +18,11 @@ export class ModeBond extends ModeBase {
     }
 
     onEnter(nodeObjects) {
-        const label = this.makeLabel('Bonds', new THREE.Vector3(0, -580, -10), 14)
+        const label = this.makeLabel('Bonds', new THREE.Vector3(0, -630, -10), 14)
         label.t.opacity = 0.8;
 
         nodeObjects = _.sortBy(nodeObjects, 'node.bond')
+
         const n = nodeObjects.length
 
         this.nameToAttractor = {}
@@ -29,6 +30,38 @@ export class ModeBond extends ModeBase {
         if (n === 0) {
             return
         }
+
+        this._positionateOnSpiral(nodeObjects)
+
+        super.onEnter();
+    }
+
+    _positionateOnSpiral(nodeObjects) {
+        const n = nodeObjects.length
+        const center = new THREE.Vector3()
+        let angle = 0.0
+        let radius = 0.0
+        // let gap = 3.0
+
+        let deltaRadius = 5.0;
+        let deltaAngle = 0.5;
+        const deltaDeltaRadius = 0.995;
+        const deltaDeltaAngle = 0.991;
+
+        for (let i = 0; i < n; ++i) {
+            radius += deltaRadius;
+            angle += deltaAngle;
+            deltaRadius *= deltaDeltaRadius
+            deltaAngle *= deltaDeltaAngle
+
+            const x = center.x + radius * Math.cos(angle)
+            const y = center.y + radius * Math.sin(angle)
+            this._addAttractor(nodeObjects[i], x, y)
+        }
+    }
+
+    _positionateOnGrid(nodeObjects) {
+        const n = nodeObjects.length
 
         const columns = Math.ceil(Math.sqrt(n))
         const rows = Math.ceil(n / columns)
@@ -44,14 +77,13 @@ export class ModeBond extends ModeBase {
             const row = Math.floor(i / columns)
             const x = gapSize * col - halfWidth
             const y = gapSize * row - halfHeight
-
-            const no = nodeObjects[i]
-            console.log(no.node.address, no.node.bond, x, y)
-
-            this.nameToAttractor[no.node.address] = new Attractor(new THREE.Vector3(x, y, 0),
-                this.force, 0, 0, -1, 10.0)
+            this._addAttractor(nodeObjects[i], x, y)
         }
+    }
 
-        super.onEnter();
+    _addAttractor(nodeObject, x, y) {
+        const z = nodeObject.o.position.z
+        this.nameToAttractor[nodeObject.node.address] = new Attractor(new THREE.Vector3(x, y, z),
+            this.force, 0, 0, -1, 10.0)
     }
 }
