@@ -4,7 +4,8 @@ import {Random, Util} from "@/helpers/MathUtil";
 import {Text} from 'troika-three-text'
 import {Colors, Config} from "@/config";
 import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
-import StdVertexShader from '@/visual/shader/standard.vert'
+// import StdVertexShader from '@/visual/shader/standard.vert'
+import StdVertexShader from '@/visual/shader/billboard.vert'
 // import FragShader1 from '@/visual/shader/node_obj_1.frag'
 import FragShader1 from '@/visual/shader/node_obj_2.frag'
 // import FragShader1 from '@/visual/shader/node_obj_3_rays.frag'
@@ -69,13 +70,14 @@ export class NodeObject extends PhysicalObject {
             fragmentShader: FragShader1,
             transparent: true,
             depthTest: false,
+            // sizeAttenuation: true,
         })
 
         // Size (scale): 1 = 1 million Rune
         const scale = this.calculateScale
 
-        // this.material = new THREE.MeshStandardMaterial({color, flatShading: true});
-        // this.material = NodeObject.material
+        // this.mesh = new THREE.Sprite(this.material)
+
         this.mesh = new THREE.Mesh(geometry, this.material);
         this.mesh.scale.setScalar(scale)
         this.mesh.position.z = z
@@ -102,7 +104,7 @@ export class NodeObject extends PhysicalObject {
             nameTextObj.fontWeight = 900
             nameTextObj.fontSize = 15
             nameTextObj.position.z = 2.42
-            nameTextObj.color = 0xFFFFFF
+            nameTextObj.color = this.node.status === NodeStatus.Active ? 0xFFFFFF : 0xBBBBBB;
             nameTextObj.anchorX = 'center'
             nameTextObj.anchorY = 'middle'
             nameTextObj.outlineWidth = 2.0
