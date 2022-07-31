@@ -1,5 +1,6 @@
 import {Vector3} from "three";
 import _ from "lodash";
+import numbro from 'numbro';
 
 export function defaultValue(x, defaultValue) {
     return x === undefined ? defaultValue : x
@@ -157,3 +158,9 @@ export class Util {
 }
 
 
+export function shortRune(x, mantissa = 2) {
+    return numbro(x).format({
+        average: true,
+        mantissa,
+    }) + ' Rune'
+}

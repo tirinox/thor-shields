@@ -16,6 +16,7 @@
             ref="fps"
         >
         </FPSCounter>
+
         <NodeDetailsWindow
             :visible="nodeDetailsVisible"
             :node="nodeToViewDetails"
@@ -119,8 +120,8 @@ export default {
                     console.log('Picked node:', nodeAddress)
                     this.content.pick(nodeAddress)
 
-                    this.nodeDetailsVisible = true
                     this.nodeToViewDetails = this.content.findNodeByAddress(nodeAddress)
+                    this.nodeDetailsVisible = true
                 }
             } else {
                 this.nodeDetailsVisible = false

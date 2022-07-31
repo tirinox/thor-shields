@@ -1,37 +1,38 @@
 <template>
-
-    <div class="window" :class="{'visible': visible}">
-        <div class="close-button" @click="close"></div>
-        <h1>Node details </h1>
-        <h2>{{ node.address }}</h2>
-        <p>
+    <Transition name="shrink">
+        <div class="window" v-show="visible" @keydown.esc="close" tabindex="0">
+            <div class="close-button" @click="close"></div>
+            <h1>Node details </h1>
+            <h2>{{ node.address }}</h2>
+            <p>
             <span v-if="node.IPAddress && node.IPAddress !== ''">
-                <a :href="`https://www.infobyip.com/ip-${node.IPAddress}.html`">
-                    {{ node.flag }} IP Address information {{ node.IPAddress }}
+                IP Address information: <a :href="`https://www.infobyip.com/ip-${node.IPAddress}.html`">
+                    {{ node.flag }} {{ node.IPAddress }}
                 </a>
             </span>
-            <span v-else>
+                <span v-else>
                 No IP address
             </span>
-            <br>
-            <a :href="`https://viewblock.io/thorchain/address/${node.address}`">Viewblock Node address</a>
-            <br>
-            <span>
+                <br>
+                <a :href="`https://viewblock.io/thorchain/address/${node.address}`">Viewblock {{ node.shortAddress }}</a>
+                <br>
+                <span>
                 <strong>Bond:</strong>
                 {{ Math.round(node.bond) }} Rune
             </span>
-            <br>
-            <span>
+                <br>
+                <span>
                 <strong>Awards:</strong>
                 {{ Math.round(node.currentAward) }} Rune
             </span>
-            <br>
-            <span>
+                <br>
+                <span>
                 <strong>Slash points:</strong>
                 {{ node.slashPoints }} pts.
             </span>
-        </p>
-    </div>
+            </p>
+        </div>
+    </Transition>
 
 </template>
 
@@ -53,6 +54,11 @@ export default {
             this.$emit('close')
         }
     },
+    watch: {
+        visible(n) {
+            console.log('visible = ', n)
+        }
+    }
 }
 
 </script>
@@ -73,7 +79,7 @@ export default {
     backdrop-filter: blur(8px);
     color: turquoise;
     padding: 20px;
-    display: none;
+    //display: none;
 }
 
 .visible {

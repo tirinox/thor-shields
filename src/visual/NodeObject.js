@@ -11,6 +11,7 @@ import FragShader1 from '@/visual/shader/node_obj_2.frag'
 // import FragShader1 from '@/visual/shader/node_obj_3_rays.frag'
 import {NodeStatus} from "@/helpers/NodeTracker";
 import {randFloat} from "three/src/math/MathUtils";
+import {clamp} from "lodash";
 
 
 const noCfg = Config.Scene.NodeObject
@@ -19,6 +20,8 @@ const noCfg = Config.Scene.NodeObject
 // const geometry = new THREE.IcosahedronGeometry(1, 1)
 const geometry = new THREE.PlaneGeometry(noCfg.PlaneScale, noCfg.PlaneScale)
 
+
+const SlashColor = 0xff3300
 
 export class NodeObject extends PhysicalObject {
     constructor(node) {
@@ -110,6 +113,9 @@ export class NodeObject extends PhysicalObject {
             nameTextObj.outlineWidth = 2.0
             nameTextObj.sync()
             nameTextObj.name = this.node.address
+            nameTextObj.scale.setScalar(
+                clamp(this.normalizedBond * 1.1, 0.5, 1.5)
+            )
             this.o.add(nameTextObj)
         }
     }
@@ -136,11 +142,13 @@ export class NodeObject extends PhysicalObject {
         const velocity = this.o.position.clone().normalize().multiplyScalar(100)
         this.velocity.copy(velocity)
 
-        const savedColor = this.material.color.clone()
+        const savedColor = this.material.uniforms.color.value.clone()
+        this.material.uniformsNeedUpdate = true
         this.velocity.set(Random.getRandomFloat(-100, 100), Random.getRandomFloat(-100, 100), 0.0)
-        this.material.color.set(0xff3300)
+        this.material.uniforms.color.value.set(SlashColor)
         setTimeout(() => {
-            this.material.color.set(savedColor)
+            this.material.uniforms.color.value.set(savedColor)
+            this.material.uniformsNeedUpdate = true
         }, 100)
     }
 

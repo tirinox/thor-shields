@@ -61,5 +61,6 @@ export class NodeInfo {
         // post init
         this.flag = '🏳️'
         this.ageSeconds = SEC_PER_BLOCK * this.statusSince
+        this.shortAddress = this.address.substring(this.address.length - 4)
     }
 }

@@ -1,6 +1,10 @@
 
 /* Headers */
 
+h1 {
+    color: #aaffdd;
+}
+
 h2 {
     margin-top: 2px;
 }
@@ -73,13 +77,14 @@ button[disabled]{
 
 .shrink-enter-active,
 .shrink-leave-active {
-    transition: 0.24s ease;
+    transition: all 0.1s ease;
 }
 
 .shrink-enter-from,
 .shrink-leave-to {
     opacity: 0;
     transform: rotateY(40deg);
+    /*transform: translateX(-1000px);*/
 }
 
 

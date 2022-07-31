@@ -42,7 +42,7 @@ export class ModeProvider extends ModeBase {
         const providers = {}
 
         let mostPopularProvider = null
-        let mostPupularCount = 0
+        let mostPopularCount = 0
 
         for (const nodeObj of objList) {
             const ipInfo = nodeObj.ipInfo
@@ -54,9 +54,9 @@ export class ModeProvider extends ModeBase {
             } else {
                 const list = providers[provider]
                 list.push(nodeObj)
-                if(list.length > mostPupularCount) {
+                if(list.length > mostPopularCount) {
                     mostPopularProvider = provider
-                    mostPupularCount = list.length
+                    mostPopularCount = list.length
                 }
             }
         }

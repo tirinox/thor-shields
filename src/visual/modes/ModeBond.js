@@ -3,6 +3,7 @@ import * as THREE from "three";
 import _ from "lodash";
 import {Attractor} from "@/helpers/physics/Attractor";
 import {Config} from "@/config";
+import {shortRune} from "@/helpers/MathUtil";
 
 export class ModeBond extends ModeBase {
     constructor(scene) {
@@ -85,5 +86,10 @@ export class ModeBond extends ModeBase {
         const z = nodeObject.o.position.z
         this.nameToAttractor[nodeObject.node.address] = new Attractor(new THREE.Vector3(x, y, z),
             this.force, 0, 0, -1, 10.0)
+
+        const bond = nodeObject.node.bond
+        if(bond > 1) {
+            this.makeLabel(shortRune(bond), new THREE.Vector3(x, y - 30.0, -10), 1)
+        }
     }
 }
