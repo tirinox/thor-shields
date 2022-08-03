@@ -9,6 +9,8 @@ import {IPAddressInfoLoader} from "@/helpers/data/IPAddressInfo";
 import {emitter, EventTypes} from "@/helpers/EventTypes";
 import {NodeSet} from "@/helpers/data/NodeSet";
 
+import {MeshLine, MeshLineMaterial} from 'three.meshline';
+
 export class MainScene {
     constructor(scene, vueComp) {
         this.scene = scene
@@ -21,6 +23,8 @@ export class MainScene {
 
         this._firstTime = true
         this._runDataSource()
+
+        // this._debugSection()
     }
 
     _runDataSource() {
@@ -43,13 +47,13 @@ export class MainScene {
 
     async _loadAdditionalInfoAbout(obj) {
         const ipAddress = obj.node.IPAddress
-        if(ipAddress) {
+        if (ipAddress) {
             obj.ipInfo = await this.ipAddressLoader.load(ipAddress)
         }
     }
 
     handleData(nodes) {
-        if(!nodes) {
+        if (!nodes) {
             console.error('No nodes to handle!')
             return
         }
@@ -79,8 +83,8 @@ export class MainScene {
             }
         }
 
-        if(this._firstTime) {
-            for(let i = 0; i < Config.Physics.Startup.SimulationSteps; ++i) {
+        if (this._firstTime) {
+            for (let i = 0; i < Config.Physics.Startup.SimulationSteps; ++i) {
                 this.nodeGroup.update(Config.Physics.Startup.DeltaTime)
             }
             this._firstTime = false
@@ -108,5 +112,32 @@ export class MainScene {
     pick(name) {
         const node = this.findNodeByAddress(name)
         console.log(node)
+    }
+
+    _debugSection() {
+        const points = [];
+        const r = 600.0
+        for (let t = 0.0; t < 100.0; t += 0.1) {
+            points.push(
+                new THREE.Vector3(
+                    Math.cos(t * 0.33) * r,
+                    Math.sin(t * 0.6211) * r,
+                    Math.sin(t * 0.1143) * r)
+            );
+        }
+
+        console.log(points)
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const line = new MeshLine();
+        line.setGeometry(geometry);
+
+        const material = new MeshLineMaterial({
+            color: 0x11ff88,
+            lineWidth: 10.0,
+            sizeAttenuation: true,
+        });
+
+        const mesh = new THREE.Mesh(line, material);
+        this.scene.add(mesh);
     }
 }
