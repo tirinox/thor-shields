@@ -4837,6 +4837,11 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
+nearby-js@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/nearby-js/-/nearby-js-1.0.0.tgz#bb46b974162e9d35710132167d6bcf11afd85d29"
+  integrity sha512-0VuN7epo56uEMP1xThgO7EWWjHcFv85Lu+443lM40zqBb0bnMUiJ2rEYyeWqAQEJ6OVL87IXoK/PXoBGL+ijeA==
+
 negotiator@0.6.3, negotiator@^0.6.2:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.3.tgz#58e323a72fedc0d6f9cd4d31fe49f51479590ccd"

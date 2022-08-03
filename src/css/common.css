@@ -83,7 +83,7 @@ button[disabled]{
 .shrink-enter-from,
 .shrink-leave-to {
     opacity: 0;
-    transform: rotateY(40deg);
+    /*transform: rotateY(40deg);*/
     /*transform: translateX(-1000px);*/
 }
 

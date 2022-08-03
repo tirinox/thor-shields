@@ -48,7 +48,7 @@ export class MainScene {
     async _loadAdditionalInfoAbout(obj) {
         const ipAddress = obj.node.IPAddress
         if (ipAddress) {
-            obj.ipInfo = await this.ipAddressLoader.load(ipAddress)
+            obj.node.IPInfo = await this.ipAddressLoader.load(ipAddress)
         }
     }
 

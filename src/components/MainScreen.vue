@@ -20,7 +20,7 @@
         <NodeDetailsWindow
             :visible="nodeDetailsVisible"
             :node="nodeToViewDetails"
-            @close="nodeDetailsVisible = false">
+            @close="onCloseDetails">
         </NodeDetailsWindow>
         <ControlPanel @mode-selected="setSceneMode"></ControlPanel>
     </div>
@@ -46,6 +46,7 @@ import NodeDetailsWindow from "@/components/parts/NodeDetailsWindow";
 import {NodeInfo} from "@/helpers/data/NodeInfo";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
+
 export default {
     name: 'MainScreen',
     components: {NodeDetailsWindow, ControlPanel, FPSCounter},
@@ -67,6 +68,9 @@ export default {
 
             nodeDetailsVisible: false,
             nodeToViewDetails: new NodeInfo(),
+
+            cameraInspectsObject: false,
+            animating: false,
         }
     },
 
@@ -116,15 +120,25 @@ export default {
                 // pick the first object. It's the closest one
                 const pickedObject = intersectedObjects[0].object
                 const nodeAddress = pickedObject.name
-                if(nodeAddress && nodeAddress.startsWith('thor')) {
-                    console.log('Picked node:', nodeAddress)
-                    this.content.pick(nodeAddress)
-
-                    this.nodeToViewDetails = this.content.findNodeByAddress(nodeAddress)
-                    this.nodeDetailsVisible = true
+                if (nodeAddress && nodeAddress.startsWith('thor')) {
+                    this._onPickNodeObject(nodeAddress)
                 }
             } else {
                 this.nodeDetailsVisible = false
+                this._restoreCamera()
+            }
+        },
+
+        _onPickNodeObject(nodeAddress) {
+            console.log('Picked node:', nodeAddress)
+            this.content.pick(nodeAddress)
+
+            this.nodeToViewDetails = this.content.findNodeByAddress(nodeAddress)
+            this.nodeDetailsVisible = true
+
+            const nodeObj = this.content.nodeGroup.getByName(nodeAddress)
+            if (nodeObj) {
+                this._cameraLookAtNode(nodeObj)
             }
         },
 
@@ -134,8 +148,8 @@ export default {
                 x: event.clientX - rect.left,
                 y: event.clientY - rect.top,
             }
-            return  {
-                x: (pos.x / this.canvas.clientWidth ) *  2 - 1,
+            return {
+                x: (pos.x / this.canvas.clientWidth) * 2 - 1,
                 y: -(pos.y / this.canvas.clientHeight) * 2 + 1
             }
         },
@@ -160,7 +174,7 @@ export default {
                     this.bloomPass.setSize(width, height);
                 }
                 this.composer.setSize(width, height);
-                if(this.bg) {
+                if (this.bg) {
                     this.bg.setSize(width, height)
                 }
             }
@@ -173,12 +187,16 @@ export default {
 
             let delta = this.clock.getDelta();
 
-            if(delta > 0.5) {
+            if (delta > 0.5) {
                 delta = 0.5
             }
 
             this.$refs.fps.update(delta, this.scene)
-            this.controls.update(delta);
+
+            if (!this.cameraInspectsObject && !this.animating) {
+                this.controls.update(delta);
+            }
+
             this.content.update(delta)
 
             this.bg.update(delta);
@@ -271,7 +289,61 @@ export default {
 
         onFullyLoaded() {
             console.log('fully loaded! removing loading screen...')
-        }
+        },
+
+        _cameraLookAtNode(nodeObj) {
+            if (!this.cameraInspectsObject) {
+                this.oldCameraPos = this.camera.position.clone()
+                this.cameraInspectsObject = true
+            }
+
+            this.animating = true
+
+            const that = this
+            const position = nodeObj.o.position
+            const target = new THREE.Vector3(
+                position.x,
+                position.y,
+                Config.Controls.Camera.Animation.Z_DistanceWhenZoomed,
+            )
+
+            new TWEEN.Tween(this.camera.position)
+                .to(target, Config.Controls.Camera.Animation.Duration)
+                .easing(TWEEN.Easing.Sinusoidal.InOut)
+                .onUpdate(function () {
+                    that.camera.position.copy(this);
+                })
+                .onComplete(() => {
+                    that.animating = false
+                })
+                .start();
+        },
+
+        _restoreCamera() {
+            if (this.cameraInspectsObject) {
+                this.cameraInspectsObject = false
+                this.animating = true
+
+                const that = this
+                new TWEEN.Tween(this.camera.position)
+                    .to(this.oldCameraPos, Config.Controls.Camera.Animation.Duration)
+                    .easing(TWEEN.Easing.Sinusoidal.InOut)
+                    .onUpdate(function () {
+                        that.camera.position.copy(this);
+                        that.camera.lookAt(0, 0, 0)
+                        // that.controls.update(); // update of controls is here now
+                    })
+                    .onComplete(() => {
+                        that.animating = false
+                    })
+                    .start();
+            }
+        },
+
+        onCloseDetails() {
+            this.nodeDetailsVisible = false
+            this._restoreCamera()
+        },
     },
 
     mounted() {
@@ -311,7 +383,8 @@ export default {
 }
 
 canvas {
-    width: 100vw; height: 100vh;
+    width: 100vw;
+    height: 100vh;
     display: block;
 }
 

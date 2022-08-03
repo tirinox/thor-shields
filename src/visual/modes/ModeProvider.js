@@ -27,7 +27,7 @@ export class ModeProvider extends ModeBase {
 
         if (physObj) {
             let groupName = IPAddressInfoLoader.refineProviderName(
-                (physObj.ipInfo && physObj.ipInfo.providerName) ? physObj.ipInfo.providerName : UNKNOWN
+                physObj?.node?.IPInfo?.providerName ?? UNKNOWN
             )
             physObj.attractors = [(this.attractors[groupName] ?? this._attractorBanish)]
         }
@@ -45,8 +45,7 @@ export class ModeProvider extends ModeBase {
         let mostPopularCount = 0
 
         for (const nodeObj of objList) {
-            const ipInfo = nodeObj.ipInfo
-            const nativeName = ipInfo ? ipInfo.providerName : UNKNOWN
+            const nativeName = nodeObj?.node?.IPInfo?.providerName ?? UNKNOWN
             const provider = IPAddressInfoLoader.refineProviderName(nativeName)
 
             if(!providers[provider]) {

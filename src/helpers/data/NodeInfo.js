@@ -2,7 +2,7 @@ import {SEC_PER_BLOCK, thorToFloat} from "@/helpers/THORUtil";
 
 export class NodeInfo {
     constructor(node) {
-        if(!node) {
+        if (!node) {
             node = {
                 status: 'Unknown',
                 jail: {},
@@ -31,8 +31,8 @@ export class NodeInfo {
         this.currentAward = thorToFloat(node.current_award)
 
         this.observeChains = {}
-        if(node.observe_chains) {
-            for(let {chain, height} of node.observe_chains) {
+        if (node.observe_chains) {
+            for (let {chain, height} of node.observe_chains) {
                 this.observeChains[chain] = +height
             }
         }
@@ -49,8 +49,8 @@ export class NodeInfo {
             providers: []
         }
 
-        if(node.bond_providers.providers) {
-            for(let {bond_address, bond} of node.bond_providers.providers) {
+        if (node.bond_providers.providers) {
+            for (let {bond_address, bond} of node.bond_providers.providers) {
                 this.bondProviders.providers.push({
                     bond_address,
                     bond: thorToFloat(bond)
@@ -59,8 +59,11 @@ export class NodeInfo {
         }
 
         // post init
-        this.flag = '🏳️'
         this.ageSeconds = SEC_PER_BLOCK * this.statusSince
         this.shortAddress = this.address ? this.address.substring(this.address.length - 4) : '?'
+
+        this.IPInfo = {
+            flag: '🏳️'
+        }
     }
 }

@@ -32,7 +32,12 @@ export const Config = {
             },
             AzimuthAngleLimit: 30,
             PolarAngleLimit: 30,
-            MouseMoveStrength: 0.0002
+            MouseMoveStrength: 0.0002,
+
+            Animation: {
+                Duration: 0.6,
+                Z_DistanceWhenZoomed: 320.0,
+            }
         },
     },
     Scene: {

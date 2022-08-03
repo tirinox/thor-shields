@@ -5,32 +5,40 @@
             <h1>Node details </h1>
             <h2>{{ node.address }}</h2>
             <p>
+                <strong>Status: </strong> {{ node.status }}
+            </p>
+
             <span v-if="node.IPAddress && node.IPAddress !== ''">
                 IP Address information: <a :href="`https://www.infobyip.com/ip-${node.IPAddress}.html`">
-                    {{ node.flag }} {{ node.IPAddress }}
+                    {{ node.IPInfo?.flag }} {{ node.IPAddress }}
                 </a>
             </span>
-                <span v-else>
+            <span v-else>
                 No IP address
             </span>
-                <br>
-                <a :href="`https://viewblock.io/thorchain/address/${node.address}`">Viewblock {{ node.shortAddress }}</a>
-                <br>
-                <span>
+            <br>
+            <a :href="`https://viewblock.io/thorchain/address/${node.address}`">Viewblock {{
+                    node.shortAddress
+                }}</a>
+            <br>
+            <span>
                 <strong>Bond:</strong>
                 {{ Math.round(node.bond) }} Rune
             </span>
-                <br>
-                <span>
+            <br>
+            <span>
                 <strong>Awards:</strong>
                 {{ Math.round(node.currentAward) }} Rune
             </span>
-                <br>
-                <span>
+            <br>
+            <span>
                 <strong>Slash points:</strong>
                 {{ node.slashPoints }} pts.
             </span>
-            </p>
+            <code>
+                {{ JSON.stringify(node.IPInfo) }}
+            </code>
+
         </div>
     </Transition>
 
