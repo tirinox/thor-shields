@@ -39,10 +39,11 @@ export class ModeBond extends ModeBase {
 
     _positionateOnSpiral(nodeObjects) {
         const n = nodeObjects.length
-        const center = new THREE.Vector3()
+        const center = new THREE.Vector3(0, 120)
         let angle = 0.0
         let radius = 0.0
         // let gap = 3.0
+        const xScale = 1.5
 
         let deltaRadius = 5.0;
         let deltaAngle = 0.5;
@@ -55,7 +56,7 @@ export class ModeBond extends ModeBase {
             deltaRadius *= deltaDeltaRadius
             deltaAngle *= deltaDeltaAngle
 
-            const x = center.x + radius * Math.cos(angle)
+            const x = center.x + xScale * radius * Math.cos(angle)
             const y = center.y + radius * Math.sin(angle)
             this._addAttractor(nodeObjects[i], x, y)
         }
