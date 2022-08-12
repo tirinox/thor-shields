@@ -37,6 +37,9 @@ export const Config = {
             Animation: {
                 Duration: 0.6,
                 Z_DistanceWhenZoomed: 320.0,
+                Shift: {
+                    X: -200.0
+                }
             }
         },
     },
@@ -53,12 +56,13 @@ export const Config = {
         }
     },
     Physics: {
-        BaseForce: 1500.0,
+        BaseForce: 3500.0,
         RepelForce: 200.0,
         Startup: {
             SimulationSteps: 10,
             DeltaTime: 0.1
         },
+        BaseFriction: 0.04,
     },
     Debug: {
         ShowFPS: false,

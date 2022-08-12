@@ -15,7 +15,7 @@ export class ModeVersion extends ModeBase {
 
         this.force = Config.Physics.BaseForce
         this.attractors = {}
-        this.circlePacker = new CirclePack(this.force, 1200, 300, 0.02, 1)
+        this.circlePacker = new CirclePack(this.force, 1200, 300, Config.Physics.BaseFriction, 1)
         this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), -100.0)
     }
 
@@ -35,6 +35,8 @@ export class ModeVersion extends ModeBase {
 
     onEnter(objList) {
         this._createVersionAttractors(objList)
+        this.makeLabel('Versions', new THREE.Vector3(0, -630, -10), 14)
+
         super.onEnter();
     }
 

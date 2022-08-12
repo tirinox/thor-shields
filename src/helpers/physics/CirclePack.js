@@ -3,6 +3,7 @@ import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
 import {Attractor} from "@/helpers/physics/Attractor";
 import {Simulation} from "@/helpers/physics/Simulation";
 import _ from "lodash";
+import {Config} from "@/config";
 
 
 class VirtualObject extends PhysicalObject {
@@ -20,8 +21,10 @@ class VirtualObject extends PhysicalObject {
     }
 }
 
+const fric = Config.Physics.BaseFriction
+
 export class CirclePack {
-    constructor(force, boundRadius, repelForce = 600, friction = 0.02, iterSteps = 1) {
+    constructor(force, boundRadius, repelForce = 600, friction = fric, iterSteps = 1) {
         this.force = force
         this.boundRadius = boundRadius
         this.iterSteps = iterSteps

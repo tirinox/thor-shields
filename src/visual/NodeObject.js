@@ -34,7 +34,7 @@ export class NodeObject extends PhysicalObject {
 
         this.attractors = []
         // this.mass = this.normalizedBond * 2.0
-        this.friction = 0.025
+        this.friction = Config.Physics.BaseFriction
 
         this._makeSphere()
         this._makeLabel()
