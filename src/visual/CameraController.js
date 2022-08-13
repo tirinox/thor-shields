@@ -43,9 +43,10 @@ export class CameraController {
     }
 
     update(delta) {
-        if (this.controlsEnabled && !this._animating) {
+        if (this.controlsEnabled && !this._animating && !this.cameraInspectsObject) {
             this.controls.update(delta);
         }
+        // todo: if we look at the object, keep tracking it while it moves around
     }
 
     onResize() {
@@ -86,6 +87,10 @@ export class CameraController {
 
     restoreCamera() {
         if (this.cameraInspectsObject) {
+            // this.camera.position.copy(this.oldCameraPos)
+            // this.cameraInspectsObject = false
+            // this._animating = false
+
             this.cameraInspectsObject = false
             this._animating = true
 
@@ -95,7 +100,7 @@ export class CameraController {
                 .easing(TWEEN.Easing.Sinusoidal.InOut)
                 .onUpdate(function () {
                     that.camera.position.copy(this);
-                    that.camera.lookAt(that.center.x)
+                    // that.camera.lookAt(that.center)
                 })
                 .onComplete(() => {
                     that._animating = false

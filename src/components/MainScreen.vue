@@ -183,11 +183,11 @@ export default {
                 delta = 0.5
             }
 
+            TWEEN.update()
             this.$refs.fps.update(delta, this.scene)
             this.cameraController.update(delta)
             this.content.update(delta)
-            this.bg.update(delta);
-            TWEEN.update()
+            this.bg.update(delta)
             this.composer.render(delta)
 
             requestAnimationFrame(this.render);
