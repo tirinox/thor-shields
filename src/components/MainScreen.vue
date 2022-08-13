@@ -32,7 +32,6 @@
 import "@/css/common.css"
 import * as THREE from "three"
 import {Config} from "@/config";
-import CameraControls from "camera-controls";
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass";
@@ -44,6 +43,7 @@ import {emitter, EventTypes} from "@/helpers/EventTypes";
 import ControlPanel from "@/components/parts/ControlPanel";
 import NodeDetailsWindow from "@/components/parts/NodeDetailsWindow";
 import {NodeInfo} from "@/helpers/data/NodeInfo";
+import {CameraController} from "@/visual/CameraController";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
 
@@ -68,16 +68,13 @@ export default {
 
             nodeDetailsVisible: false,
             nodeToViewDetails: new NodeInfo(),
-
-            cameraInspectsObject: false,
-            animating: false,
         }
     },
 
     methods: {
         onKeyDown(event) {
             if (event.code === 'KeyR') {
-                this.resetCamera()
+                this.cameraController.reset()
             } else if (event.code === 'KeyF') {
                 this.showFps = !this.showFps
             } else if (event.code === 'KeyH') {
@@ -98,7 +95,7 @@ export default {
             const dy = this.mouseEnterY - y
             this.mouseEnterX = x
             this.mouseEnterY = y
-            this.controls.rotate(dx * scale, dy * scale)
+            this.cameraController.controls.rotate(dx * scale, dy * scale)
         },
 
         onMouseEnter(event) {
@@ -113,7 +110,7 @@ export default {
             const pickPosition = this.getCanvasRelativePosition(event)
 
             // cast a ray through the frustum
-            this.raycaster.setFromCamera(pickPosition, this.camera);
+            this.raycaster.setFromCamera(pickPosition, this.cameraController.camera);
             // get the list of objects the ray intersected
             const intersectedObjects = this.raycaster.intersectObjects(this.scene.children);
             if (intersectedObjects.length) {
@@ -125,7 +122,7 @@ export default {
                 }
             } else {
                 this.nodeDetailsVisible = false
-                this._restoreCamera()
+                this.cameraController.restoreCamera()
             }
         },
 
@@ -138,7 +135,7 @@ export default {
 
             const nodeObj = this.content.nodeGroup.getByName(nodeAddress)
             if (nodeObj) {
-                this._cameraLookAtNode(nodeObj)
+                this.cameraController.cameraLookAtNode(nodeObj)
             }
         },
 
@@ -154,18 +151,11 @@ export default {
             }
         },
 
-        resetCamera() {
-            this.controls.reset()
-        },
-
         resizeRendererToDisplaySize() {
             const renderer = this.renderer
             const canvas = renderer.domElement;
             const width = canvas.clientWidth;
             const height = canvas.clientHeight;
-
-            this.camera.aspect = width / height;
-            this.camera.updateProjectionMatrix();
 
             const needResize = this.composer._width !== width || this.composer._height !== height;
             if (needResize) {
@@ -177,6 +167,8 @@ export default {
                 if (this.bg) {
                     this.bg.setSize(width, height)
                 }
+
+                this.cameraController.onResize()
             }
 
             return needResize;
@@ -192,45 +184,13 @@ export default {
             }
 
             this.$refs.fps.update(delta, this.scene)
-
-            if (!this.cameraInspectsObject && !this.animating) {
-                this.controls.update(delta);
-            }
-
+            this.cameraController.update(delta)
             this.content.update(delta)
-
             this.bg.update(delta);
-
             TWEEN.update()
-
             this.composer.render(delta)
 
             requestAnimationFrame(this.render);
-        },
-
-        createCamera() {
-            this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
-                0.001, Config.Controls.Camera.Distance.Max * 2);
-            // this.camera = new THREE.OrthographicCamera()
-            this.camera.position.z = Config.Controls.Camera.Distance.Start
-        },
-
-        createCameraControl() {
-            const controls = this.controls = new CameraControls(this.camera, this.renderer.domElement);
-            const cfg = Config.Controls.Camera
-
-            controls.dragToOffset = true
-            controls.minDistance = cfg.Distance.Min
-            controls.maxDistance = cfg.Distance.Max
-            this.camera.position.z = cfg.Distance.Start
-
-            controls.minAzimuthAngle = THREE.MathUtils.degToRad(-cfg.AzimuthAngleLimit)
-            controls.maxAzimuthAngle = THREE.MathUtils.degToRad(cfg.AzimuthAngleLimit)
-
-            controls.minPolarAngle = THREE.MathUtils.degToRad(-cfg.PolarAngleLimit + 90)
-            controls.maxPolarAngle = THREE.MathUtils.degToRad(cfg.PolarAngleLimit + 90)
-
-            controls.update(0)
         },
 
         makeSkybox() {
@@ -252,7 +212,7 @@ export default {
                 renderer.setPixelRatio(devicePixelRatio)
             }
 
-            const renderScene = new RenderPass(this.scene, this.camera);
+            const renderScene = new RenderPass(this.scene, this.cameraController.camera);
 
             this.composer = new EffectComposer(renderer);
             this.composer.addPass(renderScene);
@@ -269,7 +229,7 @@ export default {
         },
 
         buildScene() {
-            this.scene.add(this.camera)
+            this.scene.add(this.cameraController.camera)
             this.makeSkybox()
 
             this.content = new MainScene(this.scene, this)
@@ -291,58 +251,9 @@ export default {
             console.log('fully loaded! removing loading screen...')
         },
 
-        _cameraLookAtNode(nodeObj) {
-            if (!this.cameraInspectsObject) {
-                this.oldCameraPos = this.camera.position.clone()
-                this.cameraInspectsObject = true
-            }
-
-            this.animating = true
-
-            const that = this
-            const position = nodeObj.o.position
-            const target = new THREE.Vector3(
-                position.x,
-                position.y,
-                Config.Controls.Camera.Animation.Z_DistanceWhenZoomed,
-            )
-
-            new TWEEN.Tween(this.camera.position)
-                .to(target, Config.Controls.Camera.Animation.Duration)
-                .easing(TWEEN.Easing.Sinusoidal.InOut)
-                .onUpdate(function () {
-                    that.camera.position.copy(this);
-                })
-                .onComplete(() => {
-                    that.animating = false
-                })
-                .start();
-        },
-
-        _restoreCamera() {
-            if (this.cameraInspectsObject) {
-                this.cameraInspectsObject = false
-                this.animating = true
-
-                const that = this
-                new TWEEN.Tween(this.camera.position)
-                    .to(this.oldCameraPos, Config.Controls.Camera.Animation.Duration)
-                    .easing(TWEEN.Easing.Sinusoidal.InOut)
-                    .onUpdate(function () {
-                        that.camera.position.copy(this);
-                        that.camera.lookAt(0, 0, 0)
-                        // that.controls.update(); // update of controls is here now
-                    })
-                    .onComplete(() => {
-                        that.animating = false
-                    })
-                    .start();
-            }
-        },
-
         onCloseDetails() {
             this.nodeDetailsVisible = false
-            this._restoreCamera()
+            this.cameraController.restoreCamera()
         },
     },
 
@@ -352,9 +263,8 @@ export default {
         this.clock = new THREE.Clock()
         this.scene = new THREE.Scene()
 
-        this.createCamera(this.canvas)
+        this.cameraController = new CameraController(this.canvas)
         this.makeRenderer(this.canvas)
-        this.createCameraControl()
         this.resizeRendererToDisplaySize()
         this.buildScene()
 
@@ -366,7 +276,7 @@ export default {
 
     unmounted() {
         this.content.dispose()
-        this.controls.dispose()
+        this.cameraController.dispose()
         emitter.off(EventTypes.FullyLoaded)
     }
 }
@@ -394,6 +304,5 @@ canvas {
     width: 100%;
     height: 100%;
 }
-
 
 </style>

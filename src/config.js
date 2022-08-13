@@ -35,7 +35,7 @@ export const Config = {
             MouseMoveStrength: 0.0002,
 
             Animation: {
-                Duration: 0.6,
+                Duration: 1.6,
                 Z_DistanceWhenZoomed: 320.0,
                 Shift: {
                     X: -200.0

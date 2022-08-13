@@ -13,6 +13,10 @@ export class CameraController {
         this.controlsEnabled = true
     }
 
+    reset() {
+        this.controls.reset()
+    }
+
     _createCamera() {
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
             0.001, Config.Controls.Camera.Distance.Max * 2);
@@ -52,7 +56,7 @@ export class CameraController {
         this.camera.updateProjectionMatrix();
     }
 
-    _cameraLookAtNode(nodeObj) {
+    cameraLookAtNode(nodeObj) {
         if (!this.cameraInspectsObject) {
             this.oldCameraPos = this.camera.position.clone()
             this.cameraInspectsObject = true
@@ -80,7 +84,7 @@ export class CameraController {
             .start();
     }
 
-    _restoreCamera() {
+    restoreCamera() {
         if (this.cameraInspectsObject) {
             this.cameraInspectsObject = false
             this._animating = true
@@ -98,5 +102,9 @@ export class CameraController {
                 })
                 .start();
         }
+    }
+
+    dispose() {
+        this.controls.dispose()
     }
 }

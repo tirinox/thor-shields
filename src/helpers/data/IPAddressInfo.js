@@ -33,7 +33,6 @@ export class IPAddressInfoLoader {
     }
 
     url(ip) {
-        // return `http://ip-api.com/json/${ip}?fields=status,message,countryCode,region,regionName,city,lat,lon,isp,org,asname,query`
         return `https://settings.thornode.org/api/node/ip/${ip}`
     }
 
