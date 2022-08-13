@@ -45,10 +45,10 @@ export class MainScene {
         this.scene.add(ambientLight);
     }
 
-    async _loadAdditionalInfoAbout(obj) {
-        const ipAddress = obj.node.IPAddress
+    async _loadAdditionalInfoAbout(node) {
+        const ipAddress = node.IPAddress
         if (ipAddress) {
-            obj.node.IPInfo = await this.ipAddressLoader.load(ipAddress)
+            node.IPInfo = await this.ipAddressLoader.load(ipAddress)
         }
     }
 
@@ -72,9 +72,10 @@ export class MainScene {
         for (const event of events) {
             const node = event.node
             if (node.address) {
+                this._loadAdditionalInfoAbout(node).then()
                 if (event.type === NodeEvent.EVENT_TYPE.CREATE) {
-                    const obj = this.nodeGroup.createNewNode(node)
-                    this._loadAdditionalInfoAbout(obj).then()
+                    this.nodeGroup.createNewNode(node)
+
                 } else if (event.type === NodeEvent.EVENT_TYPE.DESTROY) {
                     this.nodeGroup.destroyNode(node)
                 } else {
