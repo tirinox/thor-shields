@@ -42,11 +42,6 @@ export class NodeGroup extends Simulation {
         this._selectedModeHandler = this._modeNormal
         this.mode = NodeGroupModes.Normal
 
-        this._startPositionBounds = {
-            xMin: -60, xMax: 60,
-            yMin: -40, yMax: 40,
-            zMin: 0, zMax: 0,
-        }
         this.repelForce = Config.Physics.RepelForce
     }
 
@@ -100,13 +95,13 @@ export class NodeGroup extends Simulation {
         this._mode = newMode
 
         // dispose old
-        this._selectedModeHandler.onLeave(this.nodeObjList)
+        this._selectedModeHandler.onLeave(this.physicalObjects)
 
         // pick new
         this._selectedModeHandler = this._selector[this._mode]
 
         // enter the new one
-        this._selectedModeHandler.onEnter(this.nodeObjList)
+        this._selectedModeHandler.onEnter(this.physicalObjects)
 
         console.log(`Set Mode: ${newMode}`)
     }
@@ -138,7 +133,7 @@ export class NodeGroup extends Simulation {
     dispose() {
         super.dispose()
         clearObject(this.parent)
-        for (const otherObj of this.nodeObjList) {
+        for (const otherObj of this.physicalObjects) {
             otherObj.dispose()
         }
     }

@@ -1,13 +1,16 @@
 import _ from "lodash";
+import RBush from "rbush";
 
 export class Simulation {
     constructor() {
-        this.objects = {}
-        this.repelForce = 501.0
+        this._objects = {}
+
+        this.repelForce = 0.0
+        this.rBush = new RBush()
     }
 
     getByName(name) {
-        return this.objects[name]
+        return this._objects[name]
     }
 
     addObject(name, physObj) {
@@ -16,7 +19,8 @@ export class Simulation {
             console.warn('PhysObj already exists. No nothing')
             return existing
         }
-        this.objects[name] = physObj
+
+        this._objects[name] = physObj
     }
 
     removeObject(name) {
@@ -27,28 +31,35 @@ export class Simulation {
         }
 
         physObj.dispose()
-        delete this.objects[name]
+        delete this._objects[name]
     }
 
     _repelForceCalculation(obj) {
-        for (const otherObj of this.nodeObjList) {
-            if (otherObj !== obj) {
-                obj.repel(otherObj, this.repelForce)
+        let vicinity = this.rBush.search(obj.boundingBox)
+
+        for (const rBushLeaf of vicinity) {
+            if (rBushLeaf.o !== obj) {
+                obj.repel(rBushLeaf.o, this.repelForce)
             }
         }
     }
 
-    _updateObject(obj, delta) {
-        obj.nullifyForce()
-        this._repelForceCalculation(obj)
-        obj.update(delta)
+    _updateObject(physObj, delta) {
+        physObj.nullifyForce()
+        this._repelForceCalculation(physObj)
+        physObj.update(delta)
     }
 
     update(dt) {
         if (isNaN(dt)) {
             return
         }
-        _.forEach(this.nodeObjList, obj => this._updateObject(obj, dt))
+        this.rBush = new RBush()
+        this.rBush.load(_.map(_.values(this._objects), physObj => ({
+            ...physObj.boundingBox,
+            o: physObj
+        })))
+        _.forEach(_.values(this._objects), obj => this._updateObject(obj, dt))
     }
 
     doNSteps(n, dt = 0.016) {
@@ -57,19 +68,24 @@ export class Simulation {
         }
     }
 
-    get nodeObjList() {
-        return _.values(this.objects)
+    get physicalObjects() {
+        return _.values(this._objects)
+    }
+
+    get allNames() {
+        return _.keys(this._objects)
     }
 
     dispose() {
-        // for (const otherObj of this.nodeObjList) {
-        //     otherObj.dispose()
-        //     // this.parent.remove(otherObj.realObject)
-        // }
-        this.objects = {}
+        this._objects = {}
+        this.rBush.clear()
     }
 
     get size() {
-        return _.size(this.objects)
+        return _.size(this._objects)
+    }
+
+    get entries() {
+        return _.entries(this._objects)
     }
 }

@@ -4,11 +4,11 @@ import {Random, Util} from "@/helpers/MathUtil";
 import {Text} from 'troika-three-text'
 import {Colors, Config} from "@/config";
 import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
-// import StdVertexShader from '@/visual/shader/standard.vert'
 import StdVertexShader from '@/visual/shader/billboard.vert'
+// import StdVertexShader from '@/visual/shader/standard.vert'
+// import FragShader1 from '@/visual/shader/node_obj_3_rays.frag'
 // import FragShader1 from '@/visual/shader/node_obj_1.frag'
 import FragShader1 from '@/visual/shader/node_obj_2.frag'
-// import FragShader1 from '@/visual/shader/node_obj_3_rays.frag'
 import {NodeStatus} from "@/helpers/NodeTracker";
 import {randFloat} from "three/src/math/MathUtils";
 import {clamp} from "lodash";
@@ -17,7 +17,7 @@ import {clamp} from "lodash";
 const noCfg = Config.Scene.NodeObject
 
 // const geometry = new THREE.SphereGeometry(0.5, 32, 32)
-// const geometry = new THREE.IcosahedronGeometry(1, 1)
+// const geometry = new THREE.IcosahedronGeometry(noCfg.PlaneScale, 1)
 const geometry = new THREE.PlaneGeometry(noCfg.PlaneScale, noCfg.PlaneScale)
 
 
@@ -95,6 +95,10 @@ export class NodeObject extends PhysicalObject {
 
     get realObject() {
         return this.o
+    }
+
+    get position() {
+        return this.o.position
     }
 
     _makeLabel() {

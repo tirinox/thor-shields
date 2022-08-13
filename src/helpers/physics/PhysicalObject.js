@@ -57,4 +57,16 @@ export class PhysicalObject {
             physObj.force.add(lineDir.negate())
         }
     }
+
+    get boundingBox() {
+        const x = this.realObject.position.x
+        const y = this.realObject.position.y
+        const r = this.radius
+        return {
+            minX: x - r,
+            minY: y - r,
+            maxX: x + r,
+            maxY: y + r,
+        }
+    }
 }

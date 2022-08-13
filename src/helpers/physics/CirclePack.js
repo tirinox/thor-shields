@@ -2,7 +2,6 @@ import * as THREE from "three";
 import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
 import {Attractor} from "@/helpers/physics/Attractor";
 import {Simulation} from "@/helpers/physics/Simulation";
-import _ from "lodash";
 import {Config} from "@/config";
 
 
@@ -60,7 +59,7 @@ export class CirclePack {
         const r = this.boundRadius * 0.5 * 0.8
         let angle = Math.PI * 0.5
 
-        for (const name of _.keys(this.simulation.objects)) {
+        for (const name of this.simulation.allNames) {
             const obj = this.simulation.getByName(name)
             if (obj) {
                 obj.position.x = r * Math.cos(angle)
@@ -88,10 +87,9 @@ export class CirclePack {
 
     getResults() {
         const results = {}
-        for (const [name, obj] of _.entries(this.simulation.objects)) {
+        for (const [name, {position, radius}] of this.simulation.entries) {
             results[name] = {
-                position: obj.position,
-                radius: obj.radius
+                position, radius
             }
         }
         return results
