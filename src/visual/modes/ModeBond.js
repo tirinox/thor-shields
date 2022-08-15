@@ -10,6 +10,7 @@ export class ModeBond extends ModeBase {
         super(scene);
         this.nameToAttractor = {}
         this.force = Config.Physics.BaseForce
+        this._noBondAttractor = new Attractor(new THREE.Vector3(0, 2000, 0), this.force)
     }
 
     handleObject(physObj) {
@@ -41,7 +42,7 @@ export class ModeBond extends ModeBase {
         const n = nodeObjects.length
         const center = new THREE.Vector3(0, 120)
         let angle = 0.0
-        let radius = 0.0
+        let radius = 50.0
         // let gap = 3.0
         const xScale = 1.5
 
@@ -51,14 +52,14 @@ export class ModeBond extends ModeBase {
         const deltaDeltaAngle = 0.991;
 
         for (let i = 0; i < n; ++i) {
-            radius += deltaRadius;
-            angle += deltaAngle;
-            deltaRadius *= deltaDeltaRadius
-            deltaAngle *= deltaDeltaAngle
-
             const x = center.x + xScale * radius * Math.cos(angle)
             const y = center.y + radius * Math.sin(angle)
-            this._addAttractor(nodeObjects[i], x, y)
+            if(this._addAttractor(nodeObjects[i], x, y)) {
+                radius += deltaRadius;
+                angle += deltaAngle;
+                deltaRadius *= deltaDeltaRadius
+                deltaAngle *= deltaDeltaAngle
+            }
         }
     }
 
@@ -84,13 +85,17 @@ export class ModeBond extends ModeBase {
     }
 
     _addAttractor(nodeObject, x, y) {
-        const z = nodeObject.o.position.z
-        this.nameToAttractor[nodeObject.node.address] = new Attractor(new THREE.Vector3(x, y, z),
-            this.force, 0, 0, -1, 10.0)
-
         const bond = nodeObject.node.bond
-        if(bond > 1) {
+        if(bond > 1.0) {
+            const z = nodeObject.o.position.z
+            this.nameToAttractor[nodeObject.node.address] = new Attractor(new THREE.Vector3(x, y, z),
+                this.force, 0, 0, -1, 10.0)
+
             this.makeLabel(shortRune(bond), new THREE.Vector3(x, y - 30.0, -10), 1)
+            return true
+        } else {
+            this.nameToAttractor[nodeObject.node.address] = this._noBondAttractor
+            return false
         }
     }
 }
