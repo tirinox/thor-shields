@@ -26,7 +26,7 @@ export class URLDataSource {
 
         this._timer = setInterval(() => {
             this._tick().then()
-        }, this.period * 1000)
+        }, this.period)
     }
 
     stop() {

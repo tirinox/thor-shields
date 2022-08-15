@@ -112,7 +112,7 @@ export class NodeGroup extends Simulation {
     }
 
     reactEvent(event) {
-        const delay = Random.getRandomFloat(0, Config.DataSource.ReactRandomDelay * 1000.0)
+        const delay = Random.getRandomFloat(0, Config.DataSource.ReactRandomDelay)
         setTimeout(() => {
             const obj = this.getByName(event.node.address)
             if (obj) {
@@ -121,6 +121,7 @@ export class NodeGroup extends Simulation {
                 } else if (event.type === NodeEvent.EVENT_TYPE.SLASH) {
                     obj.reactSlash()
                 }
+                // todo: react to status, bond changes
             }
         }, delay)
     }

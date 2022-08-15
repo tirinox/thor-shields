@@ -75,7 +75,6 @@ export class MainScene {
                 this._loadAdditionalInfoAbout(node).then()
                 if (event.type === NodeEvent.EVENT_TYPE.CREATE) {
                     this.nodeGroup.createNewNode(node)
-
                 } else if (event.type === NodeEvent.EVENT_TYPE.DESTROY) {
                     this.nodeGroup.destroyNode(node)
                 } else {
