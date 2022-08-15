@@ -81,27 +81,33 @@ export class CameraController {
 
         this._animating = true
 
+        const cfg = Config.Controls.Camera.Animation
+
         const that = this
         const position = nodeObj.o.position
+
         const target = new THREE.Vector3(
-            position.x,
+            cfg.X_DistanceWhenZoomed + position.x,
             position.y,
-            Config.Controls.Camera.Animation.Z_DistanceWhenZoomed,
+            cfg.Z_DistanceWhenZoomed,
+        )
+        const targetLookAt = new THREE.Vector3(
+            cfg.X_DistanceWhenZoomed + position.x,
+            position.y,
+            position.z,
         )
 
-        const animTime = Config.Controls.Camera.Animation.Duration
-
         new TWEEN.Tween(this.camera.position)
-            .to(target, animTime)
+            .to(target, cfg.Duration)
             .easing(TWEEN.Easing.Sinusoidal.InOut)
             .onComplete(() => {
                 that._animating = false
             })
             .start();
 
-        const endQuaternion = this._getEndQuaternion(target, position)
+        const endQuaternion = this._getEndQuaternion(target, targetLookAt)
         new TWEEN.Tween(this.camera.quaternion)
-            .to(endQuaternion, animTime)
+            .to(endQuaternion, cfg.Duration)
             .easing(TWEEN.Easing.Sinusoidal.InOut)
             .start()
     }
