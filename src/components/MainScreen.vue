@@ -187,17 +187,21 @@ export default {
             this.$refs.fps.update(delta, this.scene)
             this.cameraController.update(delta)
             this.content.update(delta)
-            this.bg.update(delta)
+            if (this.bg) {
+                this.bg.update(delta)
+            }
             this.composer.render(delta)
 
             requestAnimationFrame(this.render);
         },
 
         makeSkybox() {
-            // this.bg = new Background(this.scene)
-            // this.bg = new BlackgroundStaticBox(this.scene, Config.Scene.Sky.SkyBox, Config.Scene.Sky.SkyBoxExt)
-            this.bg = new Background(this.scene)
-            this.bg.install()
+            if (Config.Scene.Background.Enabled) {
+                // this.bg = new Background(this.scene)
+                // this.bg = new BlackgroundStaticBox(this.scene, Config.Scene.Sky.SkyBox, Config.Scene.Sky.SkyBoxExt)
+                this.bg = new Background(this.scene)
+                this.bg.install()
+            }
         },
 
         makeRenderer(canvas) {

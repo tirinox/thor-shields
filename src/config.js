@@ -44,6 +44,9 @@ export const Config = {
         },
     },
     Scene: {
+        Background: {
+            Enabled: false,  // todo: enable. disabled for better performance
+        },
         Sky: {
             SkyBox: 'texture/skybox/star',
             SkyBoxExt: 'png',
@@ -62,7 +65,7 @@ export const Config = {
             SimulationSteps: 10,
             DeltaTime: 0.1
         },
-        BaseFriction: 0.04,
+        BaseFriction: 0.07, //0.04
     },
     Debug: {
         ShowFPS: false,
