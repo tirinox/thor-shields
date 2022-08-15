@@ -57,9 +57,25 @@ export class CameraController {
         this.camera.updateProjectionMatrix();
     }
 
+    _getEndQuaternion(target, lookAtThis) {
+        const currPos = this.camera.position.clone()
+        const currQ = this.camera.quaternion.clone()
+
+        this.camera.position.copy(target)
+        this.camera.lookAt(lookAtThis)
+
+        const endQuaternion = this.camera.quaternion.clone()
+
+        this.camera.position.copy(currPos)
+        this.camera.quaternion.copy(currQ)
+
+        return endQuaternion
+    }
+
     cameraLookAtNode(nodeObj) {
         if (!this.cameraInspectsObject) {
             this.oldCameraPos = this.camera.position.clone()
+            this.oldCameraQuaternion = this.camera.quaternion.clone()
             this.cameraInspectsObject = true
         }
 
@@ -73,39 +89,47 @@ export class CameraController {
             Config.Controls.Camera.Animation.Z_DistanceWhenZoomed,
         )
 
+        const animTime = Config.Controls.Camera.Animation.Duration
+
         new TWEEN.Tween(this.camera.position)
-            .to(target, Config.Controls.Camera.Animation.Duration)
+            .to(target, animTime)
             .easing(TWEEN.Easing.Sinusoidal.InOut)
-            .onUpdate(function () {
-                that.camera.position.copy(this);
-            })
             .onComplete(() => {
                 that._animating = false
             })
             .start();
+
+        const endQuaternion = this._getEndQuaternion(target, position)
+        new TWEEN.Tween(this.camera.quaternion)
+            .to(endQuaternion, animTime)
+            .easing(TWEEN.Easing.Sinusoidal.InOut)
+            .start()
     }
 
     restoreCamera() {
         if (this.cameraInspectsObject) {
-            // this.camera.position.copy(this.oldCameraPos)
-            // this.cameraInspectsObject = false
-            // this._animating = false
-
             this.cameraInspectsObject = false
             this._animating = true
 
             const that = this
+            const animTime = Config.Controls.Camera.Animation.Duration
             new TWEEN.Tween(this.camera.position)
                 .to(this.oldCameraPos, Config.Controls.Camera.Animation.Duration)
                 .easing(TWEEN.Easing.Sinusoidal.InOut)
                 .onUpdate(function () {
-                    that.camera.position.copy(this);
+                    // that.camera.position.copy(this);
                     // that.camera.lookAt(that.center)
                 })
                 .onComplete(() => {
                     that._animating = false
                 })
                 .start();
+
+            const endQuaternion = this._getEndQuaternion(this.oldCameraPos, this.center)
+            new TWEEN.Tween(this.camera.quaternion)
+                .to(endQuaternion, animTime)
+                .easing(TWEEN.Easing.Sinusoidal.InOut)
+                .start()
         }
     }
 
