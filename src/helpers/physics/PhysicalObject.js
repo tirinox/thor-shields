@@ -1,5 +1,6 @@
 import {Vector3} from "three";
 import {Util} from "@/helpers/MathUtil";
+import {Config} from "@/config";
 
 export class PhysicalObject {
     constructor() {
@@ -18,6 +19,9 @@ export class PhysicalObject {
         const acceleration = this.force.multiplyScalar(this.mass)
         this.velocity.copy(this.velocity.clone().add(acceleration.multiplyScalar(dt)))
         this.velocity.multiplyScalar(Util.clamp(1.0 - this.friction, 0.0, 1.0))
+        if(this.velocity.lengthSq() > Config.Physics.MaxSpeedSq) {
+            this.velocity.setLength(Math.sqrt(Config.Physics.MaxSpeedSq))
+        }
         this.realObject.position.add(this.velocity.clone().multiplyScalar(dt))
     }
 

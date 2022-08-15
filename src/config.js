@@ -5,11 +5,11 @@ const Live = process.env.USE_LOCAL_DATA !== "1"
 export const Config = {
     DataSource: {
         NodesURL: (Live ?
-                'https://thornode.ninerealms.com/thorchain/nodes' :
-                'http://localhost:8080/data/samplenodes.json'),
+            'https://thornode.ninerealms.com/thorchain/nodes' :
+            'http://localhost:8080/data/samplenodes.json'),
 
-        PollPeriod: 3, // sec
-        ReactRandomDelay: 2.5, // sec
+        PollPeriod: 3000.0, // msec
+        ReactRandomDelay: 2500.0, // msec
     },
     Font: {
         // Main: 'fonts/NorseBold-2Kge.otf'
@@ -36,6 +36,7 @@ export const Config = {
 
             Animation: {
                 Duration: 500.0,
+                X_DistanceWhenZoomed: -200.0,
                 Z_DistanceWhenZoomed: 320.0,
                 Shift: {
                     X: -200.0
@@ -66,6 +67,7 @@ export const Config = {
             DeltaTime: 0.1
         },
         BaseFriction: 0.07, //0.04
+        MaxSpeedSq: Math.pow(1500, 2),
     },
     Debug: {
         ShowFPS: false,
