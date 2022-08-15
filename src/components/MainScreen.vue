@@ -4,7 +4,7 @@
             ref="canvas"
             class="canvas-full"
             tabindex="1"
-            @keydown="onKeyDown"
+            @keypress="onKeyDown"
             @mousemove="onMouseMove"
             @mouseenter="onMouseEnter"
             @mouseleave="onMouseLeave"
@@ -41,7 +41,7 @@ import TWEEN from "tween";
 import {Background} from "@/visual/helpers/Background";
 import {emitter, EventTypes} from "@/helpers/EventTypes";
 import ControlPanel from "@/components/parts/ControlPanel";
-import NodeDetailsWindow from "@/components/parts/NodeDetailsWindow";
+import NodeDetailsWindow from "@/components/NodeDetailsWindow";
 import {NodeInfo} from "@/helpers/data/NodeInfo";
 import {CameraController} from "@/visual/CameraController";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
@@ -73,6 +73,7 @@ export default {
 
     methods: {
         onKeyDown(event) {
+            console.log(event)
             if (event.code === 'KeyR') {
                 this.cameraController.reset()
             } else if (event.code === 'KeyF') {
@@ -80,6 +81,7 @@ export default {
             } else if (event.code === 'KeyH') {
                 console.log('help?')
             }
+            // event.target.blur();
         },
 
         onMouseMove(event) {
@@ -175,13 +177,15 @@ export default {
         },
 
         render() {
-            this.resizeRendererToDisplaySize(this.renderer)
-
             let delta = this.clock.getDelta();
 
-            if (delta > 0.5) {
-                delta = 0.5
+            if (document.visibilityState === 'hidden') {
+                return
+            } else if (delta > 0.4) {
+                delta = 0.01
             }
+
+            this.resizeRendererToDisplaySize(this.renderer)
 
             TWEEN.update()
             this.$refs.fps.update(delta, this.scene)
