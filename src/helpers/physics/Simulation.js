@@ -72,6 +72,10 @@ export class Simulation {
         return _.values(this._objects)
     }
 
+    get objectPositions() {
+        return _.map(this.physicalObjects, 'position')
+    }
+
     get allNames() {
         return _.keys(this._objects)
     }
