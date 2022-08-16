@@ -20,8 +20,9 @@ const noCfg = Config.Scene.NodeObject
 // const geometry = new THREE.IcosahedronGeometry(noCfg.PlaneScale, 1)
 const geometry = new THREE.PlaneGeometry(noCfg.PlaneScale, noCfg.PlaneScale)
 
-
 const SlashColor = 0xff3300
+
+const NormalLabelZ = 2.42
 
 export class NodeObject extends PhysicalObject {
     constructor(node) {
@@ -31,6 +32,7 @@ export class NodeObject extends PhysicalObject {
         this.normalizedBond = this.node.bond / 1_000_000  // millions of Rune
 
         this.o = new THREE.Group()
+        this.o.name = this.name
 
         this.attractors = []
         // this.mass = this.normalizedBond * 2.0
@@ -38,6 +40,30 @@ export class NodeObject extends PhysicalObject {
 
         this._makeSphere()
         this._makeLabel()
+
+        this._elevated = false
+    }
+
+    get name() {
+        return this.node.address
+    }
+
+    set elevated(v) {
+        v = Boolean(v)
+        if(this._elevated !== v) {
+            this._elevated = v
+            // this.material.uniforms.color.value = this._elevated ? PickedColor : this.normalColor
+            this.material.uniforms.saturation.value = this._elevated ? 1.5 : 1.0
+            this.material.uniformsNeedUpdate = true
+            if(this.nameTextObj) {
+                this.nameTextObj.position.z = this._elevated ? 10.0 : NormalLabelZ
+            }
+            // todo: add glow effect
+        }
+    }
+
+    get elevated() {
+        return this._elevated
     }
 
     _makeSphere() {
@@ -76,6 +102,8 @@ export class NodeObject extends PhysicalObject {
             // sizeAttenuation: true,
         })
 
+        this.normalColor = colorObj
+
         // Size (scale): 1 = 1 million Rune
         const scale = this.calculateScale
 
@@ -84,7 +112,7 @@ export class NodeObject extends PhysicalObject {
         this.mesh = new THREE.Mesh(geometry, this.material);
         this.mesh.scale.setScalar(scale)
         this.mesh.position.z = z
-        this.mesh.name = this.node.address
+        this.mesh.name = this.name
         this.o.add(this.mesh)
     }
 
@@ -110,17 +138,18 @@ export class NodeObject extends PhysicalObject {
             nameTextObj.font = Config.Font.Main
             nameTextObj.fontWeight = 900
             nameTextObj.fontSize = 15
-            nameTextObj.position.z = 2.42
+            nameTextObj.position.z = NormalLabelZ
             nameTextObj.color = this.node.status === NodeStatus.Active ? 0xFFFFFF : 0xBBBBBB;
             nameTextObj.anchorX = 'center'
             nameTextObj.anchorY = 'middle'
             nameTextObj.outlineWidth = 2.0
             nameTextObj.sync()
-            nameTextObj.name = this.node.address
+            nameTextObj.name = this.name
             nameTextObj.scale.setScalar(
                 clamp(this.normalizedBond * 1.1, 0.5, 1.5)
             )
             this.o.add(nameTextObj)
+            this.labelObj = nameTextObj
         }
     }
 

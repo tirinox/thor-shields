@@ -98,6 +98,9 @@ export default {
             this.mouseEnterX = x
             this.mouseEnterY = y
             this.cameraController.controls.rotate(dx * scale, dy * scale)
+
+            const pickedName = this._pickObject(event)?.name
+            this.content.nodeGroup.setElevatedNode(pickedName)
         },
 
         onMouseEnter(event) {
@@ -108,16 +111,20 @@ export default {
         onMouseLeave() {
         },
 
-        onClick(event) {
+        _pickObject(event) {
             const pickPosition = this.getCanvasRelativePosition(event)
 
             // cast a ray through the frustum
             this.raycaster.setFromCamera(pickPosition, this.cameraController.camera);
             // get the list of objects the ray intersected
             const intersectedObjects = this.raycaster.intersectObjects(this.scene.children);
-            if (intersectedObjects.length) {
-                // pick the first object. It's the closest one
-                const pickedObject = intersectedObjects[0].object
+            return intersectedObjects.length ? intersectedObjects[0].object : null
+        },
+
+        onClick(event) {
+            const pickedObject = this._pickObject(event)
+            console.log(pickedObject)
+            if(pickedObject) {
                 const nodeAddress = pickedObject.name
                 if (nodeAddress && nodeAddress.startsWith('thor')) {
                     this._onPickNodeObject(nodeAddress)

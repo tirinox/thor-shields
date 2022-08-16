@@ -126,7 +126,6 @@ export class MainScene {
             );
         }
 
-        console.log(points)
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const line = new MeshLine();
         line.setGeometry(geometry);

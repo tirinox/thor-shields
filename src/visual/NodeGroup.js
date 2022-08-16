@@ -138,4 +138,10 @@ export class NodeGroup extends Simulation {
             otherObj.dispose()
         }
     }
+
+    setElevatedNode(name) {
+        for(const obj of this.physicalObjects) {
+            obj.elevated = (obj.name === name)
+        }
+    }
 }

@@ -30,7 +30,7 @@ varying vec2 vUv;
 #define Color3 vec4(0.2, 0.03, 1.0, 1.0)
 #define Color4 vec4(0.05, 0.02, 0.02, 0.3)
 
-const float zoom = 2.8f; // 2.5 full
+const float zoom = 2.8f;// 2.5 full
 
 // Description : Array and textureless GLSL 2D/3D/4D simplex
 //               noise functions.
@@ -171,6 +171,8 @@ bool IntersectSphere(vec3 ro, vec3 rd, vec3 pos, float radius, out vec3 intersec
     return d >= 0.0;
 }
 
+
+
 void main()
 {
     vec2 p = vUv * 2.0 - 1.0;
@@ -178,17 +180,19 @@ void main()
     float rotx = 0.0;
     float roty = 0.0;
 
+
     // camera
     vec3 ro = zoom * normalize(vec3(cos(roty), cos(rotx), sin(roty)));
     vec3 ww = normalize(vec3(0.0, 0.0, 0.0) - ro);
     vec3 uu = normalize(cross(vec3(0.0, 1.0, 0.0), ww));
     vec3 vv = normalize(cross(ww, uu));
-    vec3 rd = normalize(p.x*uu + p.y*vv + 1.5*ww);
+    vec3 rd = normalize(p.x*uu + p.y*vv + 1.5 * ww);
+//    vec3 rd = normalize(p.x*uu + p.y*vv + zoom_f * ww);
     vec4 col = Background;
     vec3 origin;
     if (IntersectSphere(ro, rd, ExpPosition, Radius + NoiseAmplitude*6.0, origin))
     {
         col = March(origin, rd);
     }
-    gl_FragColor = col;
+    gl_FragColor = col * saturation;
 }
