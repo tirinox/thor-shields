@@ -180,7 +180,6 @@ void main()
     float rotx = 0.0;
     float roty = 0.0;
 
-
     // camera
     vec3 ro = zoom * normalize(vec3(cos(roty), cos(rotx), sin(roty)));
     vec3 ww = normalize(vec3(0.0, 0.0, 0.0) - ro);
@@ -190,9 +189,17 @@ void main()
 //    vec3 rd = normalize(p.x*uu + p.y*vv + zoom_f * ww);
     vec4 col = Background;
     vec3 origin;
-    if (IntersectSphere(ro, rd, ExpPosition, Radius + NoiseAmplitude*6.0, origin))
+    if (IntersectSphere(ro, rd, ExpPosition, Radius + NoiseAmplitude * 6.0, origin))
     {
         col = March(origin, rd);
     }
-    gl_FragColor = col * saturation;
+
+    if(saturation > 1.0) {
+        float d = length(p);
+        //  1.0 - smoothstep(radius-borderThickness, radius, d);
+        float t = 1.0 - smoothstep(0.0, 0.1, abs(0.8 - d));
+        col = mix(col * saturation, vec4(0.9, 0.9, 1.0, 1.0), clamp(t, 0.0, 0.5));
+    }
+
+    gl_FragColor = col;
 }
