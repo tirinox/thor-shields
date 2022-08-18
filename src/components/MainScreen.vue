@@ -1,29 +1,38 @@
 <template>
-    <div class="canvas-holder">
-        <canvas
-            ref="canvas"
-            class="canvas-full"
-            tabindex="1"
-            @keypress="onKeyDown"
-            @mousemove="onMouseMove"
-            @mouseenter="onMouseEnter"
-            @mouseleave="onMouseLeave"
-            @click="onClick"
-        >
-        </canvas>
-        <FPSCounter
-            v-show="showFps"
-            ref="fps"
-        >
-        </FPSCounter>
+    <div class="container">
+        <!-- 3D -->
+        <div class="canvas-container">
+            <canvas
+                ref="canvas"
+                class="canvas-full"
+                tabindex="1"
+                @keypress="onKeyDown"
+                @mousemove="onMouseMove"
+                @mouseenter="onMouseEnter"
+                @mouseleave="onMouseLeave"
+                @click="onClick"
+            >
+            </canvas>
+            <FPSCounter
+                v-show="showFps"
+                ref="fps"
+            >
+            </FPSCounter>
 
-        <NodeDetailsWindow
-            :visible="nodeDetailsVisible"
-            :node="nodeToViewDetails"
-            @close="onCloseDetails">
-        </NodeDetailsWindow>
-        <ControlPanel @mode-selected="setSceneMode"></ControlPanel>
+            <ControlPanel @mode-selected="setSceneMode"></ControlPanel>
+        </div>
+
+        <!-- UI -->
+        <div class="ui-container">
+            <NodeDetailsWindow
+                :visible="nodeDetailsVisible"
+                :node="nodeToViewDetails"
+                @close="onCloseDetails">
+            </NodeDetailsWindow>
+        </div>
+
     </div>
+
 
 </template>
 
@@ -300,6 +309,25 @@ export default {
 
 <style>
 
+.container {
+    position: relative;
+}
+
+.canvas-container {
+    /*margin: 0;*/
+    /*padding: 0;*/
+    /*width: 100%;*/
+    /*height: 100%;*/
+    position: absolute;
+    z-index: 8;
+}
+
+.ui-container {
+    position: absolute;
+    z-index: 10;
+}
+
+
 .canvas-full {
     margin: 0;
     padding: 0;
@@ -308,16 +336,14 @@ export default {
 }
 
 canvas {
-    width: 100vw;
-    height: 100vh;
-    display: block;
+    /*width: 100vw;*/
+    /*height: 100vh;*/
+    /*display: block;*/
 }
 
-.canvas-holder {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
+canvas:focus {
+    outline: none;
 }
+
 
 </style>

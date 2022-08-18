@@ -1,6 +1,6 @@
 <template>
     <Transition name="shrink">
-        <div class="window" v-show="visible" @keydown.esc="close" tabindex="0">
+        <div class="window" v-if="visible" @keydown.esc="close" tabindex="0">
             <div class="close-button" @click="close"></div>
             <h1>Node details </h1>
             <h2>{{ node.address }}</h2>
@@ -9,7 +9,8 @@
             </p>
 
             <span v-if="node.IPAddress && node.IPAddress !== ''">
-                IP Address information: <a :href="`https://www.infobyip.com/ip-${node.IPAddress}.html`">
+                IP Address information:
+                <a :href="`https://www.infobyip.com/ip-${node.IPAddress}.html`" target="_blank">
                     {{ node.IPInfo?.flag }} {{ node.IPAddress }}
                 </a>
             </span>
@@ -17,9 +18,13 @@
                 No IP address
             </span>
             <br>
-            <a :href="`https://viewblock.io/thorchain/address/${node.address}`">Viewblock {{
-                    node.shortAddress
-                }}</a>
+
+            <span>
+                Explorer:
+                 <a :href="`https://viewblock.io/thorchain/address/${node.address}`" target="_blank">
+                     Viewblock {{ node.shortAddress }}</a>
+            </span>
+
             <br>
             <span>
                 <strong>Bond:</strong>
@@ -72,25 +77,22 @@ export default {
 
 // todo: different variant for Portrait orientation
 .window {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
     border: 1px solid darkturquoise;
     border-radius: 12px;
-    position: absolute;
-    width: 40vw;
-    height: 80vh;
-    float: right;
-    right: 10%;
-    top: auto;
 
-    //transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.72);
     backdrop-filter: blur(8px);
     color: turquoise;
     padding: 20px;
-    //display: none;
 }
 
 .visible {
-    display: block;
+    display: flex;
 }
 
 .close-button {

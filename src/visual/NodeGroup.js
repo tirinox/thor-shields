@@ -135,8 +135,8 @@ export class NodeGroup extends Simulation {
 
         super.update(dt)
 
-        this._visNet.update(dt)
-        this._visNet.updatePositions(this.rBush, this.objectPositions)
+        // this._visNet.update(dt)
+        // this._visNet.updatePositions(this.rBush, this.objectPositions)
     }
 
     dispose() {

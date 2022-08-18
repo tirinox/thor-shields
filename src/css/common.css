@@ -77,13 +77,13 @@ button[disabled]{
 
 .shrink-enter-active,
 .shrink-leave-active {
-    transition: all 0.1s ease;
+    transition: all 0.5s ease;
 }
 
 .shrink-enter-from,
 .shrink-leave-to {
     opacity: 0;
-    /*transform: rotateY(40deg);*/
+    transform: rotateX(80deg);
     /*transform: translateX(-1000px);*/
 }
 

@@ -52,12 +52,13 @@ export class NodeObject extends PhysicalObject {
         v = Boolean(v)
         if(this._elevated !== v) {
             this._elevated = v
-            // this.material.uniforms.color.value = this._elevated ? PickedColor : this.normalColor
+
             this.material.uniforms.saturation.value = this._elevated ? 1.5 : 1.0
             this.material.uniformsNeedUpdate = true
-            if(this.nameTextObj) {
-                this.nameTextObj.position.z = this._elevated ? 10.0 : NormalLabelZ
-            }
+
+            // if(this.nameTextObj) {
+            //     this.nameTextObj.position.z = this._elevated ? 10.0 : NormalLabelZ
+            // }
             // todo: add glow effect
         }
     }

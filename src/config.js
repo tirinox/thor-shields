@@ -1,5 +1,6 @@
-const Live = process.env.NODE_ENV !== 'development'
+// const Live = process.env.NODE_ENV !== 'development'
 // const Live = false // process.env.USE_LOCAL_DATA !== "1"
+const Live = true
 
 
 export const Config = {
@@ -36,7 +37,7 @@ export const Config = {
 
             Animation: {
                 Duration: 500.0,
-                X_DistanceWhenZoomed: -200.0,
+                X_DistanceWhenZoomed: 0.0,
                 Z_DistanceWhenZoomed: 320.0,
                 Shift: {
                     X: -200.0
