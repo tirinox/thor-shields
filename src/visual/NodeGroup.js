@@ -9,7 +9,7 @@ import {ModeStatus} from "@/visual/modes/ModeStatus";
 import {ModeProvider} from "@/visual/modes/ModeProvider";
 import {ModeVersion} from "@/visual/modes/ModeVersion";
 import {ModeBond} from "@/visual/modes/ModeBond";
-import {VisNetwork} from "@/visual/VisNetwork";
+// import {VisNetwork} from "@/visual/VisNetwork";
 
 export const NodeGroupModes = Object.freeze({
     Normal: 'normal',
@@ -45,8 +45,8 @@ export class NodeGroup extends Simulation {
 
         this.repelForce = Config.Physics.RepelForce
 
-        this._visNet = new VisNetwork()
-        this.parent.add(this._visNet)
+        // this._visNet = new VisNetwork()
+        // this.parent.add(this._visNet)
     }
 
     genIdent(node) {

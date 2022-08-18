@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 export class VisNetwork extends THREE.Group {
-    constructor(maxRadius = 30.0) {
+    constructor(maxRadius = 10.0) {
         super();
         this.maxRadius = maxRadius
 
