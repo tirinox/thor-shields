@@ -58,7 +58,10 @@ export const Config = {
             MaxScale: 80.0,
             MinScale: 10.0,
             ScaleFactor: 1.0,
-        }
+        },
+        Globe: {
+            Radius: 383.0,
+        },
     },
     Physics: {
         BaseForce: 3500.0,

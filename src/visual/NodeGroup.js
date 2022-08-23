@@ -9,6 +9,7 @@ import {ModeStatus} from "@/visual/modes/ModeStatus";
 import {ModeProvider} from "@/visual/modes/ModeProvider";
 import {ModeVersion} from "@/visual/modes/ModeVersion";
 import {ModeBond} from "@/visual/modes/ModeBond";
+import {ModeGeo} from "@/visual/modes/ModeGeo";
 // import {VisNetwork} from "@/visual/VisNetwork";
 
 export const NodeGroupModes = Object.freeze({
@@ -17,6 +18,7 @@ export const NodeGroupModes = Object.freeze({
     Provider: 'provider',
     Version: 'version',
     Bond: 'bond',
+    Geo: 'geo',
 })
 
 export class NodeGroup extends Simulation {
@@ -31,6 +33,7 @@ export class NodeGroup extends Simulation {
         this._modeProvider = new ModeProvider(this.parent)
         this._modeVersion = new ModeVersion(this.parent)
         this._modeBond = new ModeBond(this.parent)
+        this._modeGeo = new ModeGeo(this.parent)
 
         this._selector = {
             [NodeGroupModes.Normal]: this._modeNormal,
@@ -38,6 +41,7 @@ export class NodeGroup extends Simulation {
             [NodeGroupModes.Provider]: this._modeProvider,
             [NodeGroupModes.Version]: this._modeVersion,
             [NodeGroupModes.Bond]: this._modeBond,
+            [NodeGroupModes.Geo]: this._modeGeo,
         }
 
         this._selectedModeHandler = this._modeNormal

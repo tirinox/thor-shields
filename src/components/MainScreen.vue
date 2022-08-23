@@ -30,9 +30,7 @@
                 @close="onCloseDetails">
             </NodeDetailsWindow>
         </div>
-
     </div>
-
 
 </template>
 

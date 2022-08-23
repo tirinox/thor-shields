@@ -31,6 +31,7 @@ export default {
                 {value: NodeGroupModes.Provider, text: 'PROVIDER'},
                 {value: NodeGroupModes.Version, text: 'VERSION'},
                 {value: NodeGroupModes.Bond, text: 'BOND'},
+                {value: NodeGroupModes.Geo, text: 'GEO'},
             ]
         }
     },

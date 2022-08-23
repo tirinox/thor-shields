@@ -10,7 +10,7 @@ export class ModeBond extends ModeBase {
         super(scene);
         this.nameToAttractor = {}
         this.force = Config.Physics.BaseForce
-        this._noBondAttractor = new Attractor(new THREE.Vector3(0, 2000, 0), this.force)
+        this._noBondAttractor = new Attractor(new THREE.Vector3(0, 0, -2000), this.force)
     }
 
     handleObject(physObj) {

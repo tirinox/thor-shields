@@ -89,7 +89,7 @@ export class CameraController {
         const target = new THREE.Vector3(
             cfg.X_DistanceWhenZoomed + position.x,
             position.y,
-            cfg.Z_DistanceWhenZoomed,
+            position.z + cfg.Z_DistanceWhenZoomed,
         )
         const targetLookAt = new THREE.Vector3(
             cfg.X_DistanceWhenZoomed + position.x,
