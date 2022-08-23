@@ -5,7 +5,6 @@ import {NodeEvent} from "@/helpers/NodeEvent";
 import {URLDataSource} from "@/helpers/data/URLDataSource";
 import {Config} from "@/config";
 import {clearObject} from "@/helpers/3D";
-import {IPAddressInfoLoader} from "@/helpers/data/IPAddressInfo";
 import {emitter, EventTypes} from "@/helpers/EventTypes";
 import {NodeSet} from "@/helpers/data/NodeSet";
 
@@ -30,10 +29,7 @@ export class MainScene {
     _runDataSource() {
         this.dataSource = new URLDataSource(Config.DataSource.NodesURL, Config.DataSource.PollPeriod)
         this.dataSource.callback = this.handleData.bind(this)
-
         this.dataSource.run()
-
-        this.ipAddressLoader = new IPAddressInfoLoader()
     }
 
     _makeSomeLight() {
@@ -45,12 +41,19 @@ export class MainScene {
         this.scene.add(ambientLight);
     }
 
-    async _loadAdditionalInfoAbout(node) {
-        const ipAddress = node.IPAddress
-        if (ipAddress) {
-            node.IPInfo = await this.ipAddressLoader.load(ipAddress)
-        }
-    }
+    // async _loadAdditionalInfoAbout(node) {
+    //     const ipAddress = node.IPAddress
+    //     if (ipAddress) {
+    //         node.IPInfo = await this.ipAddressLoader.load(ipAddress)
+    //     }
+    //
+    //     // debug
+    //     if(node.IPInfo) {
+    //         console.info(`got IPInfo for ${ipAddress} node = ${node.address} => ${node.IPInfo.countryCode}`)
+    //     } else {
+    //         console.warn(`no IPInfo for ${ipAddress} node = ${node.address}`)
+    //     }
+    // }
 
     handleData(nodes) {
         if (!nodes) {
@@ -72,7 +75,6 @@ export class MainScene {
         for (const event of events) {
             const node = event.node
             if (node.address) {
-                this._loadAdditionalInfoAbout(node).then()
                 if (event.type === NodeEvent.EVENT_TYPE.CREATE) {
                     this.nodeGroup.createNewNode(node)
                 } else if (event.type === NodeEvent.EVENT_TYPE.DESTROY) {

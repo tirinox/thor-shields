@@ -2,6 +2,7 @@ import axios from "axios";
 import {NodeSet} from "@/helpers/data/NodeSet";
 import {NodeInfo} from "@/helpers/data/NodeInfo";
 import _ from "lodash";
+import {IPAddressInfoLoader} from "@/helpers/data/IPAddressInfo";
 
 
 export class URLDataSource {
@@ -11,6 +12,7 @@ export class URLDataSource {
         this._isRunning = false
         this._timer = 0
         this.callback = () => 0
+        this.ipAddressLoader = new IPAddressInfoLoader()
     }
 
     run() {
@@ -58,6 +60,17 @@ export class URLDataSource {
                 const nodeSet = new NodeSet(
                     _.map(rawData, json => new NodeInfo(json))
                 )
+
+                for(const node of nodeSet.nodes) {
+                    if(node.IPAddress) {
+                        try {
+                            node.IPInfo = await this.ipAddressLoader.load(node.IPAddress)
+                        } catch (e) {
+                            console.error(`failed to load IPInfo for ${node.IPAddress}`)
+                        }
+                    }
+                }
+
                 this.callback(nodeSet)
             }
         } catch (e) {
