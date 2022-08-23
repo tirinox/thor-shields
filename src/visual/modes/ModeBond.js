@@ -91,7 +91,7 @@ export class ModeBond extends ModeBase {
             this.nameToAttractor[nodeObject.node.address] = new Attractor(new THREE.Vector3(x, y, z),
                 this.force, 0, 0, -1, 10.0)
 
-            this.makeLabel(shortRune(bond), new THREE.Vector3(x, y - 30.0, -10), 1)
+            this.makeLabel(shortRune(bond), new THREE.Vector3(x, y - nodeObject.radius - 5.0, -10), 1)
             return true
         } else {
             this.nameToAttractor[nodeObject.node.address] = this._noBondAttractor

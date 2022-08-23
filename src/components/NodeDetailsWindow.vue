@@ -9,18 +9,19 @@
             </p>
 
             <span v-if="node.IPAddress && node.IPAddress !== ''">
-                IP Address information:
+                <strong>IP Address information:</strong>
                 <a :href="`https://www.infobyip.com/ip-${node.IPAddress}.html`" target="_blank">
                     {{ node.IPInfo?.flag }} {{ node.IPAddress }}
                 </a>
+                | {{ node.IPInfo?.country }}
             </span>
             <span v-else>
-                No IP address
+                <code>No IP address</code>
             </span>
             <br>
 
             <span>
-                Explorer:
+                <strong>Explorer:</strong>
                  <a :href="`https://viewblock.io/thorchain/address/${node.address}`" target="_blank">
                      Viewblock {{ node.shortAddress }}</a>
             </span>
@@ -82,13 +83,15 @@ export default {
     top: 50%;
     transform: translate(-50%, -50%);
 
-    border: 1px solid darkturquoise;
+    border: 1px solid #097a7b;
     border-radius: 12px;
 
     background-color: rgba(0, 0, 0, 0.72);
     backdrop-filter: blur(8px);
     color: turquoise;
     padding: 20px;
+
+    font-size: 10pt;
 }
 
 .visible {

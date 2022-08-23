@@ -28,8 +28,8 @@ export const Config = {
         Camera: {
             Distance: {
                 Min: 800,
-                Max: 2500,
-                Start: 1800,
+                Max: 2900,
+                Start: 2000,
             },
             AzimuthAngleLimit: 30,
             PolarAngleLimit: 30,

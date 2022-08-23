@@ -171,7 +171,8 @@ bool IntersectSphere(vec3 ro, vec3 rd, vec3 pos, float radius, out vec3 intersec
     return d >= 0.0;
 }
 
-
+const float circleThickness = 0.15;
+const float circleRadius = 0.78;
 
 void main()
 {
@@ -197,8 +198,8 @@ void main()
     if(saturation > 1.0) {
         float d = length(p);
         //  1.0 - smoothstep(radius-borderThickness, radius, d);
-        float t = 1.0 - smoothstep(0.0, 0.1, abs(0.8 - d));
-        col = mix(col * saturation, vec4(0.9, 0.9, 1.0, 1.0), clamp(t, 0.0, 0.5));
+        float t = 1.0 - smoothstep(0.0, circleRadius, abs(circleThickness - d));
+        col = mix(col * saturation, vec4(0.9, 0.9, 1.0, 0.5), clamp(t, 0.0, 0.5));
     }
 
     gl_FragColor = col;

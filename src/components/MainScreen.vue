@@ -345,5 +345,4 @@ canvas:focus {
     outline: none;
 }
 
-
 </style>
