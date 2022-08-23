@@ -33,12 +33,12 @@ export class Random {
     }
 
     static randomVector({xMin, xMax, yMin, yMax, zMin, zMax}) {
-        xMin = defaultValue(xMin, -10)
-        xMax = defaultValue(xMax, 10)
-        yMin = defaultValue(yMin, -10)
-        yMax = defaultValue(yMax, 10)
-        zMin = defaultValue(zMin, -10)
-        zMax = defaultValue(zMax, 10)
+        xMin = defaultValue(+xMin, -10)
+        xMax = defaultValue(+xMax, 10)
+        yMin = defaultValue(+yMin, -10)
+        yMax = defaultValue(+yMax, 10)
+        zMin = defaultValue(+zMin, -10)
+        zMax = defaultValue(+zMax, 10)
 
         return new Vector3(
             Random.getRandomFloat(xMin, xMax),
@@ -162,5 +162,12 @@ export function shortRune(x, mantissa = 2) {
     return numbro(x).format({
         average: true,
         mantissa,
+    }) + ' Rune'
+}
+
+
+export function fullRune(x) {
+    return numbro(x).format({
+        thousandSeparated: true
     }) + ' Rune'
 }

@@ -6,7 +6,8 @@ export class IPAddressInfo {
     constructor(j) {
         this.ipAddress = j['ip']
         this.countryCode = j['country_code']
-        this.country = j['country']
+        this.country = j['country_name']
+        this.city = j['city']
         this.latitude = j['latitude']
         this.longitude = j['longitude']
         this.providerName = j['org']

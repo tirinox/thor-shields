@@ -4,41 +4,56 @@
             <div class="close-button" @click="close"></div>
             <h1>Node details </h1>
             <h2>{{ node.address }}</h2>
-            <p>
-                <strong>Status: </strong> {{ node.status }}
-            </p>
 
-            <span v-if="node.IPAddress && node.IPAddress !== ''">
-                <strong>IP Address information:</strong>
-                <a :href="`https://www.infobyip.com/ip-${node.IPAddress}.html`" target="_blank">
-                    {{ node.IPInfo?.flag }} {{ node.IPAddress }}
-                </a>
-                | {{ node.IPInfo?.country }}
-            </span>
-            <span v-else>
+            <h4>
+                {{ statusEmoji }} <span class="category">Status: </span>
+                {{ node.status }}
+            </h4>
+
+            <div v-if="node.IPAddress && node.IPAddress !== ''">
+
+                <span class="category">IP Address information:</span>
+                <span>
+                    <a :href="`https://www.infobyip.com/ip-${node.IPAddress}.html`" target="_blank">
+                        {{ node.IPInfo?.flag }} {{ node.IPAddress }}
+                    </a>
+                </span>
+
+                <br>
+
+                <span class="category">
+                    Location:
+                </span>
+                <span>
+                    {{ node.IPInfo?.countryCode }}, {{ node.IPInfo?.city || 'unknown city' }}
+                </span>
+
+            </div>
+            <div v-else>
                 <code>No IP address</code>
-            </span>
+            </div>
+
             <br>
 
             <span>
-                <strong>Explorer:</strong>
+                <span class="category">🌐 Explorer:</span>
                  <a :href="`https://viewblock.io/thorchain/address/${node.address}`" target="_blank">
                      Viewblock {{ node.shortAddress }}</a>
             </span>
 
             <br>
             <span>
-                <strong>Bond:</strong>
-                {{ Math.round(node.bond) }} Rune
+                <span class="category">🔒 Bond:</span>
+                {{ $filters.fullRune(Math.round(node.bond)) }}
             </span>
             <br>
             <span>
-                <strong>Awards:</strong>
-                {{ Math.round(node.currentAward) }} Rune
+                <span class="category">🏆 Awards:</span>
+                {{ $filters.fullRune(Math.round(node.currentAward)) }}
             </span>
             <br>
             <span>
-                <strong>Slash points:</strong>
+                <span class="category">😈 Slash points:</span>
                 {{ node.slashPoints }} pts.
             </span>
 
@@ -48,6 +63,8 @@
 </template>
 
 <script>
+
+import {NodeStatus} from "@/helpers/NodeTracker";
 
 export default {
     name: 'NodeDetailsWindow',
@@ -59,7 +76,21 @@ export default {
     data() {
         return {}
     },
-    computed: {},
+    computed: {
+        statusEmoji() {
+            const st = this.node.status
+            if (st === NodeStatus.Active) {
+                return '✅'
+            } else if (st === NodeStatus.Standby) {
+                return '⏳'
+            } else if (st === NodeStatus.Whitelisted) {
+                return '📄'
+            } else if (st === NodeStatus.Disabled) {
+                return '🔴'
+            }
+            return ''
+        },
+    },
     methods: {
         close() {
             this.$emit('close')
@@ -137,6 +168,18 @@ export default {
     &:after {
         transform: rotate(-45deg);
     }
+}
+
+h1 {
+    margin: 0;
+    padding: 0;
+    color: white;
+}
+
+.category {
+    font-family: EXO2, monospace;
+    font-weight: bolder;
+    color: white;
 }
 
 </style>
