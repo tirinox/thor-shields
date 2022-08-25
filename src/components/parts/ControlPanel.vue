@@ -45,7 +45,11 @@ export default {
         setSceneMode(value) {
             this.selectedMode = value
             this.$emit('mode-selected', value)
-        }
+        },
+    },
+    mounted() {
+        // debug: auto set mode
+        // setTimeout(() => this.setSceneMode(NodeGroupModes.Geo), 1000.0)
     }
 }
 

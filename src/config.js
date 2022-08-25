@@ -19,9 +19,9 @@ export const Config = {
     Effects: {
         Bloom: {
             Enabled: true,
-            Strength: 0.4,
+            Strength: 0.9,
             Threshold: 0.5,
-            Radius: 0.02,
+            Radius: 1.2,
         }
     },
     Controls: {
@@ -59,6 +59,7 @@ export const Config = {
             MaxScale: 80.0,
             MinScale: 10.0,
             ScaleFactor: 1.0,
+            RadiusFactor: 0.3,
         },
         Globe: {
             Details: 64,

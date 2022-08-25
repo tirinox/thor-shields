@@ -54,6 +54,7 @@ import NodeDetailsWindow from "@/components/NodeDetailsWindow";
 import {NodeInfo} from "@/helpers/data/NodeInfo";
 import {CameraController} from "@/visual/CameraController";
 import LoadingIndicator from "@/components/parts/LoadingIndicator";
+import _ from "lodash";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
 
@@ -130,7 +131,8 @@ export default {
             this.raycaster.setFromCamera(pickPosition, this.cameraController.camera);
             // get the list of objects the ray intersected
             const intersectedObjects = this.raycaster.intersectObjects(this.scene.children);
-            return intersectedObjects.length ? intersectedObjects[0].object : null
+            const namedObjects = _.filter(_.map(intersectedObjects, 'object'), o => o.name && o.name !== '')
+            return namedObjects.length ? namedObjects[0] : null
         },
 
         onClick(event) {
