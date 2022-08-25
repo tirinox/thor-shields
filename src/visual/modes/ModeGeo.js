@@ -4,6 +4,7 @@ import {Config} from "@/config";
 import {Attractor} from "@/helpers/physics/Attractor";
 import {longLatTo3D} from "@/helpers/3D";
 import TWEEN from "tween";
+import _ from "lodash";
 
 export class ModeGeo extends ModeBase {
     constructor(scene) {
@@ -32,8 +33,9 @@ export class ModeGeo extends ModeBase {
         this._makeGlobe()
     }
 
-    onLeave() {
+    onLeave(nodeObjects) {
         this._destroyGlobe()
+        _.forEach(nodeObjects, nodeObj => nodeObj.shootOut(2000))
         super.onLeave();
     }
 
@@ -102,7 +104,7 @@ export class ModeGeo extends ModeBase {
         const r = Config.Scene.Globe.Radius + Config.Scene.Globe.NodeElevation
         this._nameToAttractor = {}
         this._coordToAttractor = {}
-        
+
         for (const nodeObject of nodeObjects) {
             const info = nodeObject.node.IPInfo
             if (!info || !nodeObject.node.IPAddress) {

@@ -194,8 +194,7 @@ export class NodeObject extends PhysicalObject {
 
     reactSlash() {
         const slashForce = 100.0
-        const velocity = this.o.position.clone().normalize().multiplyScalar(slashForce)
-        this.velocity.copy(velocity)
+        this.shootOut(slashForce)
         // this.velocity.set(Random.randomOnCircle(slashForce))
 
         const savedColor = this.material.uniforms.color.value.clone()
