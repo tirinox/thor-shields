@@ -24,7 +24,7 @@ export class ModeGeo extends ModeBase {
     onEnter(nodeObjects) {
         +nodeObjects
 
-        this.makeLabel('Geo', new THREE.Vector3(0, -630, -10), 14, true)
+        this.makeLabel('Geo', new THREE.Vector3(0, -630, -10), 14, 0, true)
 
         super.onEnter();
 
@@ -41,17 +41,19 @@ export class ModeGeo extends ModeBase {
         if (this.globeMesh) {
             return
         }
+        const textureLoader = new THREE.TextureLoader()
 
-        const geometry = new THREE.SphereGeometry(Config.Scene.Globe.Radius, 32, 32);
+        const globeConfig = Config.Scene.Globe
+        const geometry = new THREE.SphereGeometry(globeConfig.Radius, globeConfig.Details, globeConfig.Details);
         const material = new THREE.MeshPhongMaterial({
             depthWrite: true,
             // depthTest: true
-            transparent: true,
-            opacity: 0.5,
+            // transparent: true,
+            // opacity: 0.5,
         });
-        material.map = THREE.ImageUtils.loadTexture('texture/globe/2k_earth_daymap.jpeg');
+        material.map = textureLoader.load(Config.Scene.Globe.TextureMap);
         this.globeMesh = new THREE.Mesh(geometry, material);
-        this.globeMesh.renderOrder = 99
+        this.globeMesh.renderOrder = 9999
         this.scene.add(this.globeMesh)
 
         this.globeMesh.scale.set(0.01, 0.01, 0.01)
@@ -59,6 +61,19 @@ export class ModeGeo extends ModeBase {
             .to(new THREE.Vector3(1, 1, 1))
             .easing(TWEEN.Easing.Sinusoidal.InOut)
             .start()
+
+        const geometryAtmo = new THREE.SphereGeometry(
+            globeConfig.Radius + 2.0,
+            globeConfig.Details, globeConfig.Details)
+        const materialAtmo = new THREE.MeshPhongMaterial({
+            map: textureLoader.load(globeConfig.TextureAtmo),
+            side: THREE.DoubleSide,
+            opacity: 0.1,
+            transparent: true,
+            depthWrite: false,
+        });
+        this.cloudMesh = new THREE.Mesh(geometryAtmo, materialAtmo)
+        this.globeMesh.add(this.cloudMesh)
     }
 
     _destroyGlobe() {
@@ -78,11 +93,16 @@ export class ModeGeo extends ModeBase {
         this.globeMesh = null
     }
 
+    update(dt) {
+        super.update(dt);
+        this.cloudMesh.rotation.y += 0.02 * dt;
+    }
+
     _createAttractors(nodeObjects) {
         const r = Config.Scene.Globe.Radius + Config.Scene.Globe.NodeElevation
         this._nameToAttractor = {}
         this._coordToAttractor = {}
-
+        
         for (const nodeObject of nodeObjects) {
             const info = nodeObject.node.IPInfo
             if (!info || !nodeObject.node.IPAddress) {
@@ -93,9 +113,10 @@ export class ModeGeo extends ModeBase {
                 if (!attractorHere) {
                     const position3d = longLatTo3D(info.longitude, info.latitude, r)
                     attractorHere = this._coordToAttractor[key] = new Attractor(position3d,
-                        this.force, 0.0, 0.0, Attractor.INFINITE, 10.0)
+                        this.force, 0.0, 0.0, Attractor.INFINITE, 5.0)
                 }
                 this._nameToAttractor[nodeObject.node.address] = attractorHere
+
             }
         }
         console.log(`Total attractors were made: ${this._coordToAttractor.length}.`)

@@ -20,6 +20,7 @@ const noCfg = Config.Scene.NodeObject
 // const geometry = new THREE.SphereGeometry(0.5, 32, 32)
 // const geometry = new THREE.IcosahedronGeometry(noCfg.PlaneScale, 1)
 const geometry = new THREE.PlaneGeometry(noCfg.PlaneScale, noCfg.PlaneScale)
+const simpleGeometry = new THREE.SphereGeometry(noCfg.PlaneScale * 0.5, 10, 10)
 
 const SlashColor = 0xff3300
 
@@ -69,10 +70,8 @@ export class NodeObject extends PhysicalObject {
         return this._elevated
     }
 
-    _makeSphere() {
-        // color
+    _getSphereColor() {
         let color = 0x111111;
-        let z = randFloat(-0.1, 0.1)
         const st = this.node.status
         if (st === NodeStatus.Standby) {
             color = 0x167a56
@@ -81,7 +80,6 @@ export class NodeObject extends PhysicalObject {
                 Colors.LightningBlue,
                 Colors.YggdrasilGreen
             ])
-            z -= 0.3
         } else if (st === NodeStatus.Disabled) {
             color = 0xee0000
         } else if (st === NodeStatus.Whitelisted) {
@@ -89,14 +87,42 @@ export class NodeObject extends PhysicalObject {
         } else if (st === NodeStatus.Unknown) {
             color = 0x111144
         }
-        const colorObj = new THREE.Color(color)
+        return new THREE.Color(color)
+    }
 
+    _makeSphere() {
+        if(Config.Scene.NodeObject.Simple) {
+            this._makeSimpleSphere()
+        } else {
+            this._makeCoolSphere()
+        }
+        const scale = this.calculateScale
+
+        // this.mesh = new THREE.Sprite(this.material)
+        let z = randFloat(-0.1, 0.1)
+
+        this.mesh.name = this.name
+        this.mesh.renderOrder = 1
+        this.mesh.scale.setScalar(scale)
+        this.mesh.position.z = z
+        this.o.renderOrder = 1
+        this.o.add(this.mesh)
+    }
+
+    _makeSimpleSphere() {
+        // simpleGeometry
+        this.mesh = new THREE.Mesh(simpleGeometry, new THREE.MeshBasicMaterial({
+            color: this._getSphereColor()
+        }))
+    }
+
+    _makeCoolSphere() {
         // material
         this.material = new THREE.ShaderMaterial({
             uniforms: {
                 "time": {value: Random.getRandomFloat(0.0, 100.0)},
                 "saturation": {value: 1.0},
-                "color": {value: colorObj},
+                "color": {value: this._getSphereColor()},
             },
             vertexShader: StdVertexShader,
             fragmentShader: FragShader1,
@@ -105,19 +131,8 @@ export class NodeObject extends PhysicalObject {
             depthWrite: true,
             // sizeAttenuation: true,
         })
-
-        this.normalColor = colorObj
-
-        // Size (scale): 1 = 1 million Rune
-        const scale = this.calculateScale
-
-        // this.mesh = new THREE.Sprite(this.material)
-
         this.mesh = new THREE.Mesh(geometry, this.material);
-        this.mesh.scale.setScalar(scale)
-        this.mesh.position.z = z
-        this.mesh.name = this.name
-        this.o.add(this.mesh)
+        return this.mesh
     }
 
     get calculateScale() {
@@ -148,6 +163,7 @@ export class NodeObject extends PhysicalObject {
             nameTextObj.anchorY = 'middle'
             nameTextObj.outlineWidth = 2.0
             nameTextObj.sync()
+            nameTextObj.renderOrder = 100
             nameTextObj.name = this.name
             nameTextObj.material = createBillboardMaterial(new MeshBasicMaterial())
             nameTextObj.scale.setScalar(
@@ -184,13 +200,15 @@ export class NodeObject extends PhysicalObject {
 
         const savedColor = this.material.uniforms.color.value.clone()
 
-        this.material.uniforms.color.value.set(SlashColor)
-        this.material.uniformsNeedUpdate = true
-
-        setTimeout(() => {
-            this.material.uniforms.color.value.set(savedColor)
+        if(this.material) {
+            this.material.uniforms.color.value.set(SlashColor)
             this.material.uniformsNeedUpdate = true
-        }, 100)
+
+            setTimeout(() => {
+                this.material.uniforms.color.value.set(savedColor)
+                this.material.uniformsNeedUpdate = true
+            }, 100)
+        }
     }
 
     static estimateRadiusOfGroup(nodeObjList) {
@@ -207,6 +225,8 @@ export class NodeObject extends PhysicalObject {
     update(dt) {
         super.update(dt);
 
-        this.material.uniforms.time.value += dt
+        if(this.material) {
+            this.material.uniforms.time.value += dt
+        }
     }
 }

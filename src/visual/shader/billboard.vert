@@ -1,3 +1,12 @@
+#ifdef USE_LOGDEPTHBUF
+#ifdef USE_LOGDEPTHBUF_EXT
+varying float vFragDepth;
+varying float vIsPerspective;
+#else
+uniform float logDepthBufFC;
+#endif
+#endif
+
 // optional: pass 2D rotation angle as an uniform
 uniform float rotation;
 // optional: pass 2D center point as an uniform
@@ -45,4 +54,16 @@ void main() {
     gl_Position = projectionMatrix * mvPosition;
 
     // [skipped includes]
+    #ifdef USE_LOGDEPTHBUF
+        #ifdef USE_LOGDEPTHBUF_EXT
+    vFragDepth = 1.0 + gl_Position.w;
+//    vIsPerspective = float(isPerspectiveMatrix(projectionMatrix));
+    vIsPerspective = 1.0;
+        #else
+//    if (isPerspectiveMatrix(projectionMatrix)) {
+        gl_Position.z = log2(max(EPSILON, gl_Position.w + 1.0)) * logDepthBufFC - 1.0;
+        gl_Position.z *= gl_Position.w;
+//    }
+        #endif
+    #endif
 }

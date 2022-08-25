@@ -3,6 +3,12 @@
 // Awd
 // @AlexWDunn
 
+#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )
+uniform float logDepthBufFC;
+varying float vFragDepth;
+varying float vIsPerspective;
+#endif
+
 uniform float time;
 uniform float saturation;
 uniform vec3 color;
@@ -178,6 +184,9 @@ void main()
 {
     vec2 p = vUv * 2.0 - 1.0;
 
+//    gl_FragColor = vec4(1.0, 1.0, 1.0, length(p) < 1.0 ?  1.0 : 0.0);
+//    return;
+
     float rotx = 0.0;
     float roty = 0.0;
 
@@ -203,4 +212,10 @@ void main()
     }
 
     gl_FragColor = col;
+
+    #if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )
+    // Doing a strict comparison with == 1.0 can cause noise artifacts
+    // on some platforms. See issue #17623.
+    gl_FragDepthEXT = vIsPerspective == 0.0 ? gl_FragCoord.z : log2( vFragDepth ) * logDepthBufFC * 0.5;
+    #endif
 }

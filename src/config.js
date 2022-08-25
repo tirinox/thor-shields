@@ -54,14 +54,19 @@ export const Config = {
             SkyBoxExt: 'png',
         },
         NodeObject: {
+            Simple: false,
             PlaneScale: 1.0,
             MaxScale: 80.0,
             MinScale: 10.0,
             ScaleFactor: 1.0,
         },
         Globe: {
+            Details: 64,
             Radius: 423.0,
-            NodeElevation: 50.0
+            NodeElevation: 10.0,
+            TextureMap: 'texture/globe/2k_earth_nightmap.jpeg',
+            TextureAtmo: 'texture/globe/earth_atmo.jpeg',
+            // TextureMap: 'texture/globe/2k_earth_daymap.jpeg',
         },
     },
     Physics: {
