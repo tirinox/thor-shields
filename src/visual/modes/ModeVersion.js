@@ -1,5 +1,5 @@
 import {ModeBase} from "@/visual/modes/ModeBase";
-import {Attractor} from "@/helpers/physics/Attractor";
+import {Attractor, AttractorFlat} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import _ from "lodash";
 import {CirclePack} from "@/helpers/physics/CirclePack";
@@ -29,7 +29,7 @@ export class ModeVersion extends ModeBase {
 
         if (physObj) {
             let groupName = physObj.node.version
-            physObj.attractors = [(this.attractors[groupName] ?? this._attractorBanish)]
+            physObj.attractors = (this.attractors[groupName] ?? this._attractorBanish)
         }
     }
 
@@ -49,7 +49,7 @@ export class ModeVersion extends ModeBase {
                 continue
             }
 
-            if(!versions[version]) {
+            if (!versions[version]) {
                 versions[version] = []
             }
 
@@ -67,10 +67,10 @@ export class ModeVersion extends ModeBase {
         for (const [version, items] of _.sortBy(_.entries(versions), [(o) => o[0]])) {
             const circleRadius = NodeObject.estimateRadiusOfGroup(items)
 
-            this.attractors[version] = new Attractor(new THREE.Vector3(),
+            this.attractors[version] = new AttractorFlat(new THREE.Vector3(),
                 this.force, 0, 0, 0, circleRadius)
 
-            if(version !== mostPopularVersion) {
+            if (version !== mostPopularVersion) {
                 this.circlePacker.addCircle(version, circleRadius)
             }
         }
@@ -86,9 +86,9 @@ export class ModeVersion extends ModeBase {
     _makeLabels() {
         const packedPositions = this.circlePacker.getResults()
         for (const [version, {position}] of _.entries(packedPositions)) {
-            const text = `v. ${version}`
             const attr = this.attractors[version]
-            if(attr) {
+            if (attr) {
+                const text = version === '0.0.0' ? 'Unknown' : `v. ${version}`
                 this.makeLabel(text,
                     new THREE.Vector3(position.x, position.y - attr.relaxRadius * 1.1 - 20.0, 50.0),
                     2.5)

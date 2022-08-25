@@ -16,7 +16,7 @@ export class ModeNormal extends ModeBase {
 
     handleObject(physObj) {
         super.handleObject(physObj);
-        physObj.attractors = [this.tcAttractor]
+        physObj.attractors = this.tcAttractor
     }
 
     onEnter(nodeObjList) {

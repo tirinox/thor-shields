@@ -29,7 +29,7 @@ export class ModeProvider extends ModeBase {
             let groupName = IPAddressInfoLoader.refineProviderName(
                 physObj?.node?.IPInfo?.providerName ?? UNKNOWN
             )
-            physObj.attractors = [(this.attractors[groupName] ?? this._attractorBanish)]
+            physObj.attractors = (this.attractors[groupName] ?? this._attractorBanish)
         }
     }
 

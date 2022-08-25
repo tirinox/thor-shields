@@ -14,6 +14,8 @@ export class PhysicalObject {
     update(dt) {
         if(this.attractors.forEach) {
             this.attractors.forEach(attr => attr.applyForce(this))
+        } else if(this.attractors.applyForce) {
+            this.attractors.applyForce(this)
         }
 
         const acceleration = this.force.multiplyScalar(this.mass)

@@ -15,8 +15,7 @@ export class ModeBond extends ModeBase {
 
     handleObject(physObj) {
         super.handleObject(physObj);
-        const attractor = this.nameToAttractor[physObj.node.address]
-        physObj.attractors = attractor ? [attractor] : []
+        physObj.attractors = this.nameToAttractor[physObj.node.address]
     }
 
     onEnter(nodeObjects) {
