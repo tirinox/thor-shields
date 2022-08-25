@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import {Vector3} from "three";
+import {MeshBasicMaterial, Vector3} from "three";
 import {Random, Util} from "@/helpers/MathUtil";
 import {Text} from 'troika-three-text'
 import {Colors, Config} from "@/config";
@@ -12,6 +12,7 @@ import FragShader1 from '@/visual/shader/node_obj_2.frag'
 import {NodeStatus} from "@/helpers/NodeTracker";
 import {randFloat} from "three/src/math/MathUtils";
 import {clamp} from "lodash";
+import {createBillboardMaterial} from "@/helpers/TextBillboard";
 
 
 const noCfg = Config.Scene.NodeObject
@@ -30,6 +31,7 @@ export class NodeObject extends PhysicalObject {
 
         this.node = node
         this.normalizedBond = this.node.bond / 1_000_000  // millions of Rune
+        this.mass = this.normalizedBond + 1.0
 
         this.o = new THREE.Group()
         this.o.name = this.name
@@ -146,6 +148,7 @@ export class NodeObject extends PhysicalObject {
             nameTextObj.outlineWidth = 2.0
             nameTextObj.sync()
             nameTextObj.name = this.name
+            nameTextObj.material = createBillboardMaterial(new MeshBasicMaterial())
             nameTextObj.scale.setScalar(
                 clamp(this.normalizedBond * 1.1, 0.5, 1.5)
             )
@@ -173,13 +176,16 @@ export class NodeObject extends PhysicalObject {
     }
 
     reactSlash() {
-        const velocity = this.o.position.clone().normalize().multiplyScalar(100)
+        const slashForce = 100.0
+        const velocity = this.o.position.clone().normalize().multiplyScalar(slashForce)
         this.velocity.copy(velocity)
+        // this.velocity.set(Random.randomOnCircle(slashForce))
 
         const savedColor = this.material.uniforms.color.value.clone()
-        this.material.uniformsNeedUpdate = true
-        this.velocity.set(Random.getRandomFloat(-100, 100), Random.getRandomFloat(-100, 100), 0.0)
+
         this.material.uniforms.color.value.set(SlashColor)
+        this.material.uniformsNeedUpdate = true
+
         setTimeout(() => {
             this.material.uniforms.color.value.set(savedColor)
             this.material.uniformsNeedUpdate = true

@@ -13,7 +13,6 @@ export default {
     },
     methods: {
         tick() {
-            console.log('1')
             this.dots += '.'
             if(this.dots.length >= 3) {
                 this.dots = ''
