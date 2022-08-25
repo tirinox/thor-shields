@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 export function countObjects(parent) {
     let numOfMeshes = 0;
     parent.traverse(function () {
@@ -12,17 +14,17 @@ export function clearObject(obj) {
     }
 }
 
-const PI180 = Math.PI / 180.0
-
 export function longLatTo3D(long, lat, r = 1) {
-    const phi = lat * PI180
-    const theta = (long + 180.0) / PI180
-    const x = -r * Math.cos(phi) * Math.cos(theta)
-    const y = r * Math.cos(phi) * Math.sin(theta)
-    const z = r * Math.sin(phi)
-    return {
-        x, y, z
-    }
+    // const phi = (lat + 180.0) * PI180
+    // const theta = (long + 180.0) / PI180
+    // const x = -r * Math.cos(phi) * Math.cos(theta)
+    // const y = r * Math.cos(phi) * Math.sin(theta)
+    // const z = r * Math.sin(phi)
+
+    const phi = Math.PI * (0.5 - (lat / 180));
+    const theta = Math.PI * (0.5 + long / 180);
+    const spherical = new THREE.Spherical(r, phi, theta);
+    return new THREE.Vector3().setFromSpherical(spherical);
 }
 
 export function distanceXY(v1, v2) {

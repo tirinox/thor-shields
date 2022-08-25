@@ -13,9 +13,9 @@ export class TrailTestScene {
     }
 
     _makeSomeLight() {
-        const light = new THREE.DirectionalLight('hsl(0, 100%, 100%)')
-        light.position.set(0, 10, 1000)
-        this.scene.add(light)
+        // const light = new THREE.DirectionalLight('hsl(0, 100%, 100%)')
+        // light.position.set(0, 10, 1000)
+        // this.scene.add(light)
 
         const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
         this.scene.add(ambientLight);

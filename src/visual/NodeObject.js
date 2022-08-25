@@ -101,7 +101,8 @@ export class NodeObject extends PhysicalObject {
             vertexShader: StdVertexShader,
             fragmentShader: FragShader1,
             transparent: true,
-            depthTest: false,
+            depthTest: true,
+            depthWrite: true,
             // sizeAttenuation: true,
         })
 

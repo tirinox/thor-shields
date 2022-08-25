@@ -231,7 +231,7 @@ export default {
             let renderer = this.renderer = new THREE.WebGLRenderer({
                 canvas,
                 antialias: false,
-                logarithmicDepthBuffer: false,
+                logarithmicDepthBuffer: true,
             });
 
             if (devicePixelRatio) {

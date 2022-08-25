@@ -24,7 +24,7 @@ export class ModeGeo extends ModeBase {
     onEnter(nodeObjects) {
         +nodeObjects
 
-        this.makeLabel('Geo', new THREE.Vector3(0, -630, -10), 14)
+        this.makeLabel('Geo', new THREE.Vector3(0, -630, -10), 14, true)
 
         super.onEnter();
 
@@ -38,24 +38,31 @@ export class ModeGeo extends ModeBase {
     }
 
     _makeGlobe() {
-        if(this.globeMesh) {
+        if (this.globeMesh) {
             return
         }
 
         const geometry = new THREE.SphereGeometry(Config.Scene.Globe.Radius, 32, 32);
-        const material = new THREE.MeshPhongMaterial();
+        const material = new THREE.MeshPhongMaterial({
+            depthWrite: true,
+            // depthTest: true
+            transparent: true,
+            opacity: 0.5,
+        });
+        material.map = THREE.ImageUtils.loadTexture('texture/globe/2k_earth_daymap.jpeg');
         this.globeMesh = new THREE.Mesh(geometry, material);
+        this.globeMesh.renderOrder = 99
         this.scene.add(this.globeMesh)
 
         this.globeMesh.scale.set(0.01, 0.01, 0.01)
         new TWEEN.Tween(this.globeMesh.scale)
-            .to(new THREE.Vector3(1,1,1))
+            .to(new THREE.Vector3(1, 1, 1))
             .easing(TWEEN.Easing.Sinusoidal.InOut)
             .start()
     }
 
     _destroyGlobe() {
-        if(!this.globeMesh) {
+        if (!this.globeMesh) {
             return
         }
         const g = this.globeMesh
@@ -63,14 +70,16 @@ export class ModeGeo extends ModeBase {
         new TWEEN.Tween(g.scale)
             .to(new THREE.Vector3(0.01, 0.01, 0.01))
             .easing(TWEEN.Easing.Sinusoidal.InOut)
-            .onComplete(() => {g.parent.remove(g)})
+            .onComplete(() => {
+                g.parent.remove(g)
+            })
             .start()
 
         this.globeMesh = null
     }
 
     _createAttractors(nodeObjects) {
-        const r = Config.Scene.Globe.Radius
+        const r = Config.Scene.Globe.Radius + Config.Scene.Globe.NodeElevation
         this._nameToAttractor = {}
         this._coordToAttractor = {}
 
@@ -81,9 +90,9 @@ export class ModeGeo extends ModeBase {
             } else {
                 const key = `${info.longitude}, ${info.latitude}`
                 let attractorHere = this._coordToAttractor[key]
-                if(!attractorHere) {
-                    const {x, y, z} = longLatTo3D(info.longitude, info.latitude, r)
-                    attractorHere = this._coordToAttractor[key] =  new Attractor(new THREE.Vector3(x, y, z),
+                if (!attractorHere) {
+                    const position3d = longLatTo3D(info.longitude, info.latitude, r)
+                    attractorHere = this._coordToAttractor[key] = new Attractor(position3d,
                         this.force, 0.0, 0.0, Attractor.INFINITE, 10.0)
                 }
                 this._nameToAttractor[nodeObject.node.address] = attractorHere

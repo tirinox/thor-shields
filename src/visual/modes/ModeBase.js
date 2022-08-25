@@ -10,12 +10,12 @@ export class ModeBase {
         +physObj // do nothing
     }
 
-    makeLabel(text, position, scale = 20, rotation=-45.0) {
+    makeLabel(text, position, scale = 20, rotation = -45.0, bb = false) {
         if (!text) {
             return
         }
 
-        const titleLabel = new TitleLabel3D(text, scale, rotation)
+        const titleLabel = new TitleLabel3D(text, scale, rotation, bb)
         titleLabel.position.copy(position)
         this.scene.add(titleLabel)
         this.labels.push(titleLabel)

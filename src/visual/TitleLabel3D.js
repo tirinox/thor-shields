@@ -1,10 +1,12 @@
 import * as THREE from "three";
+import {MeshBasicMaterial} from "three";
 import {Text} from 'troika-three-text'
 import {Config} from "@/config";
 import TWEEN from "tween";
+import {createBillboardMaterial} from "@/helpers/TextBillboard";
 
 export class TitleLabel3D extends THREE.Object3D {
-    constructor(text, scale = 20, rotAngle = -45) {
+    constructor(text, scale = 20, rotAngle = -45, billboard = false) {
         super();
         this.text = text
         const t = this.label = new Text()
@@ -16,8 +18,11 @@ export class TitleLabel3D extends THREE.Object3D {
         t.anchorX = 'center'
         t.anchorY = 'middle'
         t.text = text
-        t.sync()
+        if (billboard) {
+            t.material = createBillboardMaterial(new MeshBasicMaterial())
+        }
         t.rotateX(THREE.MathUtils.degToRad(rotAngle))
+        t.sync()
         this.t = t
         this.add(t)
         this.animDuration = 500
@@ -40,7 +45,7 @@ export class TitleLabel3D extends THREE.Object3D {
             .start()
     }
 
-    animateOut(kill=false) {
+    animateOut(kill = false) {
         const expandedDuration = this.animDuration * 5
         new TWEEN.Tween(this.t.position)
             .to({z: -this.animDistance * 5}, expandedDuration)
@@ -51,7 +56,7 @@ export class TitleLabel3D extends THREE.Object3D {
             .to({opacity: 0.0}, expandedDuration)
             .easing(this.easeType)
             .start().onComplete(() => {
-            if(kill) {
+            if (kill) {
                 this.parent.remove(this)
             }
         })
