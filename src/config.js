@@ -72,6 +72,11 @@ export const Config = {
         },
         BaseFriction: 0.07, //0.04
         MaxSpeedSq: Math.pow(1500, 2),
+        Attractor: {
+            Flat: {
+                DeltaZ: 1.0,
+            }
+        }
     },
     Debug: {
         ShowFPS: false,

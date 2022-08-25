@@ -87,7 +87,7 @@ export class ModeBond extends ModeBase {
     _addAttractor(nodeObject, x, y) {
         const bond = nodeObject.node.bond
         if(bond > 1.0) {
-            const z = nodeObject.o.position.z
+            const z = 0.0
             this.nameToAttractor[nodeObject.node.address] = new Attractor(new THREE.Vector3(x, y, z),
                 this.force, 0, 0, -1, 10.0)
 

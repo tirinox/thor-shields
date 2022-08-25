@@ -30,7 +30,7 @@
 
             </div>
             <div v-else>
-                <code>No IP address</code>
+                <code>Unknown IP address</code>
             </div>
 
             <br>

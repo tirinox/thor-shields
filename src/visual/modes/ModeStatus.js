@@ -56,12 +56,12 @@ export class ModeStatus extends ModeBase {
         const otherCount = nodeObj.length - (standbyCount + activeCount)
 
         this.makeLabel('Active', new THREE.Vector3(0, -500, 0), 20)
-        this.makeLabel('Standby', new THREE.Vector3(-this._sideDistance, -400, 0), 12)
-        this.makeLabel('Other', new THREE.Vector3(this._sideDistance, -400, 0), 12)
+        this.makeLabel('Standby', new THREE.Vector3(-this._sideDistance, -420, 0), 12)
+        this.makeLabel('Other', new THREE.Vector3(this._sideDistance, -420, 0), 12)
 
         this.makeLabel(activeCount, new THREE.Vector3(0, -650, 0), 10, -45)
-        this.makeLabel(standbyCount, new THREE.Vector3(-this._sideDistance, -480, 0), 6, -45)
-        this.makeLabel(otherCount, new THREE.Vector3(this._sideDistance, -480, 0), 6, -45)
+        this.makeLabel(standbyCount, new THREE.Vector3(-this._sideDistance, -500, 0), 6, -45)
+        this.makeLabel(otherCount, new THREE.Vector3(this._sideDistance, -500, 0), 6, -45)
 
         super.onEnter();
     }

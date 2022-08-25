@@ -5,17 +5,18 @@ import * as THREE from "three";
 
 
 export class AttractorShape extends Attractor {
-    constructor(triangles, constCoeff = 0, linearCoeff = 0, quadraticCoeff = 0) {
+    constructor(triangles, constCoeff = 0, linearCoeff = 0, quadraticCoeff = 0, z = 0) {
         const center = Util.centerOf(_.flatten(triangles))
         super(new THREE.Vector3(center.x, center.y, 0.0),
             constCoeff, linearCoeff, quadraticCoeff, 0, 0)
         this.triangles = triangles
         this.center = center
+        this.z = z
     }
 
     get allSectors() {
         const sectors = []
-        for(const triangle of this.triangles) {
+        for (const triangle of this.triangles) {
             sectors.push(new Section(triangle[0], triangle[1]))
             sectors.push(new Section(triangle[1], triangle[2]))
             sectors.push(new Section(triangle[2], triangle[0]))
@@ -34,9 +35,9 @@ export class AttractorShape extends Attractor {
             return
         }
 
-        const neartestSector = _.minBy(this.allSectors, sector => sector.pDistance(p.x, p.y))
-        const neartestPoint = neartestSector.nearestPoint(p.x, p.y)
-        const distance = new Section(neartestPoint, p).length
-        this.applyForceToDistance(physObj, distance, new THREE.Vector3(neartestPoint.x, neartestPoint.y, 0.0))
+        const nearestSector = _.minBy(this.allSectors, sector => sector.pDistance(p.x, p.y))
+        const nearestPoint = nearestSector.nearestPoint(p.x, p.y)
+        const distance = new Section(nearestPoint, p).length
+        this.applyForceToDistance(physObj, distance, new THREE.Vector3(nearestPoint.x, nearestPoint.y, this.z))
     }
 }
