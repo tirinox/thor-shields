@@ -11,7 +11,7 @@ class VirtualObject extends PhysicalObject {
         this.name = name
         this.position = new THREE.Vector3(x, y, 0)
         this._radius = r
-        this.attractors = [attractor]
+        this.attractors = attractor
         this.friction = friction
     }
 

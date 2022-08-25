@@ -1,10 +1,10 @@
 import _ from "lodash";
 import {Section, Util} from "@/helpers/MathUtil";
-import {Attractor} from "@/helpers/physics/Attractor";
+import {AttractorFlat} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 
 
-export class AttractorShape extends Attractor {
+export class AttractorShape extends AttractorFlat {
     constructor(triangles, constCoeff = 0, linearCoeff = 0, quadraticCoeff = 0, z = 0) {
         const center = Util.centerOf(_.flatten(triangles))
         super(new THREE.Vector3(center.x, center.y, 0.0),
@@ -31,6 +31,9 @@ export class AttractorShape extends Attractor {
         const objPosition = physObj.realObject.position
         const p = {x: objPosition.x, y: objPosition.y}
         const relaxed = _.some(this.triangles, tri => Util.pointInTriangle(p, tri))
+
+        this.squishZ(physObj)
+
         if (relaxed) {
             return
         }
@@ -39,5 +42,7 @@ export class AttractorShape extends Attractor {
         const nearestPoint = nearestSector.nearestPoint(p.x, p.y)
         const distance = new Section(nearestPoint, p).length
         this.applyForceToDistance(physObj, distance, new THREE.Vector3(nearestPoint.x, nearestPoint.y, this.z))
+
+
     }
 }

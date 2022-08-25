@@ -1,4 +1,5 @@
 import {distanceXY} from "@/helpers/3D";
+// import * as THREE from "three";
 
 export class Attractor {
     constructor(position,
@@ -39,14 +40,24 @@ export class Attractor {
     }
 }
 
+Attractor.INFINITE = -1
+
 export class AttractorFlat extends Attractor {
     distance(physObj) {
-        return distanceXY(this.position, physObj.realObject.pos)
+        return distanceXY(this.position, physObj.realObject.position)
     }
 
-    getForce(distance, fromPosition, toPosition) {
-        let f = super.getForce(distance, fromPosition, toPosition);
-        f.z = (fromPosition.z - toPosition.z) * 0.1
-        return f
+    applyForce(physObj) {
+        super.applyForce(physObj);
+        this.squishZ(physObj)
+    }
+
+    squishZ(phyObj) {
+        const zDist = phyObj.realObject.position.z - this.position.z
+        let fZ = 0.0
+        if(Math.abs(zDist) > 1.0) {
+            fZ = -zDist * 100.0
+        }
+        phyObj.force.z = fZ
     }
 }
