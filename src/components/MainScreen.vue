@@ -19,6 +19,8 @@
             >
             </FPSCounter>
 
+            <LoadingIndicator v-if="isLoading"></LoadingIndicator>
+
             <ControlPanel @mode-selected="setSceneMode"></ControlPanel>
         </div>
 
@@ -51,16 +53,19 @@ import ControlPanel from "@/components/parts/ControlPanel";
 import NodeDetailsWindow from "@/components/NodeDetailsWindow";
 import {NodeInfo} from "@/helpers/data/NodeInfo";
 import {CameraController} from "@/visual/CameraController";
+import LoadingIndicator from "@/components/parts/LoadingIndicator";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
 
 export default {
     name: 'MainScreen',
-    components: {NodeDetailsWindow, ControlPanel, FPSCounter},
+    components: {LoadingIndicator, NodeDetailsWindow, ControlPanel, FPSCounter},
     props: {},
 
     data() {
         return {
+            isLoading: true,
+
             showFps: Config.Debug.ShowFPS,
 
             nodes: [],
@@ -271,6 +276,7 @@ export default {
 
         onFullyLoaded() {
             console.log('fully loaded! removing loading screen...')
+            this.isLoading = false
         },
 
         onCloseDetails() {

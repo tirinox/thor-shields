@@ -23,6 +23,8 @@ export class MainScene {
         this._firstTime = true
         this._runDataSource()
 
+        this._fullyLoaded = false
+
         // this._debugSection()
     }
 
@@ -59,6 +61,11 @@ export class MainScene {
         if (!nodes) {
             console.error('No nodes to handle!')
             return
+        }
+
+        if(!this._fullyLoaded) {
+            this._fullyLoaded = true
+            emitter.emit(EventTypes.FullyLoaded)
         }
 
         emitter.emit(EventTypes.DataSourceTick, nodes)
