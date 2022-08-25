@@ -31,8 +31,8 @@ export const Config = {
                 Max: 2900,
                 Start: 2000,
             },
-            AzimuthAngleLimit: 30,
-            PolarAngleLimit: 30,
+            AzimuthAngleLimit: 100,
+            PolarAngleLimit: 100,
             MouseMoveStrength: 0.0002,
 
             Animation: {
@@ -60,7 +60,7 @@ export const Config = {
             ScaleFactor: 1.0,
         },
         Globe: {
-            Radius: 383.0,
+            Radius: 483.0,
         },
     },
     Physics: {
