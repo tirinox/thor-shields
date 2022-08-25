@@ -29,7 +29,8 @@ export class ModeGeo extends ModeBase {
 
         super.onEnter();
 
-        this._createAttractors(nodeObjects)
+        // this._createAttractors(nodeObjects)
+        this._createAttractorsStacked(nodeObjects)
         this._makeGlobe()
     }
 
@@ -121,6 +122,44 @@ export class ModeGeo extends ModeBase {
 
             }
         }
+        console.log(`Total attractors were made: ${this._coordToAttractor.length}.`)
+    }
+
+    _createAttractorsStacked(nodeObjects) {
+        this._nameToAttractor = {}
+        this._coordToStack = {}
+
+        for (const nodeObject of nodeObjects) {
+            const info = nodeObject.node.IPInfo
+            if (!info || !nodeObject.node.IPAddress) {
+                this._nameToAttractor[nodeObject.node.address] = this._banishAttractor
+            } else {
+                const key = `${info.longitude}, ${info.latitude}`
+                let stackObj = this._coordToStack[key]
+                if (!stackObj) {
+                    this._coordToStack[key] = stackObj = {
+                        stack: [],
+                        longitude: info.longitude,
+                        latitude: info.latitude,
+                    }
+                }
+                stackObj.stack.push(nodeObject)
+                // this._nameToAttractor[nodeObject.node.address] = attractorHere
+            }
+        }
+
+        const basicRadius = Config.Scene.Globe.Radius + Config.Scene.Globe.NodeElevation
+        for(const {stack, longitude, latitude} of _.values(this._coordToStack)) {
+            const sortedStack = _.sortBy(stack, nodeObject => -nodeObject.node.bond)
+            let radius = basicRadius
+            for(const nodeObj of sortedStack) {
+                const position3d = longLatTo3D(longitude, latitude, radius)
+                this._nameToAttractor[nodeObj.node.address] = new Attractor(position3d,
+                    this.force, 0.0, 0.0, Attractor.INFINITE, 5.0)
+                radius += nodeObj.radius * 1.2
+            }
+        }
+
         console.log(`Total attractors were made: ${this._coordToAttractor.length}.`)
     }
 }
