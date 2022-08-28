@@ -10,7 +10,7 @@ export class ModeGeo extends ModeBase {
     constructor(scene) {
         super(scene);
 
-        this.force = Config.Physics.BaseForce
+        this.force = Config.Physics.BaseForce * 1.2
         this._banishAttractor = new Attractor(new THREE.Vector3(0, 0, 0), this.force)
 
         this._nameToAttractor = {}
@@ -23,13 +23,10 @@ export class ModeGeo extends ModeBase {
     }
 
     onEnter(nodeObjects) {
-        +nodeObjects
-
-        this.makeLabel('Geo', new THREE.Vector3(0, -630, -10), 14, 0, true)
+        // this.makeLabel('Geo', new THREE.Vector3(0, -630, -10), 14, 0, true)
 
         super.onEnter();
 
-        // this._createAttractors(nodeObjects)
         this._createAttractorsStacked(nodeObjects)
         this._makeGlobe()
     }
@@ -149,14 +146,14 @@ export class ModeGeo extends ModeBase {
         }
 
         const basicRadius = Config.Scene.Globe.Radius + Config.Scene.Globe.NodeElevation
-        for(const {stack, longitude, latitude} of _.values(this._coordToStack)) {
+        for (const {stack, longitude, latitude} of _.values(this._coordToStack)) {
             const sortedStack = _.sortBy(stack, nodeObject => -nodeObject.node.bond)
             let radius = basicRadius
-            for(const nodeObj of sortedStack) {
+            for (const nodeObj of sortedStack) {
                 const position3d = longLatTo3D(longitude, latitude, radius)
                 this._nameToAttractor[nodeObj.node.address] = new Attractor(position3d,
                     this.force, 0.0, 0.0, Attractor.INFINITE, 5.0)
-                radius += nodeObj.radius * 1.2
+                radius += nodeObj.radius * 2.1
             }
         }
 

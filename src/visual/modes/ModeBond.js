@@ -10,7 +10,9 @@ export class ModeBond extends ModeBase {
         super(scene);
         this.nameToAttractor = {}
         this.force = Config.Physics.BaseForce
-        this._noBondAttractor = new Attractor(new THREE.Vector3(0, 0, -2000), this.force)
+
+        this.center = new THREE.Vector3(0, 120)
+        this._noBondAttractor = new Attractor(this.center, this.force)
     }
 
     handleObject(physObj) {
@@ -39,20 +41,19 @@ export class ModeBond extends ModeBase {
 
     _positionateOnSpiral(nodeObjects) {
         const n = nodeObjects.length
-        const center = new THREE.Vector3(0, 120)
         let angle = 0.0
-        let radius = 50.0
+        let radius = 34.0
         // let gap = 3.0
         const xScale = 1.5
 
-        let deltaRadius = 5.0;
+        let deltaRadius = 5.9;
         let deltaAngle = 0.5;
         const deltaDeltaRadius = 0.995;
         const deltaDeltaAngle = 0.991;
 
         for (let i = 0; i < n; ++i) {
-            const x = center.x + xScale * radius * Math.cos(angle)
-            const y = center.y + radius * Math.sin(angle)
+            const x = this.center.x + xScale * radius * Math.cos(angle)
+            const y = this.center.y + radius * Math.sin(angle)
             if(this._addAttractor(nodeObjects[i], x, y)) {
                 radius += deltaRadius;
                 angle += deltaAngle;
@@ -90,7 +91,7 @@ export class ModeBond extends ModeBase {
             this.nameToAttractor[nodeObject.node.address] = new Attractor(new THREE.Vector3(x, y, z),
                 this.force, 0, 0, -1, 10.0)
 
-            this.makeLabel(shortRune(bond), new THREE.Vector3(x, y - nodeObject.radius - 5.0, -10), 1)
+            this.makeLabel(shortRune(bond), new THREE.Vector3(x, y - nodeObject.radius - 10.0, -10), 1)
             return true
         } else {
             this.nameToAttractor[nodeObject.node.address] = this._noBondAttractor

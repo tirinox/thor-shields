@@ -56,6 +56,7 @@ export const Config = {
         NodeObject: {
             Simple: false,
             PlaneScale: 1.0,
+            MinRadius: 12.0,
             MaxScale: 80.0,
             MinScale: 10.0,
             ScaleFactor: 1.0,
@@ -63,8 +64,8 @@ export const Config = {
         },
         Globe: {
             Details: 64,
-            Radius: 423.0,
-            NodeElevation: 10.0,
+            Radius: 600.0,
+            NodeElevation: 50.0,
             TextureMap: 'texture/globe/2k_earth_nightmap.jpeg',
             TextureAtmo: 'texture/globe/earth_atmo.jpeg',
             // TextureMap: 'texture/globe/2k_earth_daymap.jpeg',
@@ -72,7 +73,7 @@ export const Config = {
     },
     Physics: {
         BaseForce: 3500.0,
-        RepelForce: 200.0,
+        RepelForce: 2000.0,
         Startup: {
             SimulationSteps: 10,
             DeltaTime: 0.1

@@ -42,7 +42,5 @@ export class AttractorShape extends AttractorFlat {
         const nearestPoint = nearestSector.nearestPoint(p.x, p.y)
         const distance = new Section(nearestPoint, p).length
         this.applyForceToDistance(physObj, distance, new THREE.Vector3(nearestPoint.x, nearestPoint.y, this.z))
-
-
     }
 }

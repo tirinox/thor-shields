@@ -182,7 +182,7 @@ export class NodeObject extends PhysicalObject {
     }
 
     get radius() {
-        return Math.max(12, this.mesh.scale.x * noCfg.PlaneScale * noCfg.RadiusFactor)
+        return Math.max(noCfg.MinRadius, this.mesh.scale.x * noCfg.PlaneScale * noCfg.RadiusFactor)
     }
 
     reactChain() {
