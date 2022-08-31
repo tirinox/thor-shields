@@ -67,8 +67,18 @@ export const Config = {
             Radius: 600.0,
             NodeElevation: 50.0,
             TextureMap: 'texture/globe/2k_earth_nightmap.jpeg',
-            TextureAtmo: 'texture/globe/earth_atmo.jpeg',
             // TextureMap: 'texture/globe/2k_earth_daymap.jpeg',
+            Clouds: {
+                ElevationScale: 1.005,
+                Opacity: 0.2,
+                Texture: 'texture/globe/earth_atmo.jpeg',
+            },
+            Atmosphere: {
+                ElevationScale: 1.15,
+            },
+            InnerAtmosphere: {
+                Enabled: true,
+            }
         },
     },
     Physics: {

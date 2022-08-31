@@ -7,6 +7,7 @@ export class Simulation {
 
         this.repelForce = 0.0
         this.rBush = new RBush()
+        this.repelEnabled = true
     }
 
     getByName(name) {
@@ -46,7 +47,9 @@ export class Simulation {
 
     _updateObject(physObj, delta) {
         physObj.nullifyForce()
-        this._repelForceCalculation(physObj)
+        if(this.repelEnabled) {
+            this._repelForceCalculation(physObj)
+        }
         physObj.update(delta)
     }
 

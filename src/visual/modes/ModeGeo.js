@@ -6,6 +6,9 @@ import {longLatTo3D} from "@/helpers/3D";
 import TWEEN from "tween";
 import _ from "lodash";
 
+import AtmosphereFragmentShader from '@/visual/shader/globe_atmo.frag'
+import StdVertexShader from '@/visual/shader/standard.vert'
+
 export class ModeGeo extends ModeBase {
     constructor(scene) {
         super(scene);
@@ -22,19 +25,22 @@ export class ModeGeo extends ModeBase {
         physObj.attractors = attr ? [attr] : [this._banishAttractor]
     }
 
-    onEnter(nodeObjects) {
+    onEnter(nodeObjects, group) {
         // this.makeLabel('Geo', new THREE.Vector3(0, -630, -10), 14, 0, true)
-
         super.onEnter();
+
+        group.repelEnabled = false
 
         this._createAttractorsStacked(nodeObjects)
         this._makeGlobe()
+        this._putInGlobe()
     }
 
-    onLeave(nodeObjects) {
+    onLeave(nodeObjects, group) {
         this._destroyGlobe()
         _.forEach(nodeObjects, nodeObj => nodeObj.shootOut(2000))
         super.onLeave();
+        group.repelEnabled = true
     }
 
     _makeGlobe() {
@@ -46,34 +52,68 @@ export class ModeGeo extends ModeBase {
         const globeConfig = Config.Scene.Globe
         const geometry = new THREE.SphereGeometry(globeConfig.Radius, globeConfig.Details, globeConfig.Details);
         const material = new THREE.MeshPhongMaterial({
-            depthWrite: true,
-            // depthTest: true
-            // transparent: true,
-            // opacity: 0.5,
+            map: textureLoader.load(Config.Scene.Globe.TextureMap)
         });
-        material.map = textureLoader.load(Config.Scene.Globe.TextureMap);
+
         this.globeMesh = new THREE.Mesh(geometry, material);
         this.globeMesh.renderOrder = 9999
         this.scene.add(this.globeMesh)
 
+        if(globeConfig.InnerAtmosphere.Enabled) {
+            const innerAtmoMaterial = new THREE.ShaderMaterial({
+                name: 'AtmosphereShaderMaterial',
+                fragmentShader: AtmosphereFragmentShader,
+                vertexShader: StdVertexShader,
+                uniforms: {
+                    globeTexture: {
+                        value: textureLoader.load(Config.Scene.Globe.TextureMap)
+                    }
+                },
+                // side: THREE.FrontSide,
+                // depthWrite: true,
+                // depthTest: true,
+            })
+
+            this.innerAtmoMesh = new THREE.Mesh(geometry, innerAtmoMaterial)
+            // this.innerAtmoMesh.scale.setScalar(1.1)
+            this.globeMesh.add(this.innerAtmoMesh)
+        }
+
+        if (globeConfig.Clouds.Opacity > 0) {
+            const materialClouds = new THREE.MeshPhongMaterial({
+                map: textureLoader.load(globeConfig.Clouds.Texture),
+                side: THREE.DoubleSide,
+                opacity: globeConfig.Clouds.Opacity,
+                transparent: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+            });
+            this.cloudMesh = new THREE.Mesh(geometry, materialClouds)
+            this.cloudMesh.scale.setScalar(globeConfig.Clouds.ElevationScale)
+            this.globeMesh.add(this.cloudMesh)
+        }
+
+        // if(globeConfig.Atmosphere) {
+        //     const materialAtmosphere = new THREE.ShaderMaterial({
+        //         name: 'AtmosphereShaderMaterial',
+        //         fragmentShader: AtmosphereFragmentShader,
+        //         vertexShader: StdVertexShader,
+        //         uniforms: {},
+        //         side: THREE.FrontSide,
+        //         depthWrite: false
+        //     })
+        //     this.atmosphereMesh = new THREE.Mesh(geometry, materialAtmosphere)
+        //     this.atmosphereMesh.scale.setScalar(globeConfig.Atmosphere.ElevationScale)
+        //     this.globeMesh.add(this.atmosphereMesh)
+        // }
+    }
+
+    _putInGlobe() {
         this.globeMesh.scale.set(0.01, 0.01, 0.01)
         new TWEEN.Tween(this.globeMesh.scale)
             .to(new THREE.Vector3(1, 1, 1))
             .easing(TWEEN.Easing.Sinusoidal.InOut)
             .start()
-
-        const geometryAtmo = new THREE.SphereGeometry(
-            globeConfig.Radius + 2.0,
-            globeConfig.Details, globeConfig.Details)
-        const materialAtmo = new THREE.MeshPhongMaterial({
-            map: textureLoader.load(globeConfig.TextureAtmo),
-            side: THREE.DoubleSide,
-            opacity: 0.1,
-            transparent: true,
-            depthWrite: false,
-        });
-        this.cloudMesh = new THREE.Mesh(geometryAtmo, materialAtmo)
-        this.globeMesh.add(this.cloudMesh)
     }
 
     _destroyGlobe() {
@@ -95,7 +135,9 @@ export class ModeGeo extends ModeBase {
 
     update(dt) {
         super.update(dt);
-        this.cloudMesh.rotation.y += 0.02 * dt;
+        if (this.cloudMesh) {
+            this.cloudMesh.rotation.y += 0.02 * dt;
+        }
     }
 
     _createAttractors(nodeObjects) {

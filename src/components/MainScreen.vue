@@ -138,7 +138,7 @@ export default {
         onClick(event) {
             const pickedObject = this._pickObject(event)
             console.log(pickedObject)
-            if(pickedObject) {
+            if (pickedObject) {
                 const nodeAddress = pickedObject.name
                 if (nodeAddress && nodeAddress.startsWith('thor')) {
                     this._onPickNodeObject(nodeAddress)
@@ -198,6 +198,7 @@ export default {
         },
 
         render() {
+            // try {
             let delta = this.clock.getDelta();
 
             if (document.visibilityState === 'hidden') {
@@ -207,7 +208,6 @@ export default {
             }
 
             this.resizeRendererToDisplaySize(this.renderer)
-
             TWEEN.update()
             this.$refs.fps.update(delta, this.scene)
             this.cameraController.update(delta)
@@ -216,6 +216,9 @@ export default {
                 this.bg.update(delta)
             }
             this.composer.render(delta)
+            // } catch (e) {
+            //     console.error('Render error! ' + e)
+            // }
 
             requestAnimationFrame(this.render);
         },
