@@ -11,6 +11,7 @@
 <script>
 
 import {NodeGroupModes} from "@/visual/NodeGroup";
+import {Config} from "@/config";
 
 export default {
     name: 'ControlPanel',
@@ -48,8 +49,9 @@ export default {
         },
     },
     mounted() {
-        // debug: auto set mode
-        // setTimeout(() => this.setSceneMode(NodeGroupModes.Geo), 1000.0)
+        if(Config.Scene.InitialMode) {
+            setTimeout(() => this.setSceneMode(Config.Scene.InitialMode), 1000.0)
+        }
     }
 }
 

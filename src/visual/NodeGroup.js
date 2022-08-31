@@ -10,6 +10,7 @@ import {ModeProvider} from "@/visual/modes/ModeProvider";
 import {ModeVersion} from "@/visual/modes/ModeVersion";
 import {ModeBond} from "@/visual/modes/ModeBond";
 import {ModeGeo} from "@/visual/modes/ModeGeo";
+import * as THREE from "three";
 // import {VisNetwork} from "@/visual/VisNetwork";
 
 export const NodeGroupModes = Object.freeze({
@@ -24,6 +25,9 @@ export const NodeGroupModes = Object.freeze({
 export class NodeGroup extends Simulation {
     constructor(parent) {
         super()
+
+        this.holder = new THREE.Group()
+        parent.add(this.holder)
 
         this._currentIdent = 0
         this.parent = parent
@@ -61,7 +65,7 @@ export class NodeGroup extends Simulation {
         // const pos = Random.randomVector(this._startPositionBounds)
         const pos = Random.randomOnCircle(2000.0)
         nodeObject.o.position.copy(pos)
-        this.parent.add(nodeObject.o)
+        this.holder.add(nodeObject.o)
     }
 
     createNewNode(node) {
@@ -75,7 +79,6 @@ export class NodeGroup extends Simulation {
         console.info(`Create node ${ident}.`)
 
         const nodeObject = new NodeObject(node)
-        this.parent.add(nodeObject.o)
         this._placeNodeObject(nodeObject)
         this.addObject(ident, nodeObject)
         return nodeObject
@@ -91,7 +94,7 @@ export class NodeGroup extends Simulation {
 
         console.info(`Destroy node ${nodeAddress}.`)
         nodeObject.dispose()
-        this.parent.remove(nodeObject.o)
+        this.holder.remove(nodeObject.o)
         super.removeObject(nodeAddress)
     }
 
@@ -145,7 +148,7 @@ export class NodeGroup extends Simulation {
 
     dispose() {
         super.dispose()
-        clearObject(this.parent)
+        clearObject(this.holder)
         for (const otherObj of this.physicalObjects) {
             otherObj.dispose()
         }

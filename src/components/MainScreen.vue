@@ -124,19 +124,24 @@ export default {
         onMouseLeave() {
         },
 
-        _pickObject(event) {
+        _pickObject(event, thoughtful = false) {
             const pickPosition = this.getCanvasRelativePosition(event)
 
             // cast a ray through the frustum
             this.raycaster.setFromCamera(pickPosition, this.cameraController.camera);
             // get the list of objects the ray intersected
-            const intersectedObjects = this.raycaster.intersectObjects(this.scene.children);
+            const intersectedObjects = this.raycaster.intersectObjects(this.content.nodeGroup.holder.children, false);
+            if(thoughtful) {
+                console.log('Objects hit by the ray caster: ' + intersectedObjects.length)
+            }
+
             const namedObjects = _.filter(_.map(intersectedObjects, 'object'), o => o.name && o.name !== '')
             return namedObjects.length ? namedObjects[0] : null
         },
 
         onClick(event) {
-            const pickedObject = this._pickObject(event)
+            // fixme: cannot pick when globe is rotated geo mode
+            const pickedObject = this._pickObject(event, true)
             console.log(pickedObject)
             if (pickedObject) {
                 const nodeAddress = pickedObject.name
@@ -236,7 +241,7 @@ export default {
             let renderer = this.renderer = new THREE.WebGLRenderer({
                 canvas,
                 antialias: false,
-                logarithmicDepthBuffer: true,
+                logarithmicDepthBuffer: Config.Renderer.LogZBuffer,
             });
 
             if (devicePixelRatio) {

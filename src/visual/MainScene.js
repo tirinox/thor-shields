@@ -18,6 +18,7 @@ export class MainScene {
         this.nodes = new NodeSet([])
 
         this._makeSomeLight()
+
         this.nodeGroup = new NodeGroup(this.scene)
 
         this._firstTime = true
@@ -38,24 +39,9 @@ export class MainScene {
         // const light = new THREE.DirectionalLight('hsl(0, 100%, 100%)')
         // light.position.set(0, 10, 1000)
         // this.scene.add(light)
-
-        const ambientLight = new THREE.AmbientLight(0xffffff); // soft white light
-        this.scene.add(ambientLight);
+        // const ambientLight = new THREE.AmbientLight(0xffffff); // soft white light
+        // this.scene.add(ambientLight);
     }
-
-    // async _loadAdditionalInfoAbout(node) {
-    //     const ipAddress = node.IPAddress
-    //     if (ipAddress) {
-    //         node.IPInfo = await this.ipAddressLoader.load(ipAddress)
-    //     }
-    //
-    //     // debug
-    //     if(node.IPInfo) {
-    //         console.info(`got IPInfo for ${ipAddress} node = ${node.address} => ${node.IPInfo.countryCode}`)
-    //     } else {
-    //         console.warn(`no IPInfo for ${ipAddress} node = ${node.address}`)
-    //     }
-    // }
 
     handleData(nodes) {
         if (!nodes) {
@@ -68,9 +54,9 @@ export class MainScene {
             emitter.emit(EventTypes.FullyLoaded)
         }
 
-        emitter.emit(EventTypes.DataSourceTick, nodes)
+        // todo: debug juggling will be here
 
-        // Random.removeRandomItem(nodes)
+        emitter.emit(EventTypes.DataSourceTick, nodes)
 
         this.prevNodes = this.nodes
         this.nodes = nodes

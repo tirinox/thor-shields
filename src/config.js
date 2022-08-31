@@ -46,6 +46,7 @@ export const Config = {
         },
     },
     Scene: {
+        InitialMode: 'geo',
         Background: {
             Enabled: false,  // todo: enable. disabled for better performance
         },
@@ -63,14 +64,15 @@ export const Config = {
             RadiusFactor: 0.3,
         },
         Globe: {
+            Enabled: true,
             Details: 64,
             Radius: 600.0,
-            NodeElevation: 50.0,
+            NodeElevation: 20.0,
             TextureMap: 'texture/globe/2k_earth_nightmap.jpeg',
             // TextureMap: 'texture/globe/2k_earth_daymap.jpeg',
             Clouds: {
                 ElevationScale: 1.005,
-                Opacity: 0.2,
+                Opacity: 0.05,
                 Texture: 'texture/globe/earth_atmo.jpeg',
             },
             Atmosphere: {
@@ -98,7 +100,10 @@ export const Config = {
     },
     Debug: {
         ShowFPS: false,
-    }
+    },
+    Renderer: {
+        LogZBuffer: false,
+    },
 }
 
 export const Colors = {
