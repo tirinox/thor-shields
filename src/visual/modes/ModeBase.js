@@ -4,6 +4,7 @@ export class ModeBase {
     constructor(scene) {
         this.scene = scene
         this.labels = []
+        this.active = false
     }
 
     handleObject(physObj) {
@@ -23,10 +24,12 @@ export class ModeBase {
     }
 
     onEnter() {
+        this.active = true
         this.labels.forEach(label => label.animateIn())
     }
 
     onLeave() {
+        this.active = false
         this.labels.forEach(label => label.animateOut(true))
         this.labels = []
     }

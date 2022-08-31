@@ -32,8 +32,9 @@ export default {
 <style scoped>
     .loading-indicator {
         position: absolute;
-        left: 1rem;
-        top: 1rem;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         font-size: 1.5rem;
         color: white;
     }

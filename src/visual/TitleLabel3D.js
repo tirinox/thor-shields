@@ -57,7 +57,9 @@ export class TitleLabel3D extends THREE.Object3D {
             .easing(this.easeType)
             .start().onComplete(() => {
             if (kill) {
-                this.parent.remove(this)
+                if(this.parent) {
+                    this.parent.remove(this)
+                }
             }
         })
     }
