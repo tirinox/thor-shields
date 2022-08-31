@@ -6,11 +6,11 @@
                 ref="canvas"
                 class="canvas-full"
                 tabindex="1"
-                @keypress="onKeyDown"
+                @keypress.prevent="onKeyDown"
                 @mousemove="onMouseMove"
                 @mouseenter="onMouseEnter"
                 @mouseleave="onMouseLeave"
-                @click="onClick"
+                @click.prevent="onClick"
             >
             </canvas>
             <FPSCounter
@@ -27,7 +27,7 @@
         <!-- UI -->
         <div class="ui-container">
             <NodeDetailsWindow
-                :visible="nodeDetailsVisible"
+                v-if="nodeDetailsVisible"
                 :node="nodeToViewDetails"
                 @close="onCloseDetails">
             </NodeDetailsWindow>
@@ -130,7 +130,7 @@ export default {
             // cast a ray through the frustum
             this.raycaster.setFromCamera(pickPosition, this.cameraController.camera);
             // get the list of objects the ray intersected
-            const intersectedObjects = this.raycaster.intersectObjects(this.content.nodeGroup.holder.children, false);
+            const intersectedObjects = this.raycaster.intersectObjects(this.content.nodeGroup.holder.children, true);
             if(thoughtful) {
                 console.log('Objects hit by the ray caster: ' + intersectedObjects.length)
             }
@@ -355,7 +355,7 @@ canvas {
     /*display: block;*/
 }
 
-canvas:focus {
+*:focus {
     outline: none;
 }
 

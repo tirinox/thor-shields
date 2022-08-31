@@ -1,6 +1,6 @@
 <template>
     <Transition name="shrink">
-        <div class="window" v-if="visible" @keydown.esc="close" tabindex="0">
+        <div class="window" @keyup.esc.prevent="close" tabindex="0" ref="modal">
             <div class="close-button" @click="close"></div>
             <h1>Node details </h1>
             <h2>{{ node.address }}</h2>
@@ -37,8 +37,7 @@
 
             <span>
                 <span class="category">🌐 Explorer:</span>
-                 <a :href="`https://viewblock.io/thorchain/address/${node.address}`" target="_blank">
-                     Viewblock {{ node.shortAddress }}</a>
+                <a :href="`https://viewblock.io/thorchain/address/${node.address}`" target="_blank">Viewblock – {{ node.shortAddress }}</a>
             </span>
 
             <br>
@@ -56,7 +55,6 @@
                 <span class="category">😈 Slash points:</span>
                 {{ node.slashPoints }} pts.
             </span>
-
         </div>
     </Transition>
 
@@ -71,7 +69,6 @@ export default {
     emits: ['close'],
     props: [
         'node',
-        'visible'
     ],
     data() {
         return {}
@@ -96,10 +93,9 @@ export default {
             this.$emit('close')
         }
     },
-    watch: {
-        visible(n) {
-            console.log('visible = ', n)
-        }
+    mounted() {
+        this.$refs.modal.focus()
+        console.log('focused!!')
     }
 }
 
@@ -125,9 +121,6 @@ export default {
     font-size: 10pt;
 }
 
-.visible {
-    display: flex;
-}
 
 .close-button {
     float: right;
