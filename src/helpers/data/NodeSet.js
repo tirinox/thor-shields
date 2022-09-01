@@ -1,19 +1,34 @@
 import _ from "lodash";
 
 export class NodeSet {
-    constructor(nodes) {
-        this.nodes = nodes
+    constructor(nodes, calculate=true) {
+        this.nodes = nodes || []
 
         this.total = this.nodes.length
 
-        this._nodesWithNames = _.filter(this.nodes, (item) => item.address)
-        this.byAddress = _.keyBy(this._nodesWithNames, 'address')
-        this.nameSet = _.keys(this.byAddress)
+        if(calculate) {
+            this._nodesWithNames = _.filter(this.nodes, (item) => item.address)
+            this.byAddress = _.keyBy(this._nodesWithNames, 'address')
+            this.nameSet = _.keys(this.byAddress)
 
-        this.totalBond = _.sumBy(this.nodes, (node) => node.bond)
-        this.maxSlashNode = _.maxBy(this.nodes, (node) => node.slashPoints)
-        this.trampCount = this.total - this._nodesWithNames.length
-        this.maxAgeNode = _.maxBy(this.nodes, (node) => node.ageSeconds)
+            this.totalBond = _.sumBy(this.nodes, (node) => node.bond)
+            this.maxSlashNode = _.maxBy(this.nodes, (node) => node.slashPoints)
+            this.trampCount = this.total - this._nodesWithNames.length
+            this.maxAgeNode = _.maxBy(this.nodes, (node) => node.ageSeconds)
+
+            this.ranks = {
+                bond: this._makeRanking('bond'),
+                slash: this._makeRanking('slashPoints'),
+                age: this._makeRanking('ageSeconds'),
+                award: this._makeRanking('currentAward')
+            }
+        }
+    }
+
+    _makeRanking(criteria) {
+        const sortedArr = _.sortBy(this._nodesWithNames, criteria)
+        const ranks = [...Array(sortedArr.length).keys()]
+        return new Map(_.zip(ranks, ranks))
     }
 
     findByAddress(address) {
@@ -26,7 +41,7 @@ export class NodeSet {
     }
 
     filteredByStatus(status) {
-        return new NodeSet(_.filter(this.nodes), (node) => node.status === status)
+        return new NodeSet(_.filter(this.nodes, (node) => node.status === status))
     }
 
     get sortedByBond() {
@@ -43,5 +58,9 @@ export class NodeSet {
 
     setStatusAll(status) {
         _.forEach(this.nodes, n => n.status = status)
+    }
+
+    bondPercentOfTotal(bond) {
+        return Math.round(bond / this.totalBond * 10000.0) * 0.01
     }
 }

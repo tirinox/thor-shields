@@ -44,6 +44,7 @@
             <span>
                 <span class="category">🔒 Bond:</span>
                 {{ $filters.fullRune(Math.round(node.bond)) }}
+                <span>({{ nodeSet.bondPercentOfTotal(node.bond) }} %, #{{ nodeSet.ranks.bond[node.address] }})</span>
             </span>
             <br>
             <span>
@@ -69,6 +70,7 @@ export default {
     emits: ['close'],
     props: [
         'node',
+        'nodeSet'
     ],
     data() {
         return {}

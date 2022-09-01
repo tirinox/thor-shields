@@ -14,8 +14,8 @@ export class MainScene {
     constructor(scene, vueComp) {
         this.scene = scene
         this.vueComp = vueComp
-        this.prevNodes = new NodeSet([])
-        this.nodes = new NodeSet([])
+        this.prevNodes = new NodeSet([], false)
+        this.nodes = new NodeSet([], false)
 
         this._makeSomeLight()
 

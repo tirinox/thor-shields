@@ -29,6 +29,7 @@
             <NodeDetailsWindow
                 v-if="nodeDetailsVisible"
                 :node="nodeToViewDetails"
+                :node-set="nodeSet"
                 @close="onCloseDetails">
             </NodeDetailsWindow>
         </div>
@@ -55,8 +56,8 @@ import {NodeInfo} from "@/helpers/data/NodeInfo";
 import {CameraController} from "@/visual/CameraController";
 import LoadingIndicator from "@/components/parts/LoadingIndicator";
 import _ from "lodash";
+import {NodeSet} from "@/helpers/data/NodeSet";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
-
 
 export default {
     name: 'MainScreen',
@@ -69,15 +70,14 @@ export default {
 
             showFps: Config.Debug.ShowFPS,
 
-            nodes: [],
-            prevNodes: [],
-
             mouseEnterX: 0,
             mouseEnterY: 0,
 
             sceneMode: 'normal',
 
             fullyLoaded: false,
+
+            nodeSet: new NodeSet(),
 
             nodeDetailsVisible: false,
             nodeToViewDetails: new NodeInfo(),
@@ -289,6 +289,10 @@ export default {
             this.isLoading = false
         },
 
+        onDataArrived(nodeSet) {
+            this.nodeSet = nodeSet
+        },
+
         onCloseDetails() {
             this.nodeDetailsVisible = false
             this.cameraController.restoreCamera()
@@ -307,15 +311,17 @@ export default {
         this.buildScene()
 
         this.raycaster = new THREE.Raycaster()
+        emitter.on(EventTypes.FullyLoaded, this.onFullyLoaded)
+        emitter.on(EventTypes.DataSourceTick, this.onDataArrived)
 
         requestAnimationFrame(this.render);
-        emitter.on(EventTypes.FullyLoaded, this.onFullyLoaded)
     },
 
     unmounted() {
         this.content.dispose()
         this.cameraController.dispose()
         emitter.off(EventTypes.FullyLoaded)
+        emitter.off(EventTypes.DataSourceTick)
     }
 }
 
