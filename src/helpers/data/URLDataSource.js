@@ -6,9 +6,9 @@ import {IPAddressInfoLoader} from "@/helpers/data/IPAddressInfo";
 
 
 export class URLDataSource {
-    constructor(url, period) {
+    constructor(baseUrl, period) {
         this.period = period
-        this.url = url
+        this.baseUrl = baseUrl
         this._isRunning = false
         this._timer = 0
         this.callback = () => 0
@@ -48,9 +48,13 @@ export class URLDataSource {
         return this._isRunning
     }
 
+    get urlNodes() {
+        return this.baseUrl + '/thorchain/nodes'
+    }
+
     async _tick() {
         try {
-            const data = await axios.get(this.url, {
+            const data = await axios.get(this.urlNodes, {
                 headers: {
                     'Content-type': 'application/json'
                 }

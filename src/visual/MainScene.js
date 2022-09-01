@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import {NodeGroup} from "@/visual/NodeGroup";
-import {NodeTracker} from "@/helpers/NodeTracker";
+import {DebugNodeJuggler, NodeTracker} from "@/helpers/NodeTracker";
 import {NodeEvent} from "@/helpers/NodeEvent";
 import {URLDataSource} from "@/helpers/data/URLDataSource";
 import {Config} from "@/config";
@@ -25,6 +25,9 @@ export class MainScene {
         this._runDataSource()
 
         this._fullyLoaded = false
+
+        this._nodeJuggler = new DebugNodeJuggler(3)
+        this._nodeJuggler.enabled = Config.DataSource.NodeJuggler.Enabled
 
         // this._debugSection()
     }
@@ -54,7 +57,7 @@ export class MainScene {
             emitter.emit(EventTypes.FullyLoaded)
         }
 
-        // todo: debug juggling will be here
+        nodes = this._nodeJuggler.handleNodes(nodes)
 
         emitter.emit(EventTypes.DataSourceTick, nodes)
 

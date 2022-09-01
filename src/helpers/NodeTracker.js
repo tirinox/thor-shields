@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {NodeEvent} from "@/helpers/NodeEvent";
+import {Random} from "@/helpers/MathUtil";
 
 export const NodeStatus = {
     Standby: 'Standby',
@@ -65,5 +66,35 @@ export class NodeTracker {
         }
 
         return events
+    }
+}
+
+export class DebugNodeJuggler {
+    constructor(period = 10) {
+        this.tick = 1
+        this.period = period
+        this.enabled = true
+    }
+
+    handleNodes(nodes) {
+        if (this.enabled) {
+            if (this.tick % this.period === 0) {
+                nodes = this._juggleNodes(nodes)
+            }
+            this.tick++
+        }
+        return nodes
+    }
+
+    _juggleNodes(nodes) {
+        const nodesIn = Random.getRandomIntRange(2, 7)
+        const nodesOut = Random.getRandomIntRange(2, 7)
+
+        console.warn(`Attention! _juggleNodes: IN: ${nodesIn}, OUT: ${nodesOut}!`)
+
+        nodes.filteredByStatus(NodeStatus.Active).sampleRandomly(nodesOut).setStatusAll(NodeStatus.Standby)
+        nodes.filteredByStatus(NodeStatus.Standby).sampleRandomly(nodesIn).setStatusAll(NodeStatus.Active)
+
+        return nodes
     }
 }

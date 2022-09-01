@@ -36,4 +36,12 @@ export class NodeSet {
     get sortedByAge() {
         return this.sortedNodes('statusSince')
     }
+
+    sampleRandomly(n) {
+        return new NodeSet(_.sampleSize(this.nodes, n))
+    }
+
+    setStatusAll(status) {
+        _.forEach(this.nodes, n => n.status = status)
+    }
 }

@@ -13,6 +13,7 @@ import {NodeStatus} from "@/helpers/NodeTracker";
 import {randFloat} from "three/src/math/MathUtils";
 import {clamp} from "lodash";
 import {createBillboardMaterial} from "@/helpers/TextBillboard";
+import {NodeEvent} from "@/helpers/NodeEvent";
 
 
 const noCfg = Config.Scene.NodeObject
@@ -53,7 +54,7 @@ export class NodeObject extends PhysicalObject {
 
     set elevated(v) {
         v = Boolean(v)
-        if(this._elevated !== v) {
+        if (this._elevated !== v) {
             this._elevated = v
 
             this.material.uniforms.saturation.value = this._elevated ? 1.5 : 1.0
@@ -91,7 +92,12 @@ export class NodeObject extends PhysicalObject {
     }
 
     _makeSphere() {
-        if(Config.Scene.NodeObject.Simple) {
+        if (this.mesh) {
+            this.o.remove(this.mesh)
+            this.mesh = null
+        }
+
+        if (Config.Scene.NodeObject.Simple) {
             this._makeSimpleSphere()
         } else {
             this._makeCoolSphere()
@@ -185,31 +191,6 @@ export class NodeObject extends PhysicalObject {
         return Math.max(noCfg.MinRadius, this.mesh.scale.x * noCfg.PlaneScale * noCfg.RadiusFactor)
     }
 
-    reactChain() {
-        // this.mesh.rotateZ(1.0)
-        const pos = this.o.position.clone().normalize()
-        const perp = pos.cross(new Vector3(0, 0, 1)).multiplyScalar(100.0)
-        this.velocity.add(perp)
-    }
-
-    reactSlash() {
-        const slashForce = 100.0
-        this.shootOut(slashForce)
-        // this.velocity.set(Random.randomOnCircle(slashForce))
-
-        const savedColor = this.material.uniforms.color.value.clone()
-
-        if(this.material) {
-            this.material.uniforms.color.value.set(SlashColor)
-            this.material.uniformsNeedUpdate = true
-
-            setTimeout(() => {
-                this.material.uniforms.color.value.set(savedColor)
-                this.material.uniformsNeedUpdate = true
-            }, 100)
-        }
-    }
-
     static estimateRadiusOfGroup(nodeObjList) {
         let r = 0.0
         for (const nodeObj of nodeObjList) {
@@ -224,8 +205,51 @@ export class NodeObject extends PhysicalObject {
     update(dt) {
         super.update(dt);
 
-        if(this.material) {
+        if (this.material) {
             this.material.uniforms.time.value += dt
         }
+    }
+
+    // ----------------- R E A C T I O N S -------------------
+
+    react(event) {
+        this.node = event.node
+        if (event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
+            this.reactChain()
+        } else if (event.type === NodeEvent.EVENT_TYPE.SLASH) {
+            this.reactSlash()
+        } else if (event.type === NodeEvent.EVENT_TYPE.STATUS) {
+            this.reactStatusChange(event.node.status)
+        }
+    }
+
+    reactChain() {
+        // this.mesh.rotateZ(1.0)
+        const pos = this.o.position.clone().normalize()
+        const perp = pos.cross(new Vector3(0, 0, 1)).multiplyScalar(100.0)
+        this.velocity.add(perp)
+    }
+
+    reactSlash() {
+        const slashForce = 100.0
+        this.shootOut(slashForce)
+        // this.velocity.set(Random.randomOnCircle(slashForce))
+
+        const savedColor = this.material.uniforms.color.value.clone()
+
+        if (this.material) {
+            this.material.uniforms.color.value.set(SlashColor)
+            this.material.uniformsNeedUpdate = true
+
+            setTimeout(() => {
+                this.material.uniforms.color.value.set(savedColor)
+                this.material.uniformsNeedUpdate = true
+            }, 100)
+        }
+    }
+
+    reactStatusChange(newStatus) {
+        console.log(`New status ${this.node.status} -> ${newStatus}`)
+        this._makeSphere()
     }
 }

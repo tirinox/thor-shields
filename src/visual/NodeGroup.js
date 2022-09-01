@@ -1,6 +1,5 @@
 import {Random} from "@/helpers/MathUtil";
 import {NodeObject} from "@/visual/NodeObject";
-import {NodeEvent} from "@/helpers/NodeEvent";
 import {clearObject} from "@/helpers/3D";
 import {Config} from "@/config";
 import {Simulation} from "@/helpers/physics/Simulation";
@@ -127,12 +126,7 @@ export class NodeGroup extends Simulation {
         setTimeout(() => {
             const obj = this.getByName(event.node.address)
             if (obj) {
-                if (event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
-                    obj.reactChain()
-                } else if (event.type === NodeEvent.EVENT_TYPE.SLASH) {
-                    obj.reactSlash()
-                }
-                // todo: react to status, bond changes
+                obj.react(event)
             }
         }, delay)
     }
