@@ -8,6 +8,7 @@
 <script>
 
 import {countObjects} from "@/helpers/3D";
+import {emitter, EventTypes} from "@/helpers/EventTypes";
 
 export default {
     name: 'FPSCounter',
@@ -40,6 +41,12 @@ export default {
                 this.lastUpdateTime = +Date.now()
             }
         },
+    },
+    unmounted() {
+        emitter.off(EventTypes.Activity, this.pokeActivity)
+    },
+    mounted() {
+        emitter.on(EventTypes.Activity, this.pokeActivity)
     }
 }
 

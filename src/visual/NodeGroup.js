@@ -105,13 +105,13 @@ export class NodeGroup extends Simulation {
         this._mode = newMode
 
         // dispose old
-        this._selectedModeHandler.onLeave(this.physicalObjects, this)
+        this._selectedModeHandler._triggerOnLeave(this.physicalObjects, this)
 
         // pick new
         this._selectedModeHandler = this._selector[this._mode]
 
         // enter the new one
-        this._selectedModeHandler.onEnter(this.physicalObjects, this)
+        this._selectedModeHandler._triggerOnEnter(this.physicalObjects, this)
 
         console.log(`Set Mode: ${newMode}`)
     }

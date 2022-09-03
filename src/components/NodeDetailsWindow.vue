@@ -98,6 +98,11 @@ export default {
     mounted() {
         this.$refs.modal.focus()
         console.log('focused!!')
+    },
+    watch: {
+        nodeSet() {
+            console.warn('node set changed')
+        }
     }
 }
 
@@ -108,9 +113,9 @@ export default {
 // todo: different variant for Portrait orientation
 .window {
     position: fixed;
-    left: 50%;
+    left: 5%;
     top: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(0%, -50%);
 
     border: 1px solid #097a7b;
     border-radius: 12px;

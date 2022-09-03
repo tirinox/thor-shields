@@ -3,9 +3,8 @@ import {clearObject} from "@/helpers/3D";
 import {TrailTesting} from "@/visual/helpers/TrailTesting";
 
 export class TrailTestScene {
-    constructor(scene, vueComp) {
+    constructor(scene) {
         this.scene = scene
-        this.vueComp = vueComp
 
         this._makeSomeLight()
 

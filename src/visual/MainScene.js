@@ -11,9 +11,8 @@ import {NodeSet} from "@/helpers/data/NodeSet";
 import {MeshLine, MeshLineMaterial} from 'three.meshline';
 
 export class MainScene {
-    constructor(scene, vueComp) {
+    constructor(scene) {
         this.scene = scene
-        this.vueComp = vueComp
         this.prevNodes = new NodeSet([], false)
         this.nodes = new NodeSet([], false)
 
@@ -88,8 +87,8 @@ export class MainScene {
             this._firstTime = false
         }
 
-        if (events.length && this.vueComp) {
-            this.vueComp.pokeActivity()
+        if (events.length) {
+            emitter.emit(EventTypes.Activity)
         }
     }
 

@@ -10,7 +10,7 @@ export const Config = {
             'http://localhost:8080/data/samplenodes.json'),
 
         PollPeriod: 3000.0, // msec
-        ReactRandomDelay: 2500.0, // msec
+        ReactRandomDelay: 500.0, // msec
         NodeJuggler: {
             Enabled: true
         }

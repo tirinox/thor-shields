@@ -21,7 +21,7 @@
 
             <LoadingIndicator v-if="isLoading"></LoadingIndicator>
 
-            <ControlPanel @mode-selected="setSceneMode"></ControlPanel>
+            <ControlPanel @mode-selected="setSceneMode" v-if="fullyLoaded"></ControlPanel>
         </div>
 
         <!-- UI -->
@@ -56,7 +56,6 @@ import {NodeInfo} from "@/helpers/data/NodeInfo";
 import {CameraController} from "@/visual/CameraController";
 import LoadingIndicator from "@/components/parts/LoadingIndicator";
 import _ from "lodash";
-import {NodeSet} from "@/helpers/data/NodeSet";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
 export default {
@@ -73,14 +72,22 @@ export default {
             mouseEnterX: 0,
             mouseEnterY: 0,
 
+            tickCounter: 0,
+
             sceneMode: 'normal',
 
             fullyLoaded: false,
 
-            nodeSet: new NodeSet(),
-
             nodeDetailsVisible: false,
             nodeToViewDetails: new NodeInfo(),
+            zoomedToNode: false,
+        }
+    },
+
+    computed: {
+        nodeSet() {
+            console.log('NodeSet update >>>' + this.tickCounter)
+            return this._nodeSet
         }
     },
 
@@ -114,6 +121,12 @@ export default {
 
             const pickedName = this._pickObject(event)?.name
             this.content.nodeGroup.setElevatedNode(pickedName)
+            if(!this.zoomedToNode) {
+                this.nodeDetailsVisible = !!pickedName
+                if (this.nodeDetailsVisible) {
+                    this.nodeToViewDetails = this.content.findNodeByAddress(pickedName)
+                }
+            }
         },
 
         onMouseEnter(event) {
@@ -131,7 +144,7 @@ export default {
             this.raycaster.setFromCamera(pickPosition, this.cameraController.camera);
             // get the list of objects the ray intersected
             const intersectedObjects = this.raycaster.intersectObjects(this.content.nodeGroup.holder.children, true);
-            if(thoughtful) {
+            if (thoughtful) {
                 console.log('Objects hit by the ray caster: ' + intersectedObjects.length)
             }
 
@@ -140,6 +153,7 @@ export default {
         },
 
         onClick(event) {
+            console.log(event)
             // fixme: cannot pick when globe is rotated geo mode
             const pickedObject = this._pickObject(event, true)
             console.log(pickedObject)
@@ -155,6 +169,7 @@ export default {
         },
 
         _onPickNodeObject(nodeAddress) {
+            this.zoomedToNode = true
             console.log('Picked node:', nodeAddress)
             this.content.pick(nodeAddress)
 
@@ -280,20 +295,19 @@ export default {
             }
         },
 
-        pokeActivity() {
-            this.$refs.fps.pokeActivity()
-        },
-
         onFullyLoaded() {
             console.log('fully loaded! removing loading screen...')
             this.isLoading = false
+            this.fullyLoaded = true
         },
 
         onDataArrived(nodeSet) {
-            this.nodeSet = nodeSet
+            this.tickCounter++
+            this._nodeSet = nodeSet
         },
 
         onCloseDetails() {
+            this.zoomedToNode = false
             this.nodeDetailsVisible = false
             this.cameraController.restoreCamera()
         },

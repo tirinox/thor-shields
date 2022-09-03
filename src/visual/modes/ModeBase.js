@@ -24,11 +24,21 @@ export class ModeBase {
     }
 
     onEnter() {
+    }
+
+    _triggerOnEnter() {
+        this.onEnter()
+
         this.active = true
         this.labels.forEach(label => label.animateIn())
     }
 
     onLeave() {
+    }
+
+    _triggerOnLeave() {
+        this.onLeave()
+
         this.active = false
         this.labels.forEach(label => label.animateOut(true))
         this.labels = []

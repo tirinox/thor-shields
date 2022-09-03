@@ -35,6 +35,7 @@ export class ModeVersion extends ModeBase {
 
     onEnter(objList) {
         this._createVersionAttractors(objList)
+
         this.makeLabel('Versions', new THREE.Vector3(0, -630, -10), 14)
 
         super.onEnter();
