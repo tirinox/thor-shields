@@ -26,8 +26,8 @@ export class ModeBase {
     onEnter() {
     }
 
-    _triggerOnEnter() {
-        this.onEnter()
+    _triggerOnEnter(a, b) {
+        this.onEnter(a, b)
 
         this.active = true
         this.labels.forEach(label => label.animateIn())
@@ -36,8 +36,8 @@ export class ModeBase {
     onLeave() {
     }
 
-    _triggerOnLeave() {
-        this.onLeave()
+    _triggerOnLeave(a, b) {
+        this.onLeave(a, b)
 
         this.active = false
         this.labels.forEach(label => label.animateOut(true))

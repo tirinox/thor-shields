@@ -138,6 +138,10 @@ export default {
         },
 
         _pickObject(event, thoughtful = false) {
+            if(!this.raycaster) {
+                return null
+            }
+
             const pickPosition = this.getCanvasRelativePosition(event)
 
             // cast a ray through the frustum
