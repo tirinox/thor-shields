@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import {NodeGroup} from "@/visual/NodeGroup";
-import {DebugNodeJuggler, NodeTracker} from "@/helpers/NodeTracker";
+import {DebugNodeJuggler, NodeTracker} from "@/helpers/data/NodeTracker";
 import {NodeEvent} from "@/helpers/NodeEvent";
 import {URLDataSource} from "@/helpers/data/URLDataSource";
 import {Config} from "@/config";

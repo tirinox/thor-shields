@@ -1,6 +1,7 @@
 import _ from "lodash";
 import {NodeEvent} from "@/helpers/NodeEvent";
 import {Random} from "@/helpers/MathUtil";
+import {Version} from "@/helpers/data/Version";
 
 export const NodeStatus = {
     Standby: 'Standby',
@@ -74,6 +75,8 @@ export class DebugNodeJuggler {
         this.tick = 1
         this.period = period
         this.enabled = true
+        this.juggleStatus = true
+        this.juggleVersion = true
     }
 
     handleNodes(nodes) {
@@ -87,6 +90,16 @@ export class DebugNodeJuggler {
     }
 
     _juggleNodes(nodes) {
+        if(this.juggleStatus) {
+            nodes = this._juggleNodesStatus(nodes)
+        }
+        if(this.juggleVersion) {
+            nodes = this._juggleNodesVersion(nodes)
+        }
+        return nodes
+    }
+
+    _juggleNodesStatus(nodes) {
         const nodesIn = Random.getRandomIntRange(2, 7)
         const nodesOut = Random.getRandomIntRange(2, 7)
 
@@ -95,6 +108,16 @@ export class DebugNodeJuggler {
         nodes.filteredByStatus(NodeStatus.Active).sampleRandomly(nodesOut).setStatusAll(NodeStatus.Standby)
         nodes.filteredByStatus(NodeStatus.Standby).sampleRandomly(nodesIn).setStatusAll(NodeStatus.Active)
 
+        return nodes
+    }
+
+    _nextVersion(vString) {
+        return Version.fromString(vString).inc(10, 100).toString()
+    }
+
+    _juggleNodesVersion(nodes) {
+        const nUpgrade = Random.getRandomIntRange(1, 5)
+        nodes.sampleRandomly(nUpgrade).nodes.forEach(node => {node.version = this._nextVersion(node.version)})
         return nodes
     }
 }

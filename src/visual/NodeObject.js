@@ -9,7 +9,7 @@ import StdVertexShader from '@/visual/shader/billboard.vert'
 // import FragShader1 from '@/visual/shader/node_obj_3_rays.frag'
 // import FragShader1 from '@/visual/shader/node_obj_1.frag'
 import FragShader1 from '@/visual/shader/node_obj_2.frag'
-import {NodeStatus} from "@/helpers/NodeTracker";
+import {NodeStatus} from "@/helpers/data/NodeTracker";
 import {randFloat} from "three/src/math/MathUtils";
 import {clamp} from "lodash";
 import {createBillboardMaterial} from "@/helpers/TextBillboard";

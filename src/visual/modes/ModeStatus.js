@@ -1,5 +1,5 @@
 import {ModeBase} from "@/visual/modes/ModeBase";
-import {NodeStatus} from "@/helpers/NodeTracker";
+import {NodeStatus} from "@/helpers/data/NodeTracker";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import {Config} from "@/config";

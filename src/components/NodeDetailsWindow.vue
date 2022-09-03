@@ -63,7 +63,7 @@
 
 <script>
 
-import {NodeStatus} from "@/helpers/NodeTracker";
+import {NodeStatus} from "@/helpers/data/NodeTracker";
 
 export default {
     name: 'NodeDetailsWindow',
