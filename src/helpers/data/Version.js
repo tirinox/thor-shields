@@ -1,4 +1,4 @@
-import _, {isString} from "lodash";
+import _ from "lodash";
 
 function isGarbage(x) {
     return x === undefined || x === null || isNaN(x)

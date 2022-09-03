@@ -53,3 +53,10 @@ test('to string version', () => {
     expect(Version.fromString('9.8.7.4').toString()).toBe('9.8.7')
     expect((new Version(4, 5, 6)).toString()).toBe('4.5.6')
 })
+
+test('compare version', () => {
+    expect(Version.fromString('1.10.5').greater(Version.fromString('1.11.3'))).toBeTruthy()
+    expect(Version.fromString('1.10.5').greater(Version.fromString('1.10.3'))).toBeTruthy()
+    expect(Version.fromString('1.10.5').greater(Version.fromString('1.10.9'))).toBeFalsy()
+    expect(Version.fromString('2.10.5').greater(Version.fromString('1.10.9'))).toBeTruthy()
+})

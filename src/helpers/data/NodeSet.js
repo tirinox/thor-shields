@@ -1,4 +1,5 @@
 import _ from "lodash";
+import {Version} from "@/helpers/data/Version";
 
 export class NodeSet {
     constructor(nodes, calculate = true) {
@@ -24,6 +25,7 @@ export class NodeSet {
             }
 
             this.topHeights = this.calculateTopBlockHeight(3)
+            this.topVersion = this.calculateTopVersion()
         }
     }
 
@@ -93,5 +95,19 @@ export class NodeSet {
             allChains,
             _.map(allChains, (chain, i) => this._calculateTopBlockOneChain(nMin, counters[i]))
         )
+    }
+
+    calculateTopVersion() {
+        if(this.nodes.length === 0) {
+            return null
+        }
+        let topVersion = Version.fromString(this.nodes[0].version)
+        for(let i = 1; i < this.nodes.length; ++i) {
+            const currentVersion = Version.fromString(this.nodes[i].version)
+            if(currentVersion.greater(topVersion)) {
+                topVersion = currentVersion
+            }
+        }
+        return topVersion
     }
 }

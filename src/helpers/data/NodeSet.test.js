@@ -25,3 +25,7 @@ test('NodeSet top chain', () => {
     expect(defaultNodeSet.topHeights['ETH']).toBe(15465509)
     expect(defaultNodeSet.topHeights['GAIA']).toBe(11909135)
 })
+
+test('Top Version', () => {
+    expect(defaultNodeSet.topVersion.toString()).toBe('1.95.1')
+})
