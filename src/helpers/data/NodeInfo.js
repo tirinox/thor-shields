@@ -31,7 +31,7 @@ export class NodeInfo {
         this.currentAward = thorToFloat(node.current_award)
 
         this.observeChains = {}
-        if (node.observe_chains) {
+        if (node['observe_chains']) {
             for (let {chain, height} of node.observe_chains) {
                 this.observeChains[chain] = +height
             }
