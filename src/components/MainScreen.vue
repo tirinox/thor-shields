@@ -26,12 +26,14 @@
 
         <!-- UI -->
         <div class="ui-container">
-            <NodeDetailsWindow
-                v-if="nodeDetailsVisible"
-                :node="nodeToViewDetails"
-                :node-set="nodeSet"
-                @close="onCloseDetails">
-            </NodeDetailsWindow>
+            <keep-alive>
+                <NodeDetailsWindow
+                    v-if="nodeDetailsVisible"
+                    :node="nodeToViewDetails"
+                    :node-set="nodeSet"
+                    @close="onCloseDetails">
+                </NodeDetailsWindow>
+            </keep-alive>
         </div>
     </div>
 
@@ -56,6 +58,7 @@ import {NodeInfo} from "@/helpers/data/NodeInfo";
 import {CameraController} from "@/visual/CameraController";
 import LoadingIndicator from "@/components/parts/LoadingIndicator";
 import _ from "lodash";
+import {shallowRef} from "vue";
 // import {TrailTestScene} from "@/visual/TrailTestScene";
 
 export default {
@@ -81,19 +84,13 @@ export default {
             nodeDetailsVisible: false,
             nodeToViewDetails: new NodeInfo(),
             zoomedToNode: false,
-        }
-    },
 
-    computed: {
-        nodeSet() {
-            console.log('NodeSet update >>>' + this.tickCounter)
-            return this._nodeSet
+            nodeSet: shallowRef(),
         }
     },
 
     methods: {
         onKeyDown(event) {
-            console.log(event)
             if (event.code === 'KeyR') {
                 this.cameraController.reset()
             } else if (event.code === 'KeyF') {
@@ -121,7 +118,8 @@ export default {
 
             const pickedName = this._pickObject(event)?.name
             this.content.nodeGroup.setElevatedNode(pickedName)
-            if(!this.zoomedToNode) {
+
+            if (!this.zoomedToNode) {
                 this.nodeDetailsVisible = !!pickedName
                 if (this.nodeDetailsVisible) {
                     this.nodeToViewDetails = this.content.findNodeByAddress(pickedName)
@@ -138,7 +136,7 @@ export default {
         },
 
         _pickObject(event, thoughtful = false) {
-            if(!this.raycaster) {
+            if (!this.raycaster) {
                 return null
             }
 
@@ -173,7 +171,6 @@ export default {
         },
 
         _onPickNodeObject(nodeAddress) {
-            this.zoomedToNode = true
             console.log('Picked node:', nodeAddress)
             this.content.pick(nodeAddress)
 
@@ -182,6 +179,7 @@ export default {
 
             const nodeObj = this.content.nodeGroup.getByName(nodeAddress)
             if (nodeObj) {
+                this.zoomedToNode = true
                 this.cameraController.cameraLookAtNode(nodeObj)
             }
         },
@@ -306,13 +304,13 @@ export default {
         },
 
         onDataArrived(nodeSet) {
-            this.tickCounter++
-            this._nodeSet = nodeSet
+            this.nodeSet = nodeSet
         },
 
         onCloseDetails() {
             this.zoomedToNode = false
             this.nodeDetailsVisible = false
+            this.nodeToViewDetails = new NodeInfo()
             this.cameraController.restoreCamera()
         },
     },
@@ -352,10 +350,6 @@ export default {
 }
 
 .canvas-container {
-    /*margin: 0;*/
-    /*padding: 0;*/
-    /*width: 100%;*/
-    /*height: 100%;*/
     position: absolute;
     z-index: 8;
 }
@@ -365,7 +359,6 @@ export default {
     z-index: 10;
 }
 
-
 .canvas-full {
     margin: 0;
     padding: 0;
@@ -374,9 +367,6 @@ export default {
 }
 
 canvas {
-    /*width: 100vw;*/
-    /*height: 100vh;*/
-    /*display: block;*/
 }
 
 *:focus {

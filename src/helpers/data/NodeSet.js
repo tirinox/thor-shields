@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {Version} from "@/helpers/data/Version";
+import {SEC_PER_BLOCK} from "@/helpers/THORUtil";
 
 export class NodeSet {
     constructor(nodes, calculate = true) {
@@ -15,12 +16,12 @@ export class NodeSet {
             this.totalBond = _.sumBy(this.nodes, (node) => node.bond)
             this.maxSlashNode = _.maxBy(this.nodes, (node) => node.slashPoints)
             this.trampCount = this.total - this._nodesWithNames.length
-            this.maxAgeNode = _.maxBy(this.nodes, (node) => node.ageSeconds)
+            // this.maxAgeNode = _.maxBy(this.nodes, (node) => node.ageSeconds)
 
             this.ranks = {
-                bond: this._makeRanking('bond'),
+                bond: this._makeRanking('bond', 'desc'),
                 slash: this._makeRanking('slashPoints'),
-                age: this._makeRanking('ageSeconds'),
+                // age: this._makeRanking('ageSeconds'),
                 award: this._makeRanking('currentAward')
             }
 
@@ -29,11 +30,11 @@ export class NodeSet {
         }
     }
 
-    _makeRanking(criteria) {
-        const sortedArr = _.sortBy(this._nodesWithNames, criteria)
+    _makeRanking(criteria, order = 'asc') {
+        const sortedArr = _.orderBy(this._nodesWithNames, [criteria], [order])
         const names = _.map(sortedArr, 'address')
         const ranks = Array.from(Array(sortedArr.length), (_, i) => i + 1)
-        return new Map(_.zip(names, ranks))
+        return Object.fromEntries(_.zip(names, ranks))
     }
 
     findByAddress(address) {
@@ -66,7 +67,7 @@ export class NodeSet {
     }
 
     bondPercentOfTotal(bond) {
-        return Math.round(bond / this.totalBond * 10000.0) * 0.01
+        return (bond / this.totalBond * 100.0).toFixed(2)
     }
 
     get length() {
@@ -98,16 +99,25 @@ export class NodeSet {
     }
 
     calculateTopVersion() {
-        if(this.nodes.length === 0) {
+        if (this.nodes.length === 0) {
             return null
         }
         let topVersion = Version.fromString(this.nodes[0].version)
-        for(let i = 1; i < this.nodes.length; ++i) {
+        for (let i = 1; i < this.nodes.length; ++i) {
             const currentVersion = Version.fromString(this.nodes[i].version)
-            if(currentVersion.greater(topVersion)) {
+            if (currentVersion.greater(topVersion)) {
                 topVersion = currentVersion
             }
         }
         return topVersion
+    }
+
+    get topThorHeight() {
+        return this.topHeights['THOR']
+    }
+
+    estimateTimestampAtBlock(no) {
+        const blockDiff = this.topThorHeight - no
+        return Date.now() - blockDiff * SEC_PER_BLOCK * 1000.0
     }
 }

@@ -163,17 +163,25 @@ export class Util {
     }
 }
 
-
-export function shortRune(x, mantissa = 2) {
+export function shortNumber(x, mantissa = 2, postFix = '') {
     return numbro(x).format({
         average: true,
         mantissa,
-    }) + ' Rune'
+    }) + postFix
 }
 
-
-export function fullRune(x) {
+export function fullNumber(x, postFix) {
     return numbro(x).format({
         thousandSeparated: true
-    }) + ' Rune'
+    }) + postFix
+}
+
+export const RUNE = 'Rune'
+
+export function shortRune(x, mantissa = 2) {
+    return shortNumber(x, mantissa, ' ' + RUNE)
+}
+
+export function fullRune(x) {
+    return fullNumber(x, ' ' + RUNE)
 }

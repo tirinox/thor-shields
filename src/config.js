@@ -12,7 +12,7 @@ export const Config = {
         PollPeriod: 3000.0, // msec
         ReactRandomDelay: 500.0, // msec
         NodeJuggler: {
-            Enabled: true
+            Enabled: false
         }
     },
     Font: {
