@@ -1,10 +1,11 @@
 import {ModeBase} from "@/visual/modes/ModeBase";
-import {Attractor, AttractorFlat} from "@/helpers/physics/Attractor";
+import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import _ from "lodash";
 import {CirclePack} from "@/helpers/physics/CirclePack";
 import {Config} from "@/config";
 import {NodeObject} from "@/visual/NodeObject";
+import {NodeEvent} from "@/helpers/NodeEvent";
 
 export class ModeVersion extends ModeBase {
     constructor(scene) {
@@ -17,6 +18,17 @@ export class ModeVersion extends ModeBase {
         this.attractors = {}
         this.circlePacker = new CirclePack(this.force, 1200, 300, Config.Physics.BaseFriction, 1)
         this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), -100.0)
+    }
+
+    reactEvent(event, nodeObjects) {
+        // fixme: if there are multiple new versions, then it re-creates attractors multiple times per tick!!
+        if(event.type === NodeEvent.EVENT_TYPE.VERSION) {
+            if(!this.attractors[event.currValue]) {
+                console.log(`New version detected: ${event.currValue}`)
+                this.clearLabels()
+                this._createVersionAttractors(nodeObjects)
+            }
+        }
     }
 
     handleObject(physObj) {
@@ -58,7 +70,7 @@ export class ModeVersion extends ModeBase {
         for (const [version, items] of _.sortBy(_.entries(versions), [(o) => o[0]])) {
             const circleRadius = NodeObject.estimateRadiusOfGroup(items)
 
-            this.attractors[version] = new AttractorFlat(new THREE.Vector3(),
+            this.attractors[version] = new Attractor(new THREE.Vector3(),
                 this.force, 0, 0, 0, circleRadius)
 
             if (version !== mostPopularVersion) {

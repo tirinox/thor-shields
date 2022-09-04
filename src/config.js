@@ -19,7 +19,7 @@ export const Config = {
 
         ReactRandomDelay: 500.0, // msec
         NodeJuggler: {
-            Enabled: false
+            Enabled: true
         }
     },
     Font: {
@@ -56,7 +56,7 @@ export const Config = {
         },
     },
     Scene: {
-        InitialMode: 'geo',
+        InitialMode: 'version', // todo: normal
         Background: {
             Enabled: false,  // todo: enable. disabled for better performance
         },

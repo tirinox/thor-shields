@@ -117,8 +117,10 @@ export class NodeGroup extends Simulation {
     }
 
     _updateObject(obj, delta) {
-        this._selectedModeHandler.handleObject(obj)
-        super._updateObject(obj, delta)
+        if(obj) {
+            this._selectedModeHandler.handleObject(obj)
+            super._updateObject(obj, delta)
+        }
     }
 
     reactEvent(event) {
@@ -127,6 +129,7 @@ export class NodeGroup extends Simulation {
             const obj = this.getByName(event.node.address)
             if (obj) {
                 obj.react(event)
+                this._selectedModeHandler.reactEvent(event, this.physicalObjects)
             }
         }, delay)
     }

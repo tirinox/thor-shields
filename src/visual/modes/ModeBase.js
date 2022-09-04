@@ -11,6 +11,10 @@ export class ModeBase {
         +physObj // do nothing
     }
 
+    reactEvent(event, nodes) {
+        +event; +nodes
+    }
+
     makeLabel(text, position, scale = 20, rotation = -45.0, bb = false) {
         if (!text) {
             return
@@ -40,6 +44,10 @@ export class ModeBase {
         this.onLeave(a, b)
 
         this.active = false
+        this.clearLabels()
+    }
+
+    clearLabels() {
         this.labels.forEach(label => label.animateOut(true))
         this.labels = []
     }

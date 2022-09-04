@@ -208,7 +208,7 @@ export default {
             return IPAddressInfoLoader.refineProviderName(nativeName)
         },
         isUpToDataVersion() {
-            return this.node.version === this.nodeSet.topVersion.toString()
+            return this.node.version === this.nodeSet.topVersion
         }
     },
     methods: {

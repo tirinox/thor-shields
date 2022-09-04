@@ -109,7 +109,7 @@ export class NodeSet {
                 topVersion = currentVersion
             }
         }
-        return topVersion
+        return topVersion.toString()
     }
 
     estimateTimestampAtBlock(topThorHeight, no) {
