@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="prop-box" v-if="hasIP">
-                    <div class="category">IP:</div>
+                    <div class="category">🕸️ IP address:</div>
                     <div class="value">
                         <a :href="ipAddressInfoLink" target="_blank">
                             {{ node.IPAddress }}
@@ -50,12 +50,17 @@
                 </div>
 
                 <div class="prop-box" v-if="hasIP">
-                    <div class="category">📍Location:</div>
+                    <div class="category">📍 Location:</div>
                     <div class="value">
                         {{ node.IPInfo?.flag }}
                         {{ node.IPInfo?.country }},
                         {{ node.IPInfo?.city || 'unknown city' }}
                     </div>
+                </div>
+
+                <div class="prop-box" v-if="hasIP">
+                    <div class="category">☁️ Provider:</div>
+                    <div class="value">{{ providerName }} </div>
                 </div>
 
                 <div class="prop-box" v-else>
@@ -115,6 +120,7 @@
 import {NodeStatus} from "@/helpers/data/NodeTracker";
 import {shortRune} from "@/helpers/MathUtil";
 import copy from "copy-to-clipboard";
+import {IPAddressInfoLoader, UNKNOWN} from "@/helpers/data/IPAddressInfo";
 
 const STATUS_PROPS = {
     [NodeStatus.Active]: {
@@ -186,6 +192,10 @@ export default {
         },
         chainLag() {
             return (chain) => (this.nodeSet.topHeights[chain] ?? 0) - (this.node.observeChains[chain] ?? 0)
+        },
+        providerName() {
+            const nativeName = this.node?.IPInfo?.providerName ?? UNKNOWN
+            return IPAddressInfoLoader.refineProviderName(nativeName)
         }
     },
     methods: {
