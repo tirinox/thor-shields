@@ -23,8 +23,6 @@ export class ModeProvider extends ModeBase {
     }
 
     handleObject(physObj) {
-        super.handleObject(physObj);
-
         if (physObj) {
             let groupName = IPAddressInfoLoader.refineProviderName(
                 physObj?.node?.IPInfo?.providerName ?? UNKNOWN

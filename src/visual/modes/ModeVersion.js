@@ -19,14 +19,7 @@ export class ModeVersion extends ModeBase {
         this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), -100.0)
     }
 
-    // update() {
-    //     // this.circlePacker.pack(dt)
-    //     this._transferAttractorsPositionFromPacker()
-    // }
-
     handleObject(physObj) {
-        super.handleObject(physObj);
-
         if (physObj) {
             let groupName = physObj.node.version
             physObj.attractors = (this.attractors[groupName] ?? this._attractorBanish)
@@ -35,10 +28,7 @@ export class ModeVersion extends ModeBase {
 
     onEnter(objList) {
         this._createVersionAttractors(objList)
-
         this.makeLabel('Versions', new THREE.Vector3(0, -630, -10), 14)
-
-        super.onEnter();
     }
 
     _createVersionAttractors(objList) {

@@ -37,8 +37,6 @@ export class ModeStatus extends ModeBase {
     }
 
     handleObject(physObj) {
-        super.handleObject(physObj);
-
         physObj.attractors = null
 
         const bestAttractors = this.attractors[physObj.node.status]
