@@ -5,7 +5,9 @@
             <h1>Node details </h1>
             <h2>
                 {{ node.address }}
-                <div class="copy-button" @click="clipboard.writeText(node.address)">&#x2398;</div>
+                <button class="copy-button" @click="copyNodeAddress">
+                    <font-awesome-icon icon="fa-solid fa-copy"/>
+                </button>
             </h2>
 
             <div class="prop-grid">
@@ -16,62 +18,72 @@
                 </div>
                 <div class="prop-box">
                     <div class="category">Since</div>
-                    {{ statusSince }}
+                    <div class="value">{{ statusSince }}</div>
                 </div>
 
                 <div class="prop-box">
                     <div class="category">Version:</div>
-                    {{ node.version }}
+                    <div class="value">{{ node.version }}</div>
                 </div>
 
                 <div class="prop-box" v-if="hasIP">
                     <div class="category">IP:</div>
-                    <a :href="ipAddressInfoLink" target="_blank">
-                        {{ node.IPAddress }}
-                    </a>
+                    <div class="value">
+                        <a :href="ipAddressInfoLink" target="_blank">
+                            {{ node.IPAddress }}
+                        </a>
+                    </div>
                 </div>
 
                 <div class="prop-box" v-if="hasIP">
                     <div class="category">Localtion:</div>
-                    {{ node.IPInfo?.flag }}
-                    {{ node.IPInfo?.country }},
-                    {{ node.IPInfo?.city || 'unknown city' }}
+                    <div class="value">
+                        {{ node.IPInfo?.flag }}
+                        {{ node.IPInfo?.country }},
+                        {{ node.IPInfo?.city || 'unknown city' }}
+                    </div>
                 </div>
 
                 <div class="prop-box" v-else>
-                    <span>Unknown IP address</span>
+                    <div class="value">Unknown IP address</div>
                 </div>
 
                 <div class="prop-box">
                     <div class="category">🌐 Explorer:</div>
-                    <a :href="`https://viewblock.io/thorchain/address/${node.address}`"
-                       target="_blank">Viewblock – {{ node.shortAddress }}</a>
+                    <div class="value">
+                        <a :href="`https://viewblock.io/thorchain/address/${node.address}`"
+                           target="_blank">Viewblock – {{ node.shortAddress }}</a>
+                    </div>
                 </div>
 
                 <div class="prop-box">
                     <div class="category">🔒 Bond:</div>
-                    {{ nodeBond }}
-                    <span>({{ nodeBondPercent }} %, #{{ nodeBondRank }})</span>
+                    <div class="value">
+                        {{ nodeBond }}
+                        <span>({{ nodeBondPercent }} %, #{{ nodeBondRank }})</span>
+                    </div>
                 </div>
 
                 <div class="prop-box">
                     <div class="category">🏆 Awards:</div>
-                    {{ award }}
+                    <div class="value">{{ award }}</div>
                 </div>
 
                 <div class="prop-box">
                     <div class="category">😈 Slash points:</div>
-                    {{ node.slashPoints }} pts.
+                    <div class="value">{{ node.slashPoints }} pts.</div>
                 </div>
 
                 <div class="prop-box" v-for="[chain, height] of Object.entries(node.observeChains)" :key="chain">
                     <div class="category">{{ chain }}</div>
-                    <span :title="height" v-if="chainLag(chain)" class="chain-lag">
-                        🩸 {{ chainLag(chain) }} behind!
-                    </span>
-                    <span v-else>
-                        Up to date
-                    </span>
+                    <div class="value">
+                        <span :title="height" v-if="chainLag(chain)" class="chain-lag">
+                            🩸 {{ chainLag(chain) }} behind!
+                        </span>
+                            <span v-else>
+                            Up to date
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -83,6 +95,7 @@
 
 import {NodeStatus} from "@/helpers/data/NodeTracker";
 import {shortRune} from "@/helpers/MathUtil";
+import copy from "copy-to-clipboard";
 
 const STATUS_PROPS = {
     [NodeStatus.Active]: {
@@ -114,6 +127,9 @@ export default {
         return {}
     },
     computed: {
+        topThorHeight() {
+            return 7000000 // todo!
+        },
         hasIP() {
             return this.node.IPAddress && this.node.IPAddress !== ''
         },
@@ -125,7 +141,11 @@ export default {
         },
         statusSince() {
             const timestamp = this.nodeSet.estimateTimestampAtBlock(this.node.statusSince)
-            return (new Date(timestamp)).toISOString().slice(0, 10)
+            try {
+                return (new Date(timestamp)).toISOString().slice(0, 10)
+            } catch {
+                return 'N/A'
+            }
         },
         award() {
             return shortRune(Math.round(this.node.currentAward))
@@ -143,11 +163,13 @@ export default {
             return `https://www.infobyip.com/ip-${this.node.IPAddress}.html`
         },
         chainLag() {
-            return (chain) => this.nodeSet.topHeights[chain] - this.node.observeChains[chain]
+            return (chain) => (this.nodeSet.topHeights[chain] ?? 0) - (this.node.observeChains[chain] ?? 0)
         }
     },
     methods: {
-
+        copyNodeAddress() {
+            copy(this.node.address)
+        },
         close() {
             this.$emit('close')
         }
@@ -237,12 +259,12 @@ h1 {
     font-family: EXO2, monospace;
     //font-weight: bolder;
     color: white;
-    font-size: 7pt;
+    font-size: 8pt;
 }
 
 .value {
     font-family: EXO2, monospace;
-    font-size: 8pt;
+    font-size: 10pt;
 }
 
 .prop-grid {
@@ -285,11 +307,10 @@ h1 {
 .copy-button {
     display: inline-block;
     background: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
+    //border-radius: 10px;
     padding: 4px;
-    width: 20px;
-    font-size: 20pt;
-    cursor: copy;
+    font-size: 10pt;
+    color: white;
 }
 
 </style>

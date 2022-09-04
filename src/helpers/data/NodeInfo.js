@@ -14,7 +14,7 @@ export class NodeInfo {
         this.address = node.node_address
         this.status = node.status
         this.bond = thorToFloat(node.bond)
-        this.height = +node.active_block_height
+        this.activeBlockHeight = +node.active_block_height
         this.bondAddress = node.bond_address
         this.statusSince = +node.status_since
         this.requestedToLeave = !!node.requested_to_leave
@@ -31,7 +31,6 @@ export class NodeInfo {
         this.currentAward = thorToFloat(node.current_award)
 
         this.observeChains = {}
-        this.observeChains['THOR'] = this.height
 
         if (node['observe_chains']) {
             for (let {chain, height} of node['observe_chains']) {

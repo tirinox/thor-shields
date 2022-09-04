@@ -112,12 +112,8 @@ export class NodeSet {
         return topVersion
     }
 
-    get topThorHeight() {
-        return this.topHeights['THOR']
-    }
-
-    estimateTimestampAtBlock(no) {
-        const blockDiff = this.topThorHeight - no
+    estimateTimestampAtBlock(topThorHeight, no) {
+        const blockDiff = topThorHeight - no
         return Date.now() - blockDiff * SEC_PER_BLOCK * 1000.0
     }
 }

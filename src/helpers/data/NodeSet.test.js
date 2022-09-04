@@ -24,6 +24,7 @@ test('NodeSet top chain', () => {
     expect(defaultNodeSet.topHeights['DOGE']).toBe(4375206)
     expect(defaultNodeSet.topHeights['ETH']).toBe(15465509)
     expect(defaultNodeSet.topHeights['GAIA']).toBe(11909135)
+    expect(defaultNodeSet.topHeights['THOR']).toBe(7134913)
 })
 
 test('Top Version', () => {
