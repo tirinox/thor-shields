@@ -1,11 +1,25 @@
 <template>
     <Transition name="shrink">
         <div class="window" @keyup.esc.prevent="close" tabindex="0" ref="modal">
-            <div class="close-button" @click="close"></div>
-            <h1>Node details </h1>
+            <div class="close-button" @click="close" v-tippy content="Close it"></div>
+            <h1>Node details</h1>
             <h2>
+                <font-awesome-icon class="icon"
+                    icon="fa-solid fa-arrow-right"
+                    v-if="node.requestedToLeave"
+                    content="Requested to leave!"
+                    v-tippy
+                />
+
+                <font-awesome-icon class="icon"
+                    icon="fa-solid fa-arrow-down-up-lock"
+                    v-if="node.forcedToLeave"
+                    content="Forced to leave!"
+                    v-tippy
+                />
+
                 {{ node.address }}
-                <button class="copy-button" @click="copyNodeAddress">
+                <button class="copy-button" @click="copyNodeAddress" content="Copy address" v-tippy>
                     <font-awesome-icon icon="fa-solid fa-copy"/>
                 </button>
             </h2>
@@ -22,7 +36,7 @@
                 </div>
 
                 <div class="prop-box">
-                    <div class="category">Version:</div>
+                    <div class="category">💽 Version:</div>
                     <div class="value">{{ node.version }}</div>
                 </div>
 
@@ -36,7 +50,7 @@
                 </div>
 
                 <div class="prop-box" v-if="hasIP">
-                    <div class="category">Localtion:</div>
+                    <div class="category">📍Location:</div>
                     <div class="value">
                         {{ node.IPInfo?.flag }}
                         {{ node.IPInfo?.country }},
@@ -60,27 +74,32 @@
                     <div class="category">🔒 Bond:</div>
                     <div class="value">
                         {{ nodeBond }}
-                        <span>({{ nodeBondPercent }} %, #{{ nodeBondRank }})</span>
+                        <span>(#{{ nodeBondRank }})</span>
                     </div>
                 </div>
 
                 <div class="prop-box">
                     <div class="category">🏆 Awards:</div>
-                    <div class="value">{{ award }}</div>
+                    <div class="value">
+                        {{ award }}
+                    </div>
                 </div>
 
                 <div class="prop-box">
                     <div class="category">😈 Slash points:</div>
-                    <div class="value">{{ node.slashPoints }} pts.</div>
+                    <div class="value">
+                        {{ node.slashPoints }} pts.
+                        <span>(#{{ slashPointsRank }})</span>
+                    </div>
                 </div>
 
                 <div class="prop-box" v-for="[chain, height] of Object.entries(node.observeChains)" :key="chain">
                     <div class="category">{{ chain }}</div>
                     <div class="value">
                         <span :title="height" v-if="chainLag(chain)" class="chain-lag">
-                            🩸 {{ chainLag(chain) }} behind!
+                            🩸 {{ chainLag(chain) }} blocks behind!
                         </span>
-                            <span v-else>
+                        <span v-else>
                             Up to date
                         </span>
                     </div>
@@ -161,6 +180,9 @@ export default {
         },
         ipAddressInfoLink() {
             return `https://www.infobyip.com/ip-${this.node.IPAddress}.html`
+        },
+        slashPointsRank() {
+            return this.nodeSet.ranks.slash[this.node.address]
         },
         chainLag() {
             return (chain) => (this.nodeSet.topHeights[chain] ?? 0) - (this.node.observeChains[chain] ?? 0)
@@ -259,7 +281,7 @@ h1 {
     font-family: EXO2, monospace;
     //font-weight: bolder;
     color: white;
-    font-size: 8pt;
+    font-size: 9pt;
 }
 
 .value {
@@ -280,8 +302,8 @@ h1 {
     color: turquoise;
     border-radius: 5px;
     padding: 6px;
-    font-size: 150%;
     border: 1px dashed #16504a;
+    font-size: 14pt;
 }
 
 .status-standby {
@@ -311,6 +333,10 @@ h1 {
     padding: 4px;
     font-size: 10pt;
     color: white;
+}
+
+.icon {
+    padding: 2px;
 }
 
 </style>

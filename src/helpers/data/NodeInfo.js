@@ -18,7 +18,7 @@ export class NodeInfo {
         this.bondAddress = node.bond_address
         this.statusSince = +node.status_since
         this.requestedToLeave = !!node.requested_to_leave
-        this.forcedtoLeave = !!node.forced_to_leave
+        this.forcedToLeave = !!node.forced_to_leave
         this.leaveHeight = +node.leave_height
         this.IPAddress = node.ip_address
         this.version = node.version
@@ -65,5 +65,8 @@ export class NodeInfo {
         this.IPInfo = {
             flag: '🏳️'
         }
+
+        // this.requestedToLeave = true
+        // this.forcedtoLeave = true
     }
 }
