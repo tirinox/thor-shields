@@ -2,13 +2,14 @@ import * as THREE from "three";
 import {NodeGroup} from "@/visual/NodeGroup";
 import {DebugNodeJuggler, NodeTracker} from "@/helpers/data/NodeTracker";
 import {NodeEvent} from "@/helpers/NodeEvent";
-import {URLDataSource} from "@/helpers/data/URLDataSource";
+import {LastBlockDataSource, NodeDataSource} from "@/helpers/data/URLDataSource";
 import {Config} from "@/config";
 import {clearObject} from "@/helpers/3D";
 import {emitter, EventTypes} from "@/helpers/EventTypes";
 import {NodeSet} from "@/helpers/data/NodeSet";
 
 import {MeshLine, MeshLineMaterial} from 'three.meshline';
+import {DataStorage} from "@/helpers/data/Storage";
 
 export class MainScene {
     constructor(scene) {
@@ -32,9 +33,16 @@ export class MainScene {
     }
 
     _runDataSource() {
-        this.dataSource = new URLDataSource(Config.DataSource.NodesURL, Config.DataSource.PollPeriod)
-        this.dataSource.callback = this.handleData.bind(this)
-        this.dataSource.run()
+        const baseUrl = Config.DataSource.NodesURL
+        this.nodeDataSource = new NodeDataSource(baseUrl, Config.DataSource.Nodes.PollPeriod)
+        this.nodeDataSource.callback = this.handleData.bind(this)
+        this.nodeDataSource.run()
+
+        this.lastBlockSource = new LastBlockDataSource(baseUrl, Config.DataSource.LastBlock.PollPeriod)
+        this.lastBlockSource.callback = (lastBlock) => {
+            DataStorage.lastBlock = lastBlock
+        }
+        this.lastBlockSource.run()
     }
 
     _makeSomeLight() {
@@ -57,6 +65,8 @@ export class MainScene {
         }
 
         nodes = this._nodeJuggler.handleNodes(nodes)
+
+        DataStorage.lastNodes = nodes
 
         emitter.emit(EventTypes.DataSourceTick, nodes)
 
@@ -97,7 +107,8 @@ export class MainScene {
     }
 
     dispose() {
-        this.dataSource.stop()
+        this.nodeDataSource.stop()
+        this.lastBlockSource.stop()
         this.nodeGroup.dispose()
         clearObject(this.scene)
     }

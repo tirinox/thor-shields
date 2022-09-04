@@ -9,7 +9,14 @@ export const Config = {
             'https://thornode.ninerealms.com' :
             'http://localhost:8080/data/samplenodes.json'),
 
-        PollPeriod: 3000.0, // msec
+        Nodes: {
+            PollPeriod: 3000.0, // msec
+        },
+
+        LastBlock: {
+            PollPeriod: 10000.0, // msec
+        },
+
         ReactRandomDelay: 500.0, // msec
         NodeJuggler: {
             Enabled: false

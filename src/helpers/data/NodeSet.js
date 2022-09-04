@@ -21,7 +21,7 @@ export class NodeSet {
             this.ranks = {
                 bond: this._makeRanking('bond', 'desc'),
                 slash: this._makeRanking('slashPoints'),
-                // age: this._makeRanking('ageSeconds'),
+                age: this._makeRanking('activeBlockHeight'),
                 award: this._makeRanking('currentAward')
             }
 

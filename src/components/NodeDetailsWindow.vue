@@ -26,22 +26,28 @@
 
             <div class="prop-grid">
                 <div class="prop-box">
-                    <div class="category">Status:</div>
+                    <div class="category">Status</div>
                     {{ statusEmoji }}
                     <span :class="nodeStatusClass">{{ node.status }}</span>
                 </div>
                 <div class="prop-box">
                     <div class="category">Since</div>
-                    <div class="value">{{ statusSince }}</div>
+                    <div class="value">
+                        {{ statusSince }} <small>(#{{ ageRank }})</small>
+                    </div>
                 </div>
 
                 <div class="prop-box">
-                    <div class="category">💽 Version:</div>
-                    <div class="value">{{ node.version }}</div>
+                    <div class="category">💽 Version</div>
+                    <div class="value">
+                        <span v-if="isUpToDataVersion" v-tippy content="Latest version">👌</span>
+                        <span v-else v-tippy content="Consider upgrading your node!">⚠️</span>
+                        {{ node.version }}
+                    </div>
                 </div>
 
                 <div class="prop-box" v-if="hasIP">
-                    <div class="category">🕸️ IP address:</div>
+                    <div class="category">🕸️ IP address</div>
                     <div class="value">
                         <a :href="ipAddressInfoLink" target="_blank">
                             {{ node.IPAddress }}
@@ -50,7 +56,7 @@
                 </div>
 
                 <div class="prop-box" v-if="hasIP">
-                    <div class="category">📍 Location:</div>
+                    <div class="category">📍 Location</div>
                     <div class="value">
                         {{ node.IPInfo?.flag }}
                         {{ node.IPInfo?.country }},
@@ -59,7 +65,7 @@
                 </div>
 
                 <div class="prop-box" v-if="hasIP">
-                    <div class="category">☁️ Provider:</div>
+                    <div class="category">☁️ Provider</div>
                     <div class="value">{{ providerName }} </div>
                 </div>
 
@@ -68,7 +74,7 @@
                 </div>
 
                 <div class="prop-box">
-                    <div class="category">🌐 Explorer:</div>
+                    <div class="category">🌐 Explorer</div>
                     <div class="value">
                         <a :href="`https://viewblock.io/thorchain/address/${node.address}`"
                            target="_blank">Viewblock – {{ node.shortAddress }}</a>
@@ -76,25 +82,25 @@
                 </div>
 
                 <div class="prop-box">
-                    <div class="category">🔒 Bond:</div>
+                    <div class="category">🔒 Bond</div>
                     <div class="value">
                         {{ nodeBond }}
-                        <span>(#{{ nodeBondRank }})</span>
+                        <small>(#{{ nodeBondRank }})</small>
                     </div>
                 </div>
 
                 <div class="prop-box">
-                    <div class="category">🏆 Awards:</div>
+                    <div class="category">🏆 Awards</div>
                     <div class="value">
                         {{ award }}
                     </div>
                 </div>
 
                 <div class="prop-box">
-                    <div class="category">😈 Slash points:</div>
+                    <div class="category">😈 Slash points</div>
                     <div class="value">
                         {{ node.slashPoints }} pts.
-                        <span>(#{{ slashPointsRank }})</span>
+                        <small>(#{{ slashPointsRank }})</small>
                     </div>
                 </div>
 
@@ -121,6 +127,7 @@ import {NodeStatus} from "@/helpers/data/NodeTracker";
 import {shortRune} from "@/helpers/MathUtil";
 import copy from "copy-to-clipboard";
 import {IPAddressInfoLoader, UNKNOWN} from "@/helpers/data/IPAddressInfo";
+import {DataStorage} from "@/helpers/data/Storage";
 
 const STATUS_PROPS = {
     [NodeStatus.Active]: {
@@ -153,7 +160,7 @@ export default {
     },
     computed: {
         topThorHeight() {
-            return 7000000 // todo!
+            return DataStorage.lastBlock['THOR']
         },
         hasIP() {
             return this.node.IPAddress && this.node.IPAddress !== ''
@@ -165,12 +172,15 @@ export default {
             return STATUS_PROPS[this.node.status]?.class
         },
         statusSince() {
-            const timestamp = this.nodeSet.estimateTimestampAtBlock(this.node.statusSince)
+            const timestamp = this.nodeSet.estimateTimestampAtBlock(this.topThorHeight, this.node.statusSince)
             try {
                 return (new Date(timestamp)).toISOString().slice(0, 10)
             } catch {
                 return 'N/A'
             }
+        },
+        ageRank() {
+            return this.nodeSet.ranks.age[this.node.address]
         },
         award() {
             return shortRune(Math.round(this.node.currentAward))
@@ -196,6 +206,9 @@ export default {
         providerName() {
             const nativeName = this.node?.IPInfo?.providerName ?? UNKNOWN
             return IPAddressInfoLoader.refineProviderName(nativeName)
+        },
+        isUpToDataVersion() {
+            return this.node.version === this.nodeSet.topVersion.toString()
         }
     },
     methods: {
@@ -347,6 +360,10 @@ h1 {
 
 .icon {
     padding: 2px;
+}
+
+small {
+    color: #34bfb1;
 }
 
 </style>

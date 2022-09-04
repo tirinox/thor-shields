@@ -41,45 +41,73 @@ export class URLDataSource {
     }
 
     toString() {
-        return `URLDataSource(${this.url}, ${this.period} sec)`
+        return `URLDataSource(${this.baseUrl}, ${this.period} sec)`
     }
 
     get isRunning() {
         return this._isRunning
     }
 
-    get urlNodes() {
-        return this.baseUrl + '/thorchain/nodes'
+    async dataProcess(rawData) {
+        return rawData
+    }
+
+    get url() {
+        return this.baseUrl
     }
 
     async _tick() {
         try {
-            const data = await axios.get(this.urlNodes, {
+            const data = await axios.get(this.url, {
                 headers: {
                     'Content-type': 'application/json'
                 }
             })
             if (this.callback) {
-                const rawData = data.data
-                const nodeSet = new NodeSet(
-                    _.map(rawData, json => new NodeInfo(json))
-                )
-
-                for(const node of nodeSet.nodes) {
-                    if(node.IPAddress) {
-                        try {
-                            node.IPInfo = await this.ipAddressLoader.load(node.IPAddress)
-                        } catch (e) {
-                            console.error(`failed to load IPInfo for ${node.IPAddress}`)
-                        }
-                    }
-                }
-
-                this.callback(nodeSet)
+                const result = await this.dataProcess(data.data)
+                this.callback(result)
             }
         } catch (e) {
             console.error(`${this.toString()} tick failed: ${e}`)
             throw e
         }
+    }
+}
+
+export class NodeDataSource extends URLDataSource {
+    get url() {
+        return this.baseUrl + '/thorchain/nodes'
+    }
+
+    async dataProcess(rawData) {
+        const nodeSet = new NodeSet(
+            _.map(rawData, json => new NodeInfo(json))
+        )
+
+        for(const node of nodeSet.nodes) {
+            if(node.IPAddress) {
+                try {
+                    node.IPInfo = await this.ipAddressLoader.load(node.IPAddress)
+                } catch (e) {
+                    console.error(`failed to load IPInfo for ${node.IPAddress}`)
+                }
+            }
+        }
+        return nodeSet
+    }
+}
+
+export class LastBlockDataSource extends URLDataSource {
+    get url() {
+        return this.baseUrl + '/thorchain/lastblock'
+    }
+
+    async dataProcess(rawData) {
+        const chainHeights = {}
+        for(const chainItem of rawData) {
+            chainHeights['THOR'] = +chainItem['thorchain']
+            chainHeights[chainItem['chain']] = +chainItem['last_observed_in']
+        }
+        return chainHeights
     }
 }
