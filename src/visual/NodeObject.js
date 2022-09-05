@@ -17,10 +17,12 @@ import {NodeEvent} from "@/helpers/NodeEvent";
 
 
 const noCfg = Config.Scene.NodeObject
+const geomSize = noCfg.PlaneScale
 
-// const geometry = new THREE.SphereGeometry(0.5, 32, 32)
+// const geometry = new THREE.SphereGeometry(noCfg.PlaneScale * 0.5, 10, 10)
+const geometry = new THREE.BoxGeometry(geomSize, geomSize, geomSize)
 // const geometry = new THREE.IcosahedronGeometry(noCfg.PlaneScale, 1)
-const geometry = new THREE.PlaneGeometry(noCfg.PlaneScale, noCfg.PlaneScale)
+// const geometry = new THREE.PlaneGeometry(noCfg.PlaneScale, noCfg.PlaneScale)
 const simpleGeometry = new THREE.SphereGeometry(noCfg.PlaneScale * 0.5, 10, 10)
 
 const SlashColor = 0xff3300
