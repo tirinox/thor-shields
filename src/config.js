@@ -47,8 +47,7 @@ export const Config = {
 
             Animation: {
                 Duration: 500.0,
-                X_DistanceWhenZoomed: 0.0,
-                Z_DistanceWhenZoomed: 320.0,
+                DistanceWhenZoomed: 300.0,
                 Shift: {
                     X: -200.0
                 }

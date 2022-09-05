@@ -5,6 +5,7 @@ export class ModeBase {
         this.scene = scene
         this.labels = []
         this.active = false
+        this.isFlat = true
     }
 
     handleObject(physObj) {

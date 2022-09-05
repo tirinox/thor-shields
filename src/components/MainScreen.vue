@@ -180,7 +180,7 @@ export default {
             const nodeObj = this.content.nodeGroup.getByName(nodeAddress)
             if (nodeObj) {
                 this.zoomedToNode = true
-                this.cameraController.cameraLookAtNode(nodeObj)
+                this.cameraController.cameraLookAtNode(nodeObj, this.content.nodeGroup.isCurrentModeFlat)
             }
         },
 

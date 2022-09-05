@@ -12,6 +12,7 @@ import StdVertexShader from '@/visual/shader/standard.vert'
 export class ModeGeo extends ModeBase {
     constructor(scene) {
         super(scene);
+        this.isFlat = false
 
         this.force = Config.Physics.BaseForce * 1.2
         this._banishAttractor = new Attractor(new THREE.Vector3(0, 0, 0), this.force)

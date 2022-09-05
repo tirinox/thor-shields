@@ -72,7 +72,7 @@ export class CameraController {
         return endQuaternion
     }
 
-    cameraLookAtNode(nodeObj) {
+    cameraLookAtNode(nodeObj, flat) {
         if (!this.cameraInspectsObject) {
             this.oldCameraPos = this.camera.position.clone()
             this.oldCameraQuaternion = this.camera.quaternion.clone()
@@ -84,18 +84,18 @@ export class CameraController {
         const cfg = Config.Controls.Camera.Animation
 
         const that = this
-        const position = nodeObj.o.position
 
-        const target = new THREE.Vector3(
-            cfg.X_DistanceWhenZoomed + position.x,
-            position.y,
-            position.z + cfg.Z_DistanceWhenZoomed,
-        )
-        const targetLookAt = new THREE.Vector3(
-            cfg.X_DistanceWhenZoomed + position.x,
-            position.y,
-            position.z,
-        )
+        let target
+        let targetLookAt
+
+        if(flat) {
+            target = nodeObj.o.position.clone().add(new THREE.Vector3(0, 0, cfg.DistanceWhenZoomed))
+            targetLookAt = nodeObj.o.position.clone()
+        } else {
+            const deltaVector = nodeObj.o.position.clone().normalize().multiplyScalar(cfg.DistanceWhenZoomed)
+            target = nodeObj.o.position.clone().add(deltaVector)
+            targetLookAt = nodeObj.o.position.clone()
+        }
 
         new TWEEN.Tween(this.camera.position)
             .to(target, cfg.Duration)

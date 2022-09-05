@@ -156,4 +156,8 @@ export class NodeGroup extends Simulation {
             obj.elevated = (obj.name === name)
         }
     }
+
+    get isCurrentModeFlat() {
+        return this._selectedModeHandler.isFlat
+    }
 }
