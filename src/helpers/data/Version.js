@@ -88,34 +88,40 @@ export class Version {
 
         const results = {}
 
-        for(const nodeObject of nodeObjects) {
+        for (const nodeObject of nodeObjects) {
             const versionStr = _.get(nodeObject, path)
             const version = Version.fromString(versionStr)
             let target = null
             let comment = ''
-            if(version.equal(maxActiveVersion)) {
+            if (version.equal(maxActiveVersion)) {
                 target = maxActiveVersion.toString()
                 comment = 'Latest version'
-            } else if(version.equal(minActiveVersion)) {
+            } else if (version.equal(minActiveVersion)) {
                 target = minActiveVersion.toString()
                 comment = 'Active version'
-            } else if(_.includes(otherActiveVersionsStr, versionStr)) {
+            } else if (_.includes(otherActiveVersionsStr, versionStr)) {
                 target = versionStr
                 comment = 'Intermediate version'
-            } else if(!versionStr || versionStr === '0.0.0') {
+            } else if (!versionStr || versionStr === '0.0.0') {
                 comment = target = 'Unknown version'
             } else {
                 target = `${version.x}.X.X`
                 comment = 'Old version'
             }
 
-            if(!results[target]) {
+            if (!results[target]) {
                 results[target] = {
                     objects: [],
-                    comment
+                    comment,
+                    mostPopular: false
                 }
             }
             results[target].objects.push(nodeObject)
+        }
+
+        if(!_.isEmpty(results)) {
+            const maxVersion = _.maxBy(_.values(results), v => v.objects.length)
+            maxVersion.mostPopular = true
         }
 
         return results

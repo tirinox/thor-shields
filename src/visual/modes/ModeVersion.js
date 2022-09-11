@@ -2,10 +2,10 @@ import {ModeBase} from "@/visual/modes/ModeBase";
 import {Attractor} from "@/helpers/physics/Attractor";
 import * as THREE from "three";
 import _ from "lodash";
-import {CirclePack} from "@/helpers/physics/CirclePack";
 import {Config} from "@/config";
-import {NodeObject} from "@/visual/NodeObject";
 import {NodeEvent} from "@/helpers/NodeEvent";
+import {Version} from "@/helpers/data/Version";
+import {NodeObject} from "@/visual/NodeObject";
 
 export class ModeVersion extends ModeBase {
     constructor(scene) {
@@ -15,11 +15,13 @@ export class ModeVersion extends ModeBase {
         this._sideDistance = 600
 
         this.force = Config.Physics.BaseForce
-        this.attractors = {}
-        this.circlePacker = new CirclePack(this.force, 1200, 300, Config.Physics.BaseFriction, 1)
+        this._attractors = {}
+
         this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), -100.0)
 
         this._currentVersionSet = []
+
+        this._versionDist = {}
     }
 
     _collectVersions(nodeObjects) {
@@ -29,13 +31,29 @@ export class ModeVersion extends ModeBase {
     reactEvent(event, nodeObjects) {
         // fixme: if there are multiple new versions, then it re-creates attractors multiple times per tick!!
         if (event.type === NodeEvent.EVENT_TYPE.VERSION) {
-            if (!this.attractors[event.currValue]) {
+            if (!this._attractors[event.currValue]) {
                 console.log(`New version detected: ${event.currValue}`)
-                // this.clearLabels()
+                this.clearLabels()
                 this._packAttractorPositions(nodeObjects)
                 this._juggleLabels(nodeObjects)
+                this._makeLabels()
             }
         }
+    }
+
+    handleObject(physObj) {
+        if (physObj) {
+            let groupName = physObj.node.version
+            physObj.attractors = (this._attractors[groupName] ?? this._attractorBanish)
+        }
+    }
+
+    onEnter(objList) {
+        this._createVersionAttractors(objList)
+        this.makeLabel({
+            text: 'Versions',
+            position: new THREE.Vector3(0, -630, -10), scale: 14
+        })
     }
 
     _juggleLabels(nodeObjects) {
@@ -52,71 +70,30 @@ export class ModeVersion extends ModeBase {
         this._currentVersionSet = freshVersionSet
     }
 
-    handleObject(physObj) {
-        if (physObj) {
-            let groupName = physObj.node.version
-            physObj.attractors = (this.attractors[groupName] ?? this._attractorBanish)
-        }
-    }
-
-    onEnter(objList) {
-        this._createVersionAttractors(objList)
-        this.makeLabel({
-            text: 'Versions',
-            position: new THREE.Vector3(0, -630, -10), scale: 14
-        })
-    }
-
     _packAttractorPositions(objList) {
-        const versions = {}
-        let mostPopularVersion = '', mostPopularList = []
-        for (const nodeObj of objList) {
-            const version = nodeObj.node.version
-            if (version === '') {
-                continue
-            }
+        this._versionDist = Version.getSemanticVersionsDistribution(objList)
 
-            if (!versions[version]) {
-                versions[version] = []
-            }
+        const gap = 150.0
+        const radAttr = 1.2
 
-            const currentList = versions[version]
-            currentList.push(nodeObj)
-
-            if (currentList.length > mostPopularList.length) {
-                mostPopularList = currentList
-                mostPopularVersion = version
-            }
+        let nGroups = 0
+        let radSum = 0.0
+        for (const versionDesc of _.values(this._versionDist)) {
+            versionDesc.radius = radAttr * NodeObject.estimateRadiusOfGroup(versionDesc.objects)
+            ++nGroups
+            radSum += versionDesc.radius
         }
+        radSum += Math.max(0, nGroups - 1) * gap
 
-        this.circlePacker.clear()
-        this.attractors = {}
-        for (const [version, items] of _.sortBy(_.entries(versions), [(o) => o[0]])) {
-            const circleRadius = NodeObject.estimateRadiusOfGroup(items)
-
-            this.attractors[version] = new Attractor(new THREE.Vector3(),
-                this.force, 0, 0, 0, circleRadius)
-
-            if (version !== mostPopularVersion) {
-                this.circlePacker.addCircle(version, circleRadius)
-            }
-        }
-        this.circlePacker.arrangeAroundCenter()
-
-        const popularRadius = NodeObject.estimateRadiusOfGroup(mostPopularList)
-        this.circlePacker.addCircle(mostPopularVersion, popularRadius)
-
-        this._transferAttractorsPositionFromPacker()
-    }
-
-    _transferAttractorsPositionFromPacker() {
-        const packedPositions = this.circlePacker.getResults()
-        for (const [name, {position}] of _.entries(packedPositions)) {
-            const attr = this.attractors[name]
-            if (attr) {
-                attr.position.copy(position)
-            } else {
-                console.warn(`no attr for ${name}`)
+        let x = -radSum * 0.5
+        this._attractors = {}
+        for (const [key, versionDesc] of _.entries(this._versionDist)) {
+            const attractor = new Attractor(new THREE.Vector3(x, 0, 0),
+                this.force, 0, 0, 0, versionDesc.radius)
+            x += gap + versionDesc.radius
+            this._attractors[key] = attractor
+            for (const nodeObj of versionDesc.objects) {
+                this._attractors[nodeObj.node.version] = attractor
             }
         }
     }
@@ -128,16 +105,22 @@ export class ModeVersion extends ModeBase {
     }
 
     _makeLabels() {
-        const packedPositions = this.circlePacker.getResults()
-        for (const [version, {position}] of _.entries(packedPositions)) {
-            const attr = this.attractors[version]
+        for (const [key, versionDesc] of _.entries(this._versionDist)) {
+            const attr = this._attractors[key]
             if (attr) {
-                const text = version === '0.0.0' ? 'Unknown' : `v. ${version}`
                 this.makeLabel({
-                    text,
-                    position: new THREE.Vector3(position.x, position.y - attr.relaxRadius * 1.1 - 20.0, 50.0),
+                    text: key,
+                    position: new THREE.Vector3(attr.position.x, attr.position.y - attr.relaxRadius * 1.1 - 20.0, 50.0),
                     scale: 2.5
                 })
+
+                if (versionDesc.comment !== key) {
+                    this.makeLabel({
+                        text: versionDesc.comment,
+                        position: new THREE.Vector3(attr.position.x, attr.position.y - attr.relaxRadius * 1.1 - 60.0, 50.0),
+                        scale: 4.0,
+                    })
+                }
             }
         }
     }

@@ -72,10 +72,16 @@ test('semantic distribution', () => {
     expect(dist['1.96.0'].objects).toHaveLength(2)
     expect(dist['1.95.1'].objects).toHaveLength(100)
     expect(dist['1.95.0'].objects).toHaveLength(3)
+    expect(dist['1.95.1'].mostPopular).toBeTruthy()
 
     expect(dist['1.X.X']).toBeTruthy()
     expect(dist['0.X.X']).toBeTruthy()
     expect(dist['2.X.X']).not.toBeTruthy()
 
     expect(dist['Unknown version'].objects).toHaveLength(42)
+})
+
+test('semantic distribution empty', () => {
+    const v = Version.getSemanticVersionsDistribution([])
+    expect(v).toEqual({})
 })

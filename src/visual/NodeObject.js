@@ -29,6 +29,8 @@ const SlashColor = 0xff3300
 
 const NormalLabelZ = 2.42
 
+const CirclePackFactor = 1 / Math.sqrt(0.72)
+
 export class NodeObject extends PhysicalObject {
     constructor(node) {
         super()
@@ -194,16 +196,14 @@ export class NodeObject extends PhysicalObject {
     get radius() {
         return Math.max(noCfg.MinRadius, this.mesh.scale.x * noCfg.PlaneScale * noCfg.RadiusFactor)
     }
-
+    
     static estimateRadiusOfGroup(nodeObjList) {
-        let r = 0.0
+        let sum_r2 = 0.0
         for (const nodeObj of nodeObjList) {
-            r += nodeObj.radius
+            sum_r2 += nodeObj.radius * nodeObj.radius
         }
-        const n = nodeObjList.length
-        const avgRadius = r > 0 ? r / n : 0.0
-        const fitRadius = avgRadius * Math.sqrt(n)
-        return Math.max(0.1, fitRadius)
+        const r = Math.sqrt(sum_r2)
+        return Math.max(0.1, CirclePackFactor * r)
     }
 
     update(dt) {
