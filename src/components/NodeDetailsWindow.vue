@@ -33,6 +33,7 @@
                 <div class="prop-box">
                     <div class="category">Since</div>
                     <div class="value">
+                        <span v-if="isOldest" v-tippy content="The oldest active node">⌛</span>
                         {{ statusSince }} <small>(#{{ ageRank }})</small>
                     </div>
                 </div>
@@ -123,11 +124,11 @@
 
 <script>
 
-import {NodeStatus} from "@/helpers/data/NodeTracker";
 import {shortRune} from "@/helpers/MathUtil";
 import copy from "copy-to-clipboard";
 import {IPAddressInfoLoader, UNKNOWN} from "@/helpers/data/IPAddressInfo";
 import {DataStorage} from "@/helpers/data/Storage";
+import {NodeStatus} from "@/helpers/data/NodeInfo";
 
 const STATUS_PROPS = {
     [NodeStatus.Active]: {
@@ -178,6 +179,9 @@ export default {
             } catch {
                 return 'N/A'
             }
+        },
+        isOldest() {
+            return true
         },
         ageRank() {
             return this.nodeSet.ranks.age[this.node.address]
@@ -248,7 +252,7 @@ export default {
     color: turquoise;
     padding: 20px;
 
-    max-width: 50vw;
+    //max-width: 50vw;
 
     font-size: 10pt;
 }
