@@ -1,18 +1,6 @@
 import {expect, test} from '@jest/globals';
-import * as fs from "fs";
-import {NodeSet} from "@/helpers/data/NodeSet";
-import _ from "lodash";
-import {NodeInfo} from "@/helpers/data/NodeInfo";
+import {defaultNodeSet} from "@/helpers/data/NodeSetExamples";
 
-function loadNodeExamples() {
-    const data = fs.readFileSync('./aux/nodes_example.json')
-    const parsed = JSON.parse(data)
-    return new NodeSet(
-        _.map(parsed, json => new NodeInfo(json))
-    )
-}
-
-const defaultNodeSet = loadNodeExamples()
 
 test('NodeSet top chain', () => {
     expect(defaultNodeSet.total).toBe(179)

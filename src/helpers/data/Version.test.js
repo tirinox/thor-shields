@@ -1,5 +1,6 @@
 import {expect, test} from '@jest/globals';
 import {Version} from "@/helpers/data/Version";
+import {defaultNodeSet, loadNodeExamples} from "@/helpers/data/NodeSetExamples";
 
 test('version construction', () => {
     const v100 = new Version()
@@ -59,4 +60,22 @@ test('compare version', () => {
     expect(Version.fromString('1.10.5').greater(Version.fromString('1.10.3'))).toBeTruthy()
     expect(Version.fromString('1.10.5').greater(Version.fromString('1.10.9'))).toBeFalsy()
     expect(Version.fromString('2.10.5').greater(Version.fromString('1.10.9'))).toBeTruthy()
+})
+
+test('semantic distribution', () => {
+    const nodes = loadNodeExamples('./aux/nodes_example_96.json').nodes
+    const dist = Version.getSemanticVersionsDistribution(nodes, 'version', 'isActive')
+    expect(dist['1.96.0'].comment).toBe('Latest version')
+    expect(dist['1.95.1'].comment).toBe('Intermediate version')
+    expect(dist['1.95.0'].comment).toBe('Active version')
+
+    expect(dist['1.96.0'].objects).toHaveLength(2)
+    expect(dist['1.95.1'].objects).toHaveLength(100)
+    expect(dist['1.95.0'].objects).toHaveLength(3)
+
+    expect(dist['1.X.X']).toBeTruthy()
+    expect(dist['0.X.X']).toBeTruthy()
+    expect(dist['2.X.X']).not.toBeTruthy()
+
+    expect(dist['Unknown version'].objects).toHaveLength(42)
 })

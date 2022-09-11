@@ -2,14 +2,7 @@ import _ from "lodash";
 import {NodeEvent} from "@/helpers/NodeEvent";
 import {Random} from "@/helpers/MathUtil";
 import {Version} from "@/helpers/data/Version";
-
-export const NodeStatus = {
-    Standby: 'Standby',
-    Whitelisted: 'Whitelisted',
-    Disabled: 'Disabled',
-    Active: 'Active',
-    Unknown: 'Unknown',
-}
+import {NodeStatus} from "@/helpers/data/NodeInfo";
 
 export class NodeTracker {
     constructor(prevNodeList, currNodeList) {

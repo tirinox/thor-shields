@@ -69,4 +69,21 @@ export class NodeInfo {
         // this.requestedToLeave = true
         // this.forcedtoLeave = true
     }
+
+    get isActive() {
+        return this.status === NodeStatus.Active
+    }
+
+    get isStandby() {
+        return this.status === NodeStatus.Standby || this.status === NodeStatus.Ready
+    }
+}
+
+export const NodeStatus = {
+    Standby: 'Standby',
+    Ready: 'Ready',
+    Whitelisted: 'Whitelisted',
+    Disabled: 'Disabled',
+    Active: 'Active',
+    Unknown: 'Unknown',
 }

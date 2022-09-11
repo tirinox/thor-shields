@@ -16,7 +16,8 @@ export class NodeSet {
             this.totalBond = _.sumBy(this.nodes, (node) => node.bond)
             this.maxSlashNode = _.maxBy(this.nodes, (node) => node.slashPoints)
             this.trampCount = this.total - this._nodesWithNames.length
-            // this.maxAgeNode = _.maxBy(this.nodes, (node) => node.ageSeconds)
+            this.maxAgeNode = _.maxBy(_.filter(this.nodes, node => node.activeBlockHeight && node.activeBlockHeight > 0),
+                node => node.activeBlockHeight)
 
             this.ranks = {
                 bond: this._makeRanking('bond', 'desc'),

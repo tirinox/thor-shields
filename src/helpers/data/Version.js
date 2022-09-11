@@ -12,6 +12,9 @@ export class Version {
     }
 
     static fromString(v) {
+        if (v instanceof Version) {
+            return v
+        }
         const components = _.map(v.split('.'), x => parseInt(x))
         const n = components.length
         const x = components[0]
@@ -51,5 +54,70 @@ export class Version {
             }
         }
         return this
+    }
+
+    get asInt() {
+        return this.z + 1000 * this.y + 1000000 * this.x
+    }
+
+    static loadVersions(rawVersions) {
+        return _.map(rawVersions, v => Version.fromString(v))
+    }
+
+    static maximumVersion(versions) {
+        return _.maxBy(Version.loadVersions(versions), v => v.asInt)
+    }
+
+    static minimumVersion(versions) {
+        return _.minBy(Version.loadVersions(versions), v => v.asInt)
+    }
+
+    static getVersionSet(nodeObjects, path = 'node.version') {
+        return Version.loadVersions(_.uniq(_.map(nodeObjects, path)))
+    }
+
+    static getSemanticVersionsDistribution(nodeObjects, path = 'node.version', activePath = 'node.isActive') {
+        const activeNodes = _.filter(nodeObjects, no => _.get(no, activePath))
+
+        const activeVersions = Version.getVersionSet(activeNodes, path)
+        const maxActiveVersion = Version.maximumVersion(activeVersions)
+        const minActiveVersion = Version.minimumVersion(activeVersions)
+        const otherActiveVersions = _.differenceBy(activeVersions, _.compact([maxActiveVersion, minActiveVersion]),
+            v => v.asInt)
+        const otherActiveVersionsStr = _.map(otherActiveVersions, v => v.toString())
+
+        const results = {}
+
+        for(const nodeObject of nodeObjects) {
+            const versionStr = _.get(nodeObject, path)
+            const version = Version.fromString(versionStr)
+            let target = null
+            let comment = ''
+            if(version.equal(maxActiveVersion)) {
+                target = maxActiveVersion.toString()
+                comment = 'Latest version'
+            } else if(version.equal(minActiveVersion)) {
+                target = minActiveVersion.toString()
+                comment = 'Active version'
+            } else if(_.includes(otherActiveVersionsStr, versionStr)) {
+                target = versionStr
+                comment = 'Intermediate version'
+            } else if(!versionStr || versionStr === '0.0.0') {
+                comment = target = 'Unknown version'
+            } else {
+                target = `${version.x}.X.X`
+                comment = 'Old version'
+            }
+
+            if(!results[target]) {
+                results[target] = {
+                    objects: [],
+                    comment
+                }
+            }
+            results[target].objects.push(nodeObject)
+        }
+
+        return results
     }
 }
