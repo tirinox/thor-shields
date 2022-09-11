@@ -95,18 +95,17 @@ export class Version {
             let comment = ''
             if (version.equal(maxActiveVersion)) {
                 target = maxActiveVersion.toString()
-                comment = 'Latest version'
+                comment = 'latest'
             } else if (version.equal(minActiveVersion)) {
                 target = minActiveVersion.toString()
-                comment = 'Active version'
+                comment = 'active'
             } else if (_.includes(otherActiveVersionsStr, versionStr)) {
                 target = versionStr
-                comment = 'Intermediate version'
             } else if (!versionStr || versionStr === '0.0.0') {
-                comment = target = 'Unknown version'
+                target = 'unknown'
             } else {
                 target = `${version.x}.X.X`
-                comment = 'Old version'
+                comment = 'old'
             }
 
             if (!results[target]) {

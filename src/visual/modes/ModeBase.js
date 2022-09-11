@@ -1,6 +1,7 @@
 import {TitleLabel3D} from "@/visual/TitleLabel3D";
 import _ from "lodash";
 import {Random} from "@/helpers/MathUtil";
+import TWEEN from "tween";
 
 export class ModeBase {
     constructor(scene) {
@@ -19,10 +20,30 @@ export class ModeBase {
         +nodes
     }
 
-    makeLabel({text, position, scale = 20, rotation = -45.0, bb = false, key = null}) {
-        key = key || Random.generateId()
-        if (!text || this.findLabelByKey(key)) {
+    makeLabel({
+                  text,
+                  position,
+                  scale = 20,
+                  rotation = -45.0,
+                  bb = false,
+                  key = null,
+                  moveIfExists = true
+              }) {
+        if (!text || text === '') {
             return
+        }
+
+        key = key || Random.generateId()
+
+        if (moveIfExists) {
+            const label = this.findLabelByKey(key)
+            if (label) {
+                new TWEEN.Tween(label.position)
+                    .to(position, 1000.0)
+                    .easing(TWEEN.Easing.Sinusoidal.InOut)
+                    .start();
+                return
+            }
         }
 
         const titleLabel = new TitleLabel3D(text, scale, rotation, bb)

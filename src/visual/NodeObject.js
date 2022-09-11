@@ -196,7 +196,7 @@ export class NodeObject extends PhysicalObject {
     get radius() {
         return Math.max(noCfg.MinRadius, this.mesh.scale.x * noCfg.PlaneScale * noCfg.RadiusFactor)
     }
-    
+
     static estimateRadiusOfGroup(nodeObjList) {
         let sum_r2 = 0.0
         for (const nodeObj of nodeObjList) {

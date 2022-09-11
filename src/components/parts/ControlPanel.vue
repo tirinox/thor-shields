@@ -49,7 +49,7 @@ export default {
         },
     },
     mounted() {
-        if(Config.Scene.InitialMode) {
+        if(Config.Scene.InitialMode && Config.Scene.InitialMode !== NodeGroupModes.Normal) {
             setTimeout(() => this.setSceneMode(Config.Scene.InitialMode), 1000.0)
         }
     }

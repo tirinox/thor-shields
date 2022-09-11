@@ -109,7 +109,7 @@ export class DebugNodeJuggler {
     }
 
     _juggleNodesVersion(nodes) {
-        const nUpgrade = Random.getRandomIntRange(1, 5)
+        const nUpgrade = 1
         nodes.sampleRandomly(nUpgrade).nodes.forEach(node => {
             const oldVersion = node.version
             node.version = this._nextVersion(node.version)

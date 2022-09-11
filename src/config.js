@@ -55,7 +55,7 @@ export const Config = {
         },
     },
     Scene: {
-        InitialMode: 'normal',
+        InitialMode: 'version', // todo: normal
         Background: {
             Enabled: false,  // todo: enable. disabled for better performance
         },
