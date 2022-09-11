@@ -1,11 +1,13 @@
 import {TitleLabel3D} from "@/visual/TitleLabel3D";
+import _ from "lodash";
+import {Random} from "@/helpers/MathUtil";
 
 export class ModeBase {
     constructor(scene) {
         this.scene = scene
-        this.labels = []
         this.active = false
         this.isFlat = true
+        this._labelsHash = {}
     }
 
     handleObject(physObj) {
@@ -13,18 +15,24 @@ export class ModeBase {
     }
 
     reactEvent(event, nodes) {
-        +event; +nodes
+        +event;
+        +nodes
     }
 
-    makeLabel(text, position, scale = 20, rotation = -45.0, bb = false) {
-        if (!text) {
+    makeLabel({text, position, scale = 20, rotation = -45.0, bb = false, key = null}) {
+        key = key || Random.generateId()
+        if (!text || this.findLabelByKey(key)) {
             return
         }
 
         const titleLabel = new TitleLabel3D(text, scale, rotation, bb)
+        titleLabel.key = key
+
         titleLabel.position.copy(position)
         this.scene.add(titleLabel)
-        this.labels.push(titleLabel)
+
+        this._labelsHash[key] = titleLabel
+
         return titleLabel
     }
 
@@ -35,7 +43,7 @@ export class ModeBase {
         this.onEnter(a, b)
 
         this.active = true
-        this.labels.forEach(label => label.animateIn())
+        _.values(this._labelsHash).forEach(label => label.animateIn())
     }
 
     onLeave() {
@@ -48,9 +56,22 @@ export class ModeBase {
         this.clearLabels()
     }
 
+    findLabelByKey(key) {
+        return this._labelsHash[key]
+    }
+
+    killLabelByKey(key) {
+        const label = this.findLabelByKey(key)
+        if (key) {
+            label.animateOut(true)
+            delete this._labelsHash[key]
+        }
+    }
+
     clearLabels() {
-        this.labels.forEach(label => label.animateOut(true))
-        this.labels = []
+        _.values(this._labelsHash).forEach(label => label.animateOut(true))
+
+        this._labelsHash = {}
     }
 
     update(dt) {

@@ -6,6 +6,9 @@ export function defaultValue(x, defaultValue) {
     return x === undefined ? defaultValue : x
 }
 
+export function dec2hex(dec) {
+    return dec.toString(16).padStart(2, "0")
+}
 
 export class Random {
     static getRandomInt(max) {
@@ -59,6 +62,13 @@ export class Random {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min)) + min;  // [min, max)
+    }
+
+    // generateId :: Integer -> String
+    static generateId(len) {
+        const arr = new Uint8Array((len || 20) / 2)
+        window.crypto.getRandomValues(arr)
+        return Array.from(arr, dec2hex).join('')
     }
 }
 

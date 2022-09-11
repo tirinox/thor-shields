@@ -18,17 +18,38 @@ export class ModeVersion extends ModeBase {
         this.attractors = {}
         this.circlePacker = new CirclePack(this.force, 1200, 300, Config.Physics.BaseFriction, 1)
         this._attractorBanish = new Attractor(new THREE.Vector3(0, 0, 0), -100.0)
+
+        this._currentVersionSet = []
+    }
+
+    _collectVersions(nodeObjects) {
+        return _.uniq(_.map(nodeObjects, 'node.version'))
     }
 
     reactEvent(event, nodeObjects) {
         // fixme: if there are multiple new versions, then it re-creates attractors multiple times per tick!!
-        if(event.type === NodeEvent.EVENT_TYPE.VERSION) {
-            if(!this.attractors[event.currValue]) {
+        if (event.type === NodeEvent.EVENT_TYPE.VERSION) {
+            if (!this.attractors[event.currValue]) {
                 console.log(`New version detected: ${event.currValue}`)
-                this.clearLabels()
-                this._createVersionAttractors(nodeObjects)
+                // this.clearLabels()
+                this._packAttractorPositions(nodeObjects)
+                this._juggleLabels(nodeObjects)
             }
         }
+    }
+
+    _juggleLabels(nodeObjects) {
+        const freshVersionSet = this._collectVersions(nodeObjects)
+        const addedVersions = _.difference(freshVersionSet, this._currentVersionSet)
+        const removedVersions = _.difference(this._currentVersionSet, freshVersionSet)
+        if (addedVersions.length || removedVersions.length) {
+            console.log(`removedVersions = ${removedVersions}, addedVersions = ${addedVersions}`)
+            _.each(removedVersions, v => {
+                this.killLabelByKey(v)
+            })
+        }
+
+        this._currentVersionSet = freshVersionSet
     }
 
     handleObject(physObj) {
@@ -40,10 +61,13 @@ export class ModeVersion extends ModeBase {
 
     onEnter(objList) {
         this._createVersionAttractors(objList)
-        this.makeLabel('Versions', new THREE.Vector3(0, -630, -10), 14)
+        this.makeLabel({
+            text: 'Versions',
+            position: new THREE.Vector3(0, -630, -10), scale: 14
+        })
     }
 
-    _createVersionAttractors(objList) {
+    _packAttractorPositions(objList) {
         const versions = {}
         let mostPopularVersion = '', mostPopularList = []
         for (const nodeObj of objList) {
@@ -83,20 +107,6 @@ export class ModeVersion extends ModeBase {
         this.circlePacker.addCircle(mostPopularVersion, popularRadius)
 
         this._transferAttractorsPositionFromPacker()
-        this._makeLabels()
-    }
-
-    _makeLabels() {
-        const packedPositions = this.circlePacker.getResults()
-        for (const [version, {position}] of _.entries(packedPositions)) {
-            const attr = this.attractors[version]
-            if (attr) {
-                const text = version === '0.0.0' ? 'Unknown' : `v. ${version}`
-                this.makeLabel(text,
-                    new THREE.Vector3(position.x, position.y - attr.relaxRadius * 1.1 - 20.0, 50.0),
-                    2.5)
-            }
-        }
     }
 
     _transferAttractorsPositionFromPacker() {
@@ -107,6 +117,27 @@ export class ModeVersion extends ModeBase {
                 attr.position.copy(position)
             } else {
                 console.warn(`no attr for ${name}`)
+            }
+        }
+    }
+
+    _createVersionAttractors(nodeObjects) {
+        this._packAttractorPositions(nodeObjects)
+        this._makeLabels()
+        this._currentVersionSet = this._collectVersions(nodeObjects)
+    }
+
+    _makeLabels() {
+        const packedPositions = this.circlePacker.getResults()
+        for (const [version, {position}] of _.entries(packedPositions)) {
+            const attr = this.attractors[version]
+            if (attr) {
+                const text = version === '0.0.0' ? 'Unknown' : `v. ${version}`
+                this.makeLabel({
+                    text,
+                    position: new THREE.Vector3(position.x, position.y - attr.relaxRadius * 1.1 - 20.0, 50.0),
+                    scale: 2.5
+                })
             }
         }
     }

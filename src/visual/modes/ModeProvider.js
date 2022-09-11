@@ -46,12 +46,12 @@ export class ModeProvider extends ModeBase {
             const nativeName = nodeObj?.node?.IPInfo?.providerName ?? UNKNOWN
             const provider = IPAddressInfoLoader.refineProviderName(nativeName)
 
-            if(!providers[provider]) {
+            if (!providers[provider]) {
                 providers[provider] = [nodeObj]
             } else {
                 const list = providers[provider]
                 list.push(nodeObj)
-                if(list.length > mostPopularCount) {
+                if (list.length > mostPopularCount) {
                     mostPopularProvider = provider
                     mostPopularCount = list.length
                 }
@@ -63,7 +63,7 @@ export class ModeProvider extends ModeBase {
         const sortedEntries = _.sortBy(_.entries(providers), [(pair) => pair[1].length])
         // const sortedEntries = _.entries(providers)
         for (const [name, items] of sortedEntries) {
-            if(name === mostPopularProvider) {
+            if (name === mostPopularProvider) {
                 continue
             }
 
@@ -72,7 +72,7 @@ export class ModeProvider extends ModeBase {
         this.circlePacker.arrangeAroundCenter()
         this._transferAttractorsPositionFromPacker()
 
-        if(mostPopularProvider) {
+        if (mostPopularProvider) {
             this._makeAttractor(mostPopularProvider, providers[mostPopularProvider], false)
         }
 
@@ -83,7 +83,7 @@ export class ModeProvider extends ModeBase {
         const circleRadius = NodeObject.estimateRadiusOfGroup(items) * 0.9
         // console.log('prov', name, circleRadius)
 
-        if(addCircle) {
+        if (addCircle) {
             this.circlePacker.addCircle(name, circleRadius)
         }
 
@@ -94,8 +94,8 @@ export class ModeProvider extends ModeBase {
 
     _makeLabelForGroup(providers, name, position) {
         const countNodes = providers[name].length
-        const title = `${name} (${countNodes})`
-        this.makeLabel(title, new THREE.Vector3(position.x, position.y - 180.0, 60.0), 5)
+        const text = `${name} (${countNodes})`
+        this.makeLabel({text, position: new THREE.Vector3(position.x, position.y - 180.0, 60.0), scale: 5})
     }
 
     _makeLabels(providers, mostPopularName) {
@@ -104,7 +104,7 @@ export class ModeProvider extends ModeBase {
             this._makeLabelForGroup(providers, name, position)
         }
 
-        if(mostPopularName) {
+        if (mostPopularName) {
             this._makeLabelForGroup(providers, mostPopularName, new THREE.Vector3())
         }
     }

@@ -9,11 +9,11 @@ import StdVertexShader from '@/visual/shader/billboard.vert'
 // import FragShader1 from '@/visual/shader/node_obj_3_rays.frag'
 // import FragShader1 from '@/visual/shader/node_obj_1.frag'
 import FragShader1 from '@/visual/shader/node_obj_2.frag'
-import {NodeStatus} from "@/helpers/data/NodeTracker";
 import {randFloat} from "three/src/math/MathUtils";
 import {clamp} from "lodash";
 import {createBillboardMaterial} from "@/helpers/TextBillboard";
 import {NodeEvent} from "@/helpers/NodeEvent";
+import {NodeStatus} from "@/helpers/data/NodeInfo";
 
 
 const noCfg = Config.Scene.NodeObject
@@ -78,6 +78,8 @@ export class NodeObject extends PhysicalObject {
         const st = this.node.status
         if (st === NodeStatus.Standby) {
             color = 0x167a56
+        } else if(st === NodeStatus.Ready) {
+            color = 0x167a8f
         } else if (st === NodeStatus.Active) {
             color = Random.getRandomSample([
                 Colors.LightningBlue,

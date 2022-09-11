@@ -20,7 +20,7 @@ export class ModeBond extends ModeBase {
     }
 
     onEnter(nodeObjects) {
-        const label = this.makeLabel('Bonds', new THREE.Vector3(0, -630, -10), 14)
+        const label = this.makeLabel({text: 'Bonds', position: new THREE.Vector3(0, -630, -10), scale: 14})
         label.t.opacity = 0.8;
 
         nodeObjects = _.sortBy(nodeObjects, 'node.bond')
@@ -53,7 +53,7 @@ export class ModeBond extends ModeBase {
         for (let i = 0; i < n; ++i) {
             const x = this.center.x + xScale * radius * Math.cos(angle)
             const y = this.center.y + radius * Math.sin(angle)
-            if(this._addAttractor(nodeObjects[i], x, y)) {
+            if (this._addAttractor(nodeObjects[i], x, y)) {
                 radius += deltaRadius;
                 angle += deltaAngle;
                 deltaRadius *= deltaDeltaRadius
@@ -85,12 +85,16 @@ export class ModeBond extends ModeBase {
 
     _addAttractor(nodeObject, x, y) {
         const bond = nodeObject.node.bond
-        if(bond > 1.0) {
+        if (bond > 1.0) {
             const z = 0.0
             this.nameToAttractor[nodeObject.node.address] = new Attractor(new THREE.Vector3(x, y, z),
                 this.force, 0, 0, -1, 10.0)
 
-            this.makeLabel(shortRune(bond), new THREE.Vector3(x, y - nodeObject.radius - 10.0, -10), 1)
+            this.makeLabel({
+                text: shortRune(bond),
+                position: new THREE.Vector3(x, y - nodeObject.radius - 10.0, -10),
+                scale: 1
+            })
             return true
         } else {
             this.nameToAttractor[nodeObject.node.address] = this._noBondAttractor
