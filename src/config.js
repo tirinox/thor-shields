@@ -19,7 +19,7 @@ export const Config = {
 
         ReactRandomDelay: 500.0, // msec
         NodeJuggler: {
-            Enabled: true
+            Enabled: true // todo: false
         }
     },
     Font: {
@@ -55,7 +55,7 @@ export const Config = {
         },
     },
     Scene: {
-        InitialMode: 'version', // todo: normal
+        InitialMode: 'normal',
         Background: {
             Enabled: false,  // todo: enable. disabled for better performance
         },
@@ -111,7 +111,8 @@ export const Config = {
         ShowFPS: false,
     },
     Renderer: {
-        LogZBuffer: false,
+        LogZBuffer: true,
+        // LogZBuffer: false,
     },
 }
 

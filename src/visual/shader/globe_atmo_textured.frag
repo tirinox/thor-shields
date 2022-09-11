@@ -12,8 +12,9 @@ uniform sampler2D globeTexture;
 
 void main(void) {
     float intensity = 1.05 - dot(vNormal, FORWARD);
-    vec3 atmo = ATMO_COLOR * pow(intensity, 1.5);
+    vec3 atmo = clamp(ATMO_COLOR * pow(intensity, 1.5), vec3(0.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0));
+//    vec3 atmo = vec3(0.0, 0.0, 0.0);
     gl_FragColor = vec4(atmo + texture2D(globeTexture, vUv).xyz, 1.0);
-//    gl_FragColor = texture2D(globeTexture, vUv);
+    //    gl_FragColor = texture2D(globeTexture, vUv);
 }
 

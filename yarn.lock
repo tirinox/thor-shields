@@ -8209,6 +8209,11 @@ wcwidth@^1.0.1:
   dependencies:
     defaults "^1.0.3"
 
+webgl-detector@^1.1.11:
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/webgl-detector/-/webgl-detector-1.1.11.tgz#cfb453f4081d0544c2f8f477da836432ad8f101a"
+  integrity sha512-CaRT8NsGAE2d0WsMmNARmo47LiKi7kBM784jCc7jqrczuBAwo9WVm+LrCrhkc9yCTLlQD55phwVufGAztbOYUw==
+
 webgl-sdf-generator@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/webgl-sdf-generator/-/webgl-sdf-generator-1.1.1.tgz#3e1b422b3d87cd3cc77f2602c9db63bc0f6accbd"

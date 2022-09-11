@@ -33,7 +33,8 @@
     "troika-three-text": "^0.46.4",
     "tween": "^0.9.0",
     "vue": "^3.2.13",
-    "vue-tippy": "^6.0.0-alpha.63"
+    "vue-tippy": "^6.0.0-alpha.63",
+    "webgl-detector": "^1.1.11"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

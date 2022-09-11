@@ -13,6 +13,11 @@ import {emitter} from "@/helpers/EventTypes";
 import { plugin as VueTippy } from 'vue-tippy'
 import 'tippy.js/dist/tippy.css' // optional for styling
 import 'tippy.js/themes/translucent.css'
+import {isWebGL2Supported} from "webgl-detector";
+
+if(!isWebGL2Supported()) {
+    alert('WebGL is not supported!')
+}
 
 CameraControls.install({THREE});
 
