@@ -110,7 +110,7 @@ export class ModeVersion extends ModeBase {
                     text = `v. ${key} (${desc.objects.length})${tag}`
                 }
 
-                const position = new THREE.Vector3(attr.position.x, attr.position.y - attr.relaxRadius * 1.1 - 20.0, 50.0)
+                const position = new THREE.Vector3(attr.position.x, attr.position.y - attr.relaxRadius * 1.1 - 30.0, 50.0)
                 // const position = new THREE.Vector3(attr.position.x, -300.0, 50.0)
                 const label = this.makeLabel({
                     text,

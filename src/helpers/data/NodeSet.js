@@ -59,6 +59,10 @@ export class NodeSet {
         return this.sortedNodes('statusSince')
     }
 
+    get ipAddresses() {
+        return _.compact(_.uniq(_.map(this.nodes, n => n.IPAddress)))
+    }
+
     sampleRandomly(n) {
         return new NodeSet(_.sampleSize(this.nodes, n))
     }

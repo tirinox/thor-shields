@@ -1,5 +1,6 @@
 import axios from "axios";
 import lscache from "lscache";
+import _ from "lodash";
 
 
 export class IPAddressInfo {
@@ -15,7 +16,7 @@ export class IPAddressInfo {
     }
 
     static getFlagEmoji(countryCode) {
-        if(countryCode) {
+        if (countryCode) {
             const codePoints = countryCode
                 .toUpperCase()
                 .split('')
@@ -41,10 +42,10 @@ export class IPAddressInfoLoader {
         return `https://settings.thornode.org/api/node/ip/${ip}`
     }
 
-    async loadFromService(ip) {
-        const r = await axios.get(this.url(ip))
-        console.info(`Loaded IP info for (${ip}) => ${r.status}`)
-        return new IPAddressInfo(r.data)
+    async loadFromService(ips) {
+        const r = await axios.get(this.url(ips.join(',')))
+        console.info(`Loaded IP info for (${ips}) => ${r.status}`)
+        return _.mapValues(r.data, j => new IPAddressInfo(j))
     }
 
     loadFromCache(ip) {
@@ -60,14 +61,28 @@ export class IPAddressInfoLoader {
         lscache.set(`${this._key}:${ip}`, data, this.expireMinutes)
     }
 
-    async load(ip) {
-        let data = this.loadFromCache(ip)
-        if (data) {
-            return data
+    async loadBunch(ipAddresses) {
+        const results = {}
+        const requestList = []
+        _.each(ipAddresses, ip => {
+            const data = this.loadFromCache(ip)
+            if (data) {
+                results[ip] = data
+            } else {
+                requestList.push(ip)
+            }
+        })
+
+        console.log(`requestList = ${requestList.length}, cached = ${_.keys(results).length}`)
+
+        const addressChunks = _.chunk(requestList, 50)
+        for(const ipListChunk of addressChunks) {
+            const chunkInfoDic = await this.loadFromService(ipListChunk)
+            _.each(_.values(chunkInfoDic), d => this.saveToCache(d))
+            _.extend(results, chunkInfoDic)
         }
-        data = await this.loadFromService(ip)
-        this.saveToCache(data)
-        return data
+
+        return results
     }
 
     static refineProviderName(name) {

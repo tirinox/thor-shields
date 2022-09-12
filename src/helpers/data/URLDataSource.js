@@ -84,13 +84,16 @@ export class NodeDataSource extends URLDataSource {
             _.map(rawData, json => new NodeInfo(json))
         )
 
-        for(const node of nodeSet.nodes) {
-            if(node.IPAddress) {
-                try {
-                    node.IPInfo = await this.ipAddressLoader.load(node.IPAddress)
-                } catch (e) {
-                    console.error(`failed to load IPInfo for ${node.IPAddress}`)
-                }
+        let ipInfoDic = {}
+        try {
+            ipInfoDic = await this.ipAddressLoader.loadBunch(nodeSet.ipAddresses)
+        } catch (e) {
+            console.error(`failed to load IPInfo`)
+        }
+
+        for (const node of nodeSet.nodes) {
+            if (node.IPAddress) {
+                node.IPInfo = ipInfoDic[node.IPAddress]
             }
         }
         return nodeSet
@@ -104,7 +107,7 @@ export class LastBlockDataSource extends URLDataSource {
 
     async dataProcess(rawData) {
         const chainHeights = {}
-        for(const chainItem of rawData) {
+        for (const chainItem of rawData) {
             chainHeights['THOR'] = +chainItem['thorchain']
             chainHeights[chainItem['chain']] = +chainItem['last_observed_in']
         }
