@@ -17,6 +17,7 @@ export class TitleLabel3D extends THREE.Object3D {
         t.fillOpacity = 1.0 // 0.5
         t.anchorX = 'center'
         t.anchorY = 'middle'
+        t.textAlign = 'center'
         t.text = text
         if (billboard) {
             t.material = createBillboardMaterial(new MeshBasicMaterial({

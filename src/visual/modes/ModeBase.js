@@ -42,7 +42,7 @@ export class ModeBase {
                     .to(position, 1000.0)
                     .easing(TWEEN.Easing.Sinusoidal.InOut)
                     .start();
-                return
+                return label
             }
         }
 

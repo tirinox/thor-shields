@@ -101,6 +101,7 @@ export class Version {
                 comment = 'active'
             } else if (_.includes(otherActiveVersionsStr, versionStr)) {
                 target = versionStr
+                comment = 'interim'
             } else if (!versionStr || versionStr === '0.0.0') {
                 target = 'unknown'
             } else {
@@ -112,7 +113,8 @@ export class Version {
                 results[target] = {
                     objects: [],
                     comment,
-                    mostPopular: false
+                    mostPopular: false,
+                    isActive: nodeObject.node.isActive
                 }
             }
             results[target].objects.push(nodeObject)

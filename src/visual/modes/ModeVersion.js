@@ -91,20 +91,40 @@ export class ModeVersion extends ModeBase {
             affectedKeys.push(key)
             const attr = this._attractorsByKey[key]
             if (attr) {
-                let text = `v. ${key} (${desc.objects.length})`
-                if(desc.comment.length) {
-                    text += '\n' + desc.comment
+
+                let tag = '\n' + desc.comment
+                let color
+                if(desc.comment === 'latest') {
+                    color = '#41e9ff'
+                } else if(desc.comment === 'active') {
+                    color = '#19ff52'
+                } else if(desc.comment === 'interim') {
+                    color = '#1cc245'
+                    tag = ''
                 }
+
+                let text
+                if(key === 'unknown') {
+                    text = 'Unknown'
+                } else {
+                    text = `v. ${key} (${desc.objects.length})${tag}`
+                }
+
                 const position = new THREE.Vector3(attr.position.x, attr.position.y - attr.relaxRadius * 1.1 - 20.0, 50.0)
                 // const position = new THREE.Vector3(attr.position.x, -300.0, 50.0)
-                console.log(`${text}: ${position.x}, ${position.y}`)
-
-                this.makeLabel({
+                const label = this.makeLabel({
                     text,
                     position,
                     scale: 2.5,
                     key
-                })
+                }).t
+
+                if(!desc.isActive) {
+                    label.fillOpacity = 0.7
+                }
+                if(color) {
+                    label.color = color
+                }
             }
         }
 

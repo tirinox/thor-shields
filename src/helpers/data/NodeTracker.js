@@ -70,6 +70,8 @@ export class DebugNodeJuggler {
         this.enabled = true
         this.juggleStatus = true
         this.juggleVersion = true
+
+        this.memorizeVersions = {}
     }
 
     handleNodes(nodes) {
@@ -110,11 +112,22 @@ export class DebugNodeJuggler {
 
     _juggleNodesVersion(nodes) {
         const nUpgrade = 1
+
+        const that = this
+        _.each(nodes.nodes, node => {
+            const v = that.memorizeVersions[node.address]
+            if(v) {
+                node.version = v
+            }
+        })
+
         nodes.sampleRandomly(nUpgrade).nodes.forEach(node => {
             const oldVersion = node.version
             node.version = this._nextVersion(node.version)
+            that.memorizeVersions[node.address] = node.version
             console.warn(`Debug upgrade ${node.shortAddress}: ${oldVersion} => ${node.version}`)
         })
+
         return nodes
     }
 }
