@@ -27,7 +27,7 @@ const simpleGeometry = new THREE.SphereGeometry(noCfg.PlaneScale * 0.5, 10, 10)
 
 const SlashColor = 0xff3300
 
-const NormalLabelZ = 2.42
+const NormalLabelZ = 42.42
 
 const CirclePackFactor = 1 / Math.sqrt(0.72)
 
@@ -43,7 +43,7 @@ export class NodeObject extends PhysicalObject {
         this.o.name = this.name
 
         this.attractors = []
-        // this.mass = this.normalizedBond * 2.0
+        this.mass = 1.0 + this.normalizedBond * 2.0
         this.friction = Config.Physics.BaseFriction
 
         this._makeSphere()
@@ -63,11 +63,6 @@ export class NodeObject extends PhysicalObject {
 
             this.material.uniforms.saturation.value = this._elevated ? 1.5 : 1.0
             this.material.uniformsNeedUpdate = true
-
-            // if(this.nameTextObj) {
-            //     this.nameTextObj.position.z = this._elevated ? 10.0 : NormalLabelZ
-            // }
-            // todo: add glow effect
         }
     }
 
@@ -212,6 +207,13 @@ export class NodeObject extends PhysicalObject {
         if (this.material) {
             this.material.uniforms.time.value += dt
         }
+
+    }
+
+    updateFromCamera(camera) {
+        const dir = camera.position.clone().sub(this.position)
+        dir.normalize().multiplyScalar(NormalLabelZ)
+        this.nameTextObj.position.copy(dir)
     }
 
     // ----------------- R E A C T I O N S -------------------

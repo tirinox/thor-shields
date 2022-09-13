@@ -9,8 +9,9 @@ import {NodeSet} from "@/helpers/data/NodeSet";
 import {DataStorage} from "@/helpers/data/Storage";
 
 export class MainScene {
-    constructor(scene) {
+    constructor(scene, camera) {
         this.scene = scene
+        this.camera = camera
         this.prevNodes = new NodeSet([], false)
         this.nodes = new NodeSet([], false)
 
@@ -91,6 +92,7 @@ export class MainScene {
 
     update(delta) {
         this.nodeGroup.update(delta)
+        this.nodeGroup.updateFromCamera(this.camera)
     }
 
     dispose() {

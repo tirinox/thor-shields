@@ -6,6 +6,7 @@ import * as THREE from "three";
 import {Config} from "@/config";
 import {IPAddressInfoLoader, UNKNOWN} from "@/helpers/data/IPAddressInfo";
 import {NodeObject} from "@/visual/NodeObject";
+import {Random} from "@/helpers/MathUtil";
 
 
 export class ModeProvider extends ModeBase {
@@ -76,11 +77,15 @@ export class ModeProvider extends ModeBase {
             this._makeAttractor(mostPopularProvider, providers[mostPopularProvider], false)
         }
 
+        for(const nodeObj of objList) {
+            nodeObj.velocity.z = Random.getRandomFloat(-1000, 1000)
+        }
+
         this._makeLabels(providers, mostPopularProvider)
     }
 
     _makeAttractor(name, items, addCircle) {
-        const circleRadius = NodeObject.estimateRadiusOfGroup(items) * 0.9
+        const circleRadius = NodeObject.estimateRadiusOfGroup(items) * 1.05
         // console.log('prov', name, circleRadius)
 
         if (addCircle) {

@@ -286,7 +286,7 @@ export default {
             this.scene.add(this.cameraController.camera)
             this.makeSkybox()
 
-            this.content = new MainScene(this.scene, this)
+            this.content = new MainScene(this.scene, this.cameraController.camera)
             // this.content = new TrailTestScene(this.scene, this)
         },
 
