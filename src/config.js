@@ -94,7 +94,7 @@ export const Config = {
     },
     Physics: {
         BaseForce: 3500.0,
-        RepelForce: 2000.0,
+        RepelForce: 200.0, // 2000
         Startup: {
             SimulationSteps: 10,
             DeltaTime: 0.1

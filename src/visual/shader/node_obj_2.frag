@@ -11,6 +11,9 @@ varying float vIsPerspective;
 
 uniform float time;
 uniform float saturation;
+
+uniform float transitionShininess;
+
 uniform vec3 color;
 
 varying vec2 vUv;
@@ -47,18 +50,18 @@ const float zoom = 2.8f;// 2.5 full
 //               Distributed under the MIT License. See LICENSE file.
 //               https://github.com/ashima/webgl-noise
 //
-
+//
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
-vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314 * r; }
+vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
 
 float snoise(vec3 v)
 {
-    const vec2  C = vec2(1.0/6.0, 1.0/3.0);
-    const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+    const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
+    const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
     // First corner
-    vec3 i  = floor(v + dot(v, C.yyy));
+    vec3 i = floor(v + dot(v, C.yyy));
     vec3 x0 = v - i + dot(i, C.xxx);
     // Other corners
     vec3 g = step(x0.yzx, x0.xyz);
@@ -74,12 +77,12 @@ float snoise(vec3 v)
     // Gradients: 7x7 points over a square, mapped onto an octahedron.
     // The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
     float n_ = 0.142857142857;// 1.0/7.0
-    vec3  ns = n_ * D.wyz - D.xzx;
+    vec3 ns = n_ * D.wyz - D.xzx;
     vec4 j = p - 49.0 * floor(p * ns.z * ns.z);//  mod(p,7*7)
     vec4 x_ = floor(j * ns.z);
     vec4 y_ = floor(j - 7.0 * x_);// mod(j,N)
-    vec4 x = x_ *ns.x + ns.yyyy;
-    vec4 y = y_ *ns.x + ns.yyyy;
+    vec4 x = x_ * ns.x + ns.yyyy;
+    vec4 y = y_ * ns.x + ns.yyyy;
     vec4 h = 1.0 - abs(x) - abs(y);
     vec4 b0 = vec4(x.xy, y.xy);
     vec4 b1 = vec4(x.zw, y.zw);
@@ -101,24 +104,26 @@ float snoise(vec3 v)
     // Mix final noise value
     vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
     m = m * m;
-    return 42.0 * dot(m*m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+    return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
 }
+
+
 
 float Turbulence(vec3 position, float minFreq, float maxFreq, float qWidth)
 {
     float value = 0.0;
-    float cutoff = clamp(0.5/qWidth, 0.0, maxFreq);
+    float cutoff = clamp(0.5 / qWidth, 0.0, maxFreq);
     float fade;
     float fOut = minFreq;
-    for (int i=NoiseSteps; i>=0; i--)
+    for (int i = NoiseSteps; i >= 0; i--)
     {
         if (fOut >= 0.5 * cutoff) break;
         fOut *= 2.0;
-        value += abs(snoise(position * fOut))/fOut;
+        value += abs(snoise(position * fOut)) / fOut;
     }
-    fade = clamp(2.0 * (cutoff-fOut)/cutoff, 0.0, 1.0);
-    value += fade * abs(snoise(position * fOut))/fOut;
-    return 1.0-value;
+    fade = clamp(2.0 * (cutoff - fOut) / cutoff, 0.0, 1.0);
+    value += fade * abs(snoise(position * fOut)) / fOut;
+    return 1.0 - value;
 }
 
 float SphereDist(vec3 position)
@@ -128,9 +133,9 @@ float SphereDist(vec3 position)
 
 vec4 Shade(float distance)
 {
-    float c1 = clamp(distance*5.0 + 0.5, 0.0, 1.0);
-    float c2 = clamp(distance*5.0, 0.0, 1.0);
-    float c3 = clamp(distance*3.4 - 0.5, 0.0, 1.0);
+    float c1 = clamp(distance * 5.0 + 0.5, 0.0, 1.0);
+    float c2 = clamp(distance * 5.0, 0.0, 1.0);
+    float c3 = clamp(distance * 3.4 - 0.5, 0.0, 1.0);
 
     //    #define Color1 vec4(1.0, 1.0, 1.0, 1.0)   -- white
     //    #define Color2 vec4(0.2, 0.8, 1.0, 1.0) --- green
@@ -146,7 +151,7 @@ vec4 Shade(float distance)
 // Draws the scene
 float RenderScene(vec3 position, out float distance)
 {
-    float noise = Turbulence(position * NoiseFrequency + Animation*time, 0.1, 1.5, 0.03) * NoiseAmplitude;
+    float noise = Turbulence(position * NoiseFrequency + Animation * time, 0.1, 1.5, 0.03) * NoiseAmplitude;
     noise = clamp(abs(noise), 0.0, 1.0);
     distance = SphereDist(position) - noise;
     return noise;
@@ -158,7 +163,7 @@ vec4 March(vec3 rayOrigin, vec3 rayStep)
     vec3 position = rayOrigin;
     float distance;
     float displacement;
-    for (int step = MarchSteps; step >=0; --step)
+    for (int step = MarchSteps; step >= 0; --step)
     {
         displacement = RenderScene(position, distance);
         if (distance < 0.05) break;
@@ -171,9 +176,9 @@ bool IntersectSphere(vec3 ro, vec3 rd, vec3 pos, float radius, out vec3 intersec
 {
     vec3 relDistance = (ro - pos);
     float b = dot(relDistance, rd);
-    float c = dot(relDistance, relDistance) - radius*radius;
-    float d = b*b - c;
-    intersectPoint = ro + rd*(-b - sqrt(d));
+    float c = dot(relDistance, relDistance) - radius * radius;
+    float d = b * b - c;
+    intersectPoint = ro + rd * (-b - sqrt(d));
     return d >= 0.0;
 }
 
@@ -184,19 +189,13 @@ void main()
 {
     vec2 p = vUv * 2.0 - 1.0;
 
-//    gl_FragColor = vec4(1.0, 1.0, 1.0, length(p) < 1.0 ?  1.0 : 0.0);
-//    return;
-
-    float rotx = 0.0;
-    float roty = 0.0;
-
     // camera
-    vec3 ro = zoom * normalize(vec3(cos(roty), cos(rotx), sin(roty)));
+    vec3 ro = zoom * vec3(.7, .7, 0.0);
     vec3 ww = normalize(vec3(0.0, 0.0, 0.0) - ro);
     vec3 uu = normalize(cross(vec3(0.0, 1.0, 0.0), ww));
     vec3 vv = normalize(cross(ww, uu));
-    vec3 rd = normalize(p.x*uu + p.y*vv + 1.5 * ww);
-//    vec3 rd = normalize(p.x*uu + p.y*vv + zoom_f * ww);
+    vec3 rd = normalize(p.x * uu + p.y * vv + 1.5 * ww);
+    //    vec3 rd = normalize(p.x*uu + p.y*vv + zoom_f * ww);
     vec4 col = Background;
     vec3 origin;
     if (IntersectSphere(ro, rd, ExpPosition, Radius + NoiseAmplitude * 6.0, origin))
@@ -204,11 +203,16 @@ void main()
         col = March(origin, rd);
     }
 
-    if(saturation > 1.0) {
-        float d = length(p);
+    float d = length(p);
+    if (saturation > 1.0) {
         //  1.0 - smoothstep(radius-borderThickness, radius, d);
         float t = 1.0 - smoothstep(0.0, circleRadius, abs(circleThickness - d));
         col = mix(col * saturation, vec4(0.9, 0.9, 1.0, 0.5), clamp(t, 0.0, 0.5));
+    }
+
+    if(transitionShininess > 0.0) {
+        vec4 shineColor = vec4(0.8, 0.9, 1.0, 1.0);
+        col += shineColor * transitionShininess * clamp(1.0 - d * 0.9, 0.0, 1.0);
     }
 
     gl_FragColor = col;
@@ -216,6 +220,6 @@ void main()
     #if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )
     // Doing a strict comparison with == 1.0 can cause noise artifacts
     // on some platforms. See issue #17623.
-    gl_FragDepthEXT = vIsPerspective == 0.0 ? gl_FragCoord.z : log2( vFragDepth ) * logDepthBufFC * 0.5;
+    gl_FragDepthEXT = vIsPerspective == 0.0 ? gl_FragCoord.z : log2(vFragDepth) * logDepthBufFC * 0.5;
     #endif
 }

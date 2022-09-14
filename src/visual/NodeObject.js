@@ -14,6 +14,7 @@ import {clamp} from "lodash";
 import {createBillboardMaterial} from "@/helpers/TextBillboard";
 import {NodeEvent} from "@/helpers/NodeEvent";
 import {NodeStatus} from "@/helpers/data/NodeInfo";
+import TWEEN from "tween";
 
 
 const noCfg = Config.Scene.NodeObject
@@ -75,7 +76,7 @@ export class NodeObject extends PhysicalObject {
         const st = this.node.status
         if (st === NodeStatus.Standby) {
             color = 0x167a56
-        } else if(st === NodeStatus.Ready) {
+        } else if (st === NodeStatus.Ready) {
             color = 0x167a8f
         } else if (st === NodeStatus.Active) {
             color = Random.getRandomSample([
@@ -93,43 +94,55 @@ export class NodeObject extends PhysicalObject {
     }
 
     _makeSphere() {
-        if (this.mesh) {
-            this.o.remove(this.mesh)
-            this.mesh = null
+        if (!this.mesh) {
+            if (Config.Scene.NodeObject.Simple) {
+                this._makeSimpleSphere()
+            } else {
+                this._makeCoolSphere()
+            }
         }
 
-        if (Config.Scene.NodeObject.Simple) {
-            this._makeSimpleSphere()
-        } else {
-            this._makeCoolSphere()
+        if (this.material.uniforms) {
+            this.material.uniforms.color.value = this._getSphereColor()
+            this.material.uniformsNeedUpdate = true
         }
-        const scale = this.calculateScale
-
-        // this.mesh = new THREE.Sprite(this.material)
-        let z = randFloat(-0.1, 0.1)
 
         this.mesh.name = this.name
         this.mesh.renderOrder = 1
+
+        const scale = this.calculateScale
         this.mesh.scale.setScalar(scale)
-        this.mesh.position.z = z
+
+        this.mesh.position.z = randFloat(-0.1, 0.1)
         this.o.renderOrder = 1
         this.o.add(this.mesh)
     }
 
     _makeSimpleSphere() {
         // simpleGeometry
-        this.mesh = new THREE.Mesh(simpleGeometry, new THREE.MeshBasicMaterial({
+        this.material = new THREE.MeshBasicMaterial({
             color: this._getSphereColor()
-        }))
+        })
+        this.mesh = new THREE.Mesh(simpleGeometry, this.material)
     }
 
     _makeCoolSphere() {
+        if (!this.material) {
+            this._makeMaterial()
+        }
+
+        this.mesh = new THREE.Mesh(geometry, this.material);
+        return this.mesh
+    }
+
+    _makeMaterial() {
         // material
         this.material = new THREE.ShaderMaterial({
             uniforms: {
                 "time": {value: Random.getRandomFloat(0.0, 100.0)},
                 "saturation": {value: 1.0},
                 "color": {value: this._getSphereColor()},
+                "transitionShininess": {value: 0.0},
             },
             vertexShader: StdVertexShader,
             fragmentShader: FragShader1,
@@ -138,8 +151,6 @@ export class NodeObject extends PhysicalObject {
             depthWrite: true,
             // sizeAttenuation: true,
         })
-        this.mesh = new THREE.Mesh(geometry, this.material);
-        return this.mesh
     }
 
     get calculateScale() {
@@ -208,6 +219,10 @@ export class NodeObject extends PhysicalObject {
             this.material.uniforms.time.value += dt
         }
 
+        // todo: remove debug
+        // if (Math.random() > 0.99) {
+        //     this._animateTransitionShininess()
+        // }
     }
 
     updateFromCamera(camera) {
@@ -226,14 +241,21 @@ export class NodeObject extends PhysicalObject {
             this.reactSlash()
         } else if (event.type === NodeEvent.EVENT_TYPE.STATUS) {
             this.reactStatusChange(event.node.status)
+        } else if(event.type === NodeEvent.EVENT_TYPE.VERSION) {
+            this.reactVersion()
         }
     }
 
     reactChain() {
+        const chainReactionVelocity = 1.0 // 100
         // this.mesh.rotateZ(1.0)
         const pos = this.o.position.clone().normalize()
-        const perp = pos.cross(new Vector3(0, 0, 1)).multiplyScalar(100.0)
+        const perp = pos.cross(new Vector3(0, 0, 1)).multiplyScalar(chainReactionVelocity)
         this.velocity.add(perp)
+    }
+
+    reactVersion() {
+        this._animateTransitionShininess()
     }
 
     reactSlash() {
@@ -256,6 +278,35 @@ export class NodeObject extends PhysicalObject {
 
     reactStatusChange(newStatus) {
         console.log(`New status ${this.node.status} -> ${newStatus}`)
-        this._makeSphere()
+        this._animateTransitionShininess()
+    }
+
+    _animateTransitionShininess() {
+        const durationIn = 500.0
+        const durationOut = durationIn * 2.5
+        const easing = TWEEN.Easing.Sinusoidal.InOut
+
+        new TWEEN.Tween(this.material.uniforms.transitionShininess)
+            .to({value: 1.0}, durationIn)
+            .easing(easing)
+            .start().onComplete(() => {
+            this._makeSphere()
+        }).chain(
+            new TWEEN.Tween(this.material.uniforms.transitionShininess)
+                .to({value: 0.0}, durationOut)
+                .easing(easing)
+        )
+
+        const normalScale = this.calculateScale
+        const bigScale = normalScale * 1.5
+        new TWEEN.Tween(this.mesh.scale)
+            .to(new THREE.Vector3(bigScale, bigScale, bigScale), durationIn)
+            .easing(easing)
+            .start()
+            .chain(
+                new TWEEN.Tween(this.mesh.scale)
+                    .to(new THREE.Vector3(normalScale, normalScale, normalScale), durationOut)
+                    .easing(easing)
+            )
     }
 }
