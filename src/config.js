@@ -1,7 +1,7 @@
-// const Live = process.env.NODE_ENV !== 'development'
-// const Live = false // process.env.USE_LOCAL_DATA !== "1"
-const Live = true
+const IsProduction = process.env.NODE_ENV !== 'development'
+console.log('Env = ', process.env.NODE_ENV)
 
+const Live = true
 
 export const Config = {
     DataSource: {
@@ -19,7 +19,7 @@ export const Config = {
 
         ReactRandomDelay: 500.0, // msec
         NodeJuggler: {
-            Enabled: true // todo: false
+            Enabled: !IsProduction
         }
     },
     Font: {
@@ -55,9 +55,9 @@ export const Config = {
         },
     },
     Scene: {
-        InitialMode: 'version', // todo: normal
+        InitialMode: IsProduction ? 'normal' : 'version', // todo: normal
         Background: {
-            Enabled: false,  // todo: enable. disabled for better performance
+            Enabled: IsProduction,  // todo: enable. disabled for better performance
         },
         Sky: {
             SkyBox: 'texture/skybox/star',
@@ -71,6 +71,18 @@ export const Config = {
             MinScale: 10.0,
             ScaleFactor: 1.0,
             RadiusFactor: 0.3,
+            Animation: {
+                // todo use this configs!
+                ReactStatus: {
+                    DurationIn: 500, // ms
+                    DurationOut: 1250,
+                    BloatScale: 1.5,
+                },
+                ReactSlash: {
+                    Force: 100.0,
+                    RedDuration: 150.0, // ms
+                }
+            }
         },
         Globe: {
             Enabled: true,
@@ -105,7 +117,8 @@ export const Config = {
             Flat: {
                 DeltaZ: 1.0,
             }
-        }
+        },
+
     },
     Debug: {
         ShowFPS: false,
