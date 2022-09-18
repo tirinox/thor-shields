@@ -122,7 +122,7 @@ export class ModeVersion extends ModeBase {
                 }).t
 
                 if(!desc.isActive) {
-                    label.fillOpacity = 0.1
+                    label.fillOpacity = 0.9
                 }
                 if(color) {
                     label.color = color

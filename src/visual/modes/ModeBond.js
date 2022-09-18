@@ -97,7 +97,6 @@ export class ModeBond extends ModeBase {
                 rotation: -22.0
             })
 
-
             if(!nodeObject.node.isActive) {
                 label.color = '#aaa'
             }
