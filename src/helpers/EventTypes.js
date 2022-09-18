@@ -15,5 +15,5 @@ export function dbgEmmitAfter(name, after_ms = 1000) {
 }
 
 export function dbgSimulateLoaded() {
-    dbgEmmitAfter(EventTypes.FullyLoaded, 1000)
+    dbgEmmitAfter(EventTypes.FullyLoaded, 100)
 }

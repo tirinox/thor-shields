@@ -14,7 +14,7 @@ import {clamp} from "lodash";
 import {createBillboardMaterial} from "@/helpers/TextBillboard";
 import {NodeEvent} from "@/helpers/NodeEvent";
 import {NodeStatus} from "@/helpers/data/NodeInfo";
-import TWEEN from "tween";
+import TWEEN from "tween.js";
 
 
 const noCfg = Config.Scene.NodeObject
@@ -139,8 +139,7 @@ export class NodeObject extends PhysicalObject {
     _makeMaterial() {
         // material
 
-        // fixme: debug 0.0
-        const initRust = Math.random()
+        const initRust = 0.0
 
         this.material = new THREE.ShaderMaterial({
             uniforms: {

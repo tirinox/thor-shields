@@ -31,7 +31,7 @@
     "three": "^0.139.2",
     "three.meshline": "^1.4.0",
     "troika-three-text": "^0.46.4",
-    "tween": "^0.9.0",
+    "tween.js": "^16.5.0",
     "vue": "^3.2.13",
     "vue-tippy": "^6.0.0-alpha.63",
     "webgl-detector": "^1.1.11"

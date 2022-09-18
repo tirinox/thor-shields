@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import {Config} from "@/config";
 import CameraControls from "camera-controls";
-import TWEEN from "tween";
+import TWEEN from "tween.js";
 
 export class CameraController {
     constructor(domElement, center = new THREE.Vector3()) {

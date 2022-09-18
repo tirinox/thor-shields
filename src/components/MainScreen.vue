@@ -50,7 +50,7 @@ import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import FPSCounter from "@/components/parts/FPSCounter";
 import {MainScene} from "@/visual/MainScene";
-import TWEEN from "tween";
+import TWEEN from "tween.js";
 import {Background} from "@/visual/helpers/Background";
 import {emitter, EventTypes} from "@/helpers/EventTypes";
 import ControlPanel from "@/components/parts/ControlPanel";
@@ -245,7 +245,9 @@ export default {
 
             this.resizeRendererToDisplaySize(this.renderer)
             TWEEN.update()
-            this.$refs.fps.update(delta, this.scene)
+            if(this.$refs.fps) {
+                this.$refs.fps.update(delta, this.scene)
+            }
             this.cameraController.update(delta)
             this.content.update(delta)
             if (this.bg) {

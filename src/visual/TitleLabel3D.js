@@ -2,7 +2,7 @@ import * as THREE from "three";
 import {MeshBasicMaterial} from "three";
 import {Text} from 'troika-three-text'
 import {Config} from "@/config";
-import TWEEN from "tween";
+import TWEEN from "tween.js";
 import {createBillboardMaterial} from "@/helpers/TextBillboard";
 
 export class TitleLabel3D extends THREE.Object3D {

@@ -1,7 +1,7 @@
 import {TitleLabel3D} from "@/visual/TitleLabel3D";
 import _ from "lodash";
 import {Random} from "@/helpers/MathUtil";
-import TWEEN from "tween";
+import TWEEN from "tween.js";
 
 export class ModeBase {
     constructor(scene) {

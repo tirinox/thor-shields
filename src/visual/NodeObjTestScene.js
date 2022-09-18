@@ -3,6 +3,7 @@ import {clearObject} from "@/helpers/3D";
 import {dbgSimulateLoaded} from "@/helpers/EventTypes";
 import {NodeObject} from "@/visual/NodeObject";
 import {NodeInfo} from "@/helpers/data/NodeInfo";
+import TWEEN from "tween.js";
 
 export class NodeObjTestScene {
     constructor(scene, camera) {
@@ -16,9 +17,19 @@ export class NodeObjTestScene {
         this.nodeObj = new NodeObject(new NodeInfo({
             node_address: 'thor123',
             status: 'Active',
-            bond: 10000000000000000,
+            bond: 100000000000000000,
             version: '1.96.2',
         }))
+
+        this.nodeObj.labelObj.visible = false
+
+        this.nodeObj.material.uniforms.rust.value = 0.001
+
+        new TWEEN.Tween(this.nodeObj.material.uniforms.rust)
+            .to({value: 1.0}, 2000)
+            .repeat(Infinity)
+            .yoyo(true)
+            .start()
 
         this.nodeObj.o.position.set(0, 0, 1500)
         scene.add(this.nodeObj.o)
@@ -36,8 +47,7 @@ export class NodeObjTestScene {
     }
 
     update(delta) {
-        +delta
-        // this.nodeObj.update(delta * 0.001)
+        this.nodeObj.update(delta * 0.1)
     }
 
     dispose() {

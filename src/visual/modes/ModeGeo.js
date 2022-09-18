@@ -3,7 +3,7 @@ import * as THREE from "three";
 import {Config} from "@/config";
 import {Attractor} from "@/helpers/physics/Attractor";
 import {longLatTo3D} from "@/helpers/3D";
-import TWEEN from "tween";
+import TWEEN from "tween.js";
 import _ from "lodash";
 
 import AtmosphereFragmentShader from '@/visual/shader/globe_atmo_textured.frag'
