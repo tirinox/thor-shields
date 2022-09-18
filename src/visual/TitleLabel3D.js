@@ -33,9 +33,25 @@ export class TitleLabel3D extends THREE.Object3D {
         this.easeType = TWEEN.Easing.Back.Out
     }
 
+    set color(c) {
+        this.t.color = c
+    }
+
+    get color() {
+        return this.t.color
+    }
+
+    set opacity(o) {
+        this.t.material.opacity = o
+    }
+
+    get opacity() {
+        return this.t.material.opacity
+    }
+
     animateIn() {
         this.t.position.z = this.animDistance
-        this.t.material.opacity = 0.0
+        this.opacity = 0.0
 
         new TWEEN.Tween(this.t.position)
             .to({z: 0}, this.animDuration)
