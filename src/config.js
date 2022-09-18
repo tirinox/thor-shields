@@ -57,10 +57,10 @@ export const Config = {
     Scene: {
         DebugMode: false, // 'nodeobj',
 
-        InitialMode: IsProduction ? 'normal' : 'version', // todo: normal
+        InitialMode: IsProduction ? 'normal' : 'version',
 
         Background: {
-            Enabled: IsProduction,  // todo: enable. disabled for better performance
+            Enabled: IsProduction,
         },
         Sky: {
             SkyBox: 'texture/skybox/star',
