@@ -195,3 +195,8 @@ export function shortRune(x, mantissa = 2) {
 export function fullRune(x) {
     return fullNumber(x, ' ' + RUNE)
 }
+
+export function smoothStep(min, max, value) {
+    var x = Math.max(0, Math.min(1, (value - min) / (max - min)));
+    return x * x * (3 - 2 * x);
+}

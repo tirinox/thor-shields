@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import {MeshBasicMaterial, Vector3} from "three";
-import {Random, Util} from "@/helpers/MathUtil";
+import {Random, smoothStep, Util} from "@/helpers/MathUtil";
 import {Text} from 'troika-three-text'
 import {Colors, Config} from "@/config";
 import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
@@ -139,7 +139,7 @@ export class NodeObject extends PhysicalObject {
     _makeMaterial() {
         // material
 
-        const initRust = 0.0
+        const initRust = -1.0
 
         this.material = new THREE.ShaderMaterial({
             uniforms: {
@@ -147,7 +147,7 @@ export class NodeObject extends PhysicalObject {
                 "saturation": {value: 1.0},
                 "color": {value: this._getSphereColor()},
                 "transitionShininess": {value: 0.0},
-                "rust": {value: initRust},  // 0.0
+                "rust": {value: initRust},
             },
             vertexShader: StdVertexShader,
             fragmentShader: FragShader1,
@@ -241,7 +241,7 @@ export class NodeObject extends PhysicalObject {
     react(event) {
         this.node = event.node
         if (event.type === NodeEvent.EVENT_TYPE.OBSERVE_CHAIN) {
-            this.reactChain()
+            this.reactChain(event.nodeSet)
         } else if (event.type === NodeEvent.EVENT_TYPE.SLASH) {
             this.reactSlash()
         } else if (event.type === NodeEvent.EVENT_TYPE.STATUS) {
@@ -255,8 +255,11 @@ export class NodeObject extends PhysicalObject {
         // }
     }
 
-    reactChain() {
+    reactChain(nodeSet) {
         // update: node appearance according chain lag
+
+        this.material.uniforms.rust.value = this._getRust(nodeSet)
+        this.material.uniformsNeedUpdate = true
 
         const chainReactionVelocity = 1.0 // 100
         // this.mesh.rotateZ(1.0)
@@ -299,8 +302,10 @@ export class NodeObject extends PhysicalObject {
         this._animateTransitionShininess()
     }
 
-    _getRust() {
-
+    _getRust(nodeSet) {
+        const {max} = nodeSet.getChainHeightLagAllSeconds(this.node)
+        const a = smoothStep(0, 86400, max)
+        return 2.0 * clamp(a, 0.0, 0.95) - 1.0
     }
 
     _animateScale(targetScaleOfNormal,

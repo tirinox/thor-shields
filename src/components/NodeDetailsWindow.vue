@@ -207,7 +207,7 @@ export default {
             return this.nodeSet.ranks.slash[this.node.address]
         },
         chainLag() {
-            return (chain) => this.nodeSet.getChainHeightLag(this.node, chain)
+            return (chain) => this.nodeSet.getChainHeightLagBlocks(this.node, chain)
         },
         providerName() {
             const nativeName = this.node?.IPInfo?.providerName ?? UNKNOWN

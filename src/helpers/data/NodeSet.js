@@ -2,6 +2,19 @@ import _ from "lodash";
 import {Version} from "@/helpers/data/Version";
 import {SEC_PER_BLOCK} from "@/helpers/THORUtil";
 
+export const TYPICAL_BLOCK_TIME = {
+    ETH: 12.8,
+    BTC: 600,
+    BCH: 600,
+    LTC: 150,
+    BNB: 0.4,
+    THOR: 6.0,
+    DOGE: 60,
+    TERRA: 6.64,
+    GAIA: 6.85, // ATOM
+    AVAX: 3.0
+}
+
 export class NodeSet {
     constructor(nodes, calculate = true) {
         this.nodes = nodes || []
@@ -27,6 +40,7 @@ export class NodeSet {
             }
 
             this.topHeights = this.calculateTopBlockHeight(3)
+
             this.topVersion = this.calculateTopVersion()
         }
     }
@@ -122,7 +136,30 @@ export class NodeSet {
         return Date.now() - blockDiff * SEC_PER_BLOCK * 1000.0
     }
 
-    getChainHeightLag(node, chain) {
+    getChainHeightLagBlocks(node, chain) {
         return (this.topHeights[chain] ?? 0) - (node.observeChains[chain] ?? 0)
+    }
+
+    getChainHeightLagSeconds(node, chain) {
+        const mult = TYPICAL_BLOCK_TIME[chain] ?? 1.0
+        return mult * this.getChainHeightLagBlocks(node, chain)
+    }
+
+    getChainHeightLagAllSeconds(node) {
+        const keys = _.keys(node.observeChains)
+        if(!keys.length) {
+            return 0
+        }
+        const results = {
+            sum: 0,
+            max: 0,
+        }
+        for(const chain of keys) {
+            const lag = this.getChainHeightLagSeconds(node, chain)
+            results.max = Math.max(results.max, lag)
+            results.sum += lag
+        }
+        results.avg = results.sum / keys.length
+        return results
     }
 }

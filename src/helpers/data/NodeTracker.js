@@ -5,9 +5,9 @@ import {Version} from "@/helpers/data/Version";
 import {NodeStatus} from "@/helpers/data/NodeInfo";
 
 export class NodeTracker {
-    constructor(prevNodeList, currNodeList) {
-        this.prev = prevNodeList
-        this.curr = currNodeList
+    constructor(prevNodeSet, currNodeSet) {
+        this.prev = prevNodeSet
+        this.curr = currNodeSet
     }
 
     extractEvents() {
@@ -15,7 +15,7 @@ export class NodeTracker {
         const addEvent = (t, node, prevNode, k) => {
             k = k || 'address'
             events.push(new NodeEvent(t, node, prevNode, node ? node[k] : '',
-                prevNode ? prevNode[k] : ''))
+                prevNode ? prevNode[k] : '', this.curr))
         }
 
         const addedNodeAddresses = _.difference(this.curr.nameSet, this.prev.nameSet)

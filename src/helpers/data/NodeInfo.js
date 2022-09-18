@@ -38,6 +38,8 @@ export class NodeInfo {
             for (let {chain, height} of node['observe_chains']) {
                 this.observeChains[chain] = +height
             }
+            // no TERRA any more...
+            delete this.observeChains['TERRA']
         }
 
         if(node.preflight_status) {

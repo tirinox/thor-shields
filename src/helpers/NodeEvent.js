@@ -15,12 +15,13 @@ const EVENT_TYPE = Object.freeze({
 })
 
 export class NodeEvent {
-    constructor(type, node, prevNode, currValue, prevValue) {
+    constructor(type, node, prevNode, currValue, prevValue, nodeSet) {
         this.type = type
         this.node = node
         this.prevNode = prevNode
         this.currValue = currValue
         this.prevValue = prevValue
+        this.nodeSet = nodeSet
         this.isTramp = node ? node.address === '' : false
     }
 

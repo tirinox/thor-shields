@@ -23,7 +23,7 @@ export class NodeObjTestScene {
 
         this.nodeObj.labelObj.visible = false
 
-        this.nodeObj.material.uniforms.rust.value = 0.001
+        this.nodeObj.material.uniforms.rust.value = -1.0
 
         new TWEEN.Tween(this.nodeObj.material.uniforms.rust)
             .to({value: 1.0}, 2000)

@@ -55,7 +55,7 @@ export const Config = {
         },
     },
     Scene: {
-        DebugMode: 'nodeobj',
+        DebugMode: false, // 'nodeobj',
 
         InitialMode: IsProduction ? 'normal' : 'version', // todo: normal
 
