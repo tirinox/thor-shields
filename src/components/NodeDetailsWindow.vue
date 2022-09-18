@@ -1,21 +1,22 @@
 <template>
     <Transition name="shrink">
-        <div :class="{'window window-left': isLeft, 'window window-right': !isLeft }" @keyup.esc.prevent="close" tabindex="0" ref="modal">
+        <div :class="{'window window-left': isLeft, 'window window-right': !isLeft }" @keyup.esc.prevent="close"
+             tabindex="0" ref="modal">
             <div class="close-button" @click="close" v-tippy content="Close it"></div>
             <h1>Node details</h1>
             <h2>
                 <font-awesome-icon class="icon"
-                    icon="fa-solid fa-arrow-right"
-                    v-if="node.requestedToLeave"
-                    content="Requested to leave!"
-                    v-tippy
+                                   icon="fa-solid fa-arrow-right"
+                                   v-if="node.requestedToLeave"
+                                   content="Requested to leave!"
+                                   v-tippy
                 />
 
                 <font-awesome-icon class="icon"
-                    icon="fa-solid fa-arrow-down-up-lock"
-                    v-if="node.forcedToLeave"
-                    content="Forced to leave!"
-                    v-tippy
+                                   icon="fa-solid fa-arrow-down-up-lock"
+                                   v-if="node.forcedToLeave"
+                                   content="Forced to leave!"
+                                   v-tippy
                 />
 
                 {{ node.address }}
@@ -67,7 +68,7 @@
 
                 <div class="prop-box" v-if="hasIP">
                     <div class="category">☁️ Provider</div>
-                    <div class="value">{{ providerName }} </div>
+                    <div class="value">{{ providerName }}</div>
                 </div>
 
                 <div class="prop-box" v-else>
@@ -206,7 +207,7 @@ export default {
             return this.nodeSet.ranks.slash[this.node.address]
         },
         chainLag() {
-            return (chain) => (this.nodeSet.topHeights[chain] ?? 0) - (this.node.observeChains[chain] ?? 0)
+            return (chain) => this.nodeSet.getChainHeightLag(this.node, chain)
         },
         providerName() {
             const nativeName = this.node?.IPInfo?.providerName ?? UNKNOWN
