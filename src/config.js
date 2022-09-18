@@ -57,7 +57,7 @@ export const Config = {
     Scene: {
         DebugMode: false, // 'nodeobj',
 
-        InitialMode: IsProduction ? 'normal' : 'version',
+        InitialMode: IsProduction ? 'normal' : 'bond',
 
         Background: {
             Enabled: IsProduction,

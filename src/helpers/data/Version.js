@@ -93,10 +93,15 @@ export class Version {
             const version = Version.fromString(versionStr)
             let target = null
             let comment = ''
-            if (version.equal(maxActiveVersion)) {
+            const isActive = version.equal(minActiveVersion)
+            const isLatest = version.equal(maxActiveVersion)
+            if(isLatest && isActive) {
+                target = minActiveVersion.toString()
+                comment = 'latest and active'
+            } else if (isLatest) {
                 target = maxActiveVersion.toString()
                 comment = 'latest'
-            } else if (version.equal(minActiveVersion)) {
+            } else if (isActive) {
                 target = minActiveVersion.toString()
                 comment = 'active'
             } else if (_.includes(otherActiveVersionsStr, versionStr)) {

@@ -20,7 +20,7 @@ export class ModeNormal extends ModeBase {
 
     onEnter(nodeObjList) {
         const label = this.makeLabel({text: 'THORChain', position: new THREE.Vector3(0, -580, -10), scale: 18})
-        label.t.opacity = 0.8;
+        label.opacity = 0.8;
 
         super.onEnter();
 

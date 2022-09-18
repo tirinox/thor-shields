@@ -21,7 +21,7 @@ export class ModeBond extends ModeBase {
 
     onEnter(nodeObjects) {
         const label = this.makeLabel({text: 'Bonds', position: new THREE.Vector3(0, -630, -10), scale: 14})
-        label.t.opacity = 0.8;
+        label.opacity = 0.8;
 
         nodeObjects = _.sortBy(nodeObjects, 'node.bond')
 
@@ -90,11 +90,18 @@ export class ModeBond extends ModeBase {
             this.nameToAttractor[nodeObject.node.address] = new Attractor(new THREE.Vector3(x, y, z),
                 this.force, 0, 0, -1, 10.0)
 
-            this.makeLabel({
+            const label = this.makeLabel({
                 text: shortRune(bond),
-                position: new THREE.Vector3(x, y - nodeObject.radius - 10.0, -10),
-                scale: 1
+                position: new THREE.Vector3(x, y - nodeObject.radius - 19.0, -10),
+                scale: 1,
+                rotation: -22.0
             })
+
+
+            if(!nodeObject.node.isActive) {
+                label.color = '#aaa'
+            }
+
             return true
         } else {
             this.nameToAttractor[nodeObject.node.address] = this._noBondAttractor
