@@ -68,7 +68,7 @@ export class NodeGroup extends Simulation {
         this.holder.add(nodeObject.o)
     }
 
-    createNewNode(node) {
+    createNewNode(node, nodeSet) {
         const ident = this.genIdent(node)
         const existing = this.getByName(ident)
         if (existing) {
@@ -79,6 +79,7 @@ export class NodeGroup extends Simulation {
         console.info(`Create node ${ident}.`)
 
         const nodeObject = new NodeObject(node)
+        nodeObject._updateRust(nodeSet)
         this._placeNodeObject(nodeObject)
         this.addObject(ident, nodeObject)
         return nodeObject

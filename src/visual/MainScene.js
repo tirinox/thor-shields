@@ -69,7 +69,7 @@ export class MainScene {
             const node = event.node
             if (node.address) {
                 if (event.type === NodeEvent.EVENT_TYPE.CREATE) {
-                    this.nodeGroup.createNewNode(node)
+                    this.nodeGroup.createNewNode(node, nodes)
                 } else if (event.type === NodeEvent.EVENT_TYPE.DESTROY) {
                     this.nodeGroup.destroyNode(node)
                 } else {

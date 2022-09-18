@@ -19,7 +19,8 @@ export const Config = {
 
         ReactRandomDelay: 500.0, // msec
         NodeJuggler: {
-            Enabled: !IsProduction
+            // Enabled: !IsProduction
+            Enabled: false
         }
     },
     Font: {
@@ -85,7 +86,12 @@ export const Config = {
                     Force: 100.0,
                     RedDuration: 150.0, // ms
                 }
-            }
+            },
+            Rust: {
+                MaxLagToFullRust: 2 * 60 * 60 * 24, // sec,
+                MaxStrength: 0.85,
+            },
+
         },
         Globe: {
             Enabled: true,

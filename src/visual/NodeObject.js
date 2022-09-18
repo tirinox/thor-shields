@@ -246,7 +246,7 @@ export class NodeObject extends PhysicalObject {
             this.reactSlash()
         } else if (event.type === NodeEvent.EVENT_TYPE.STATUS) {
             this.reactStatusChange(event.node.status)
-        } else if(event.type === NodeEvent.EVENT_TYPE.VERSION) {
+        } else if (event.type === NodeEvent.EVENT_TYPE.VERSION) {
             this.reactVersion()
         }
 
@@ -257,9 +257,7 @@ export class NodeObject extends PhysicalObject {
 
     reactChain(nodeSet) {
         // update: node appearance according chain lag
-
-        this.material.uniforms.rust.value = this._getRust(nodeSet)
-        this.material.uniformsNeedUpdate = true
+        this._updateRust(nodeSet)
 
         const chainReactionVelocity = 1.0 // 100
         // this.mesh.rotateZ(1.0)
@@ -273,7 +271,7 @@ export class NodeObject extends PhysicalObject {
     }
 
     reactSlash() {
-        if(this._reactingToSlash || !this.material) {
+        if (this._reactingToSlash || !this.material) {
             return
         }
 
@@ -302,16 +300,28 @@ export class NodeObject extends PhysicalObject {
         this._animateTransitionShininess()
     }
 
+    _updateRust(nodeSet) {
+        this.material.uniforms.rust.value = this._getRust(nodeSet)
+        this.material.uniformsNeedUpdate = true
+    }
+
     _getRust(nodeSet) {
+        if (!this.node.isActive) {
+            return -1.0
+        }
+
+        const rustCfg = Config.Scene.NodeObject.Rust
+
         const {max} = nodeSet.getChainHeightLagAllSeconds(this.node)
-        const a = smoothStep(0, 86400, max)
-        return 2.0 * clamp(a, 0.0, 0.95) - 1.0
+        const maxRustLag = rustCfg.MaxLagToFullRust
+        const a = smoothStep(0, maxRustLag, max)
+        return 2.0 * clamp(a, 0.0, rustCfg.MaxStrength) - 1.0
     }
 
     _animateScale(targetScaleOfNormal,
                   durationIn = 1000,
                   durationOut = 1000,
-                  easing =TWEEN.Easing.Sinusoidal.InOut ) {
+                  easing = TWEEN.Easing.Sinusoidal.InOut) {
         const normalScale = this.calculateScale
         const targetScale = targetScaleOfNormal * normalScale
         new TWEEN.Tween(this.mesh.scale)
