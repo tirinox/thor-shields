@@ -60,7 +60,8 @@ import {CameraController} from "@/visual/CameraController";
 import LoadingIndicator from "@/components/parts/LoadingIndicator";
 import _ from "lodash";
 import {shallowRef} from "vue";
-// import {TrailTestScene} from "@/visual/TrailTestScene";
+import {TrailTestScene} from "@/visual/TrailTestScene";
+import {NodeObjTestScene} from "@/visual/NodeObjTestScene";
 
 export default {
     name: 'MainScreen',
@@ -135,6 +136,9 @@ export default {
                         this.nodeToViewDetails = this.content.findNodeByAddress(pickedName)
                     }
                 }
+            } else if(!this.zoomedToNode) {
+                this.nodeDetailsVisible = false
+                // this.nodeToViewDetails = this.content.findNodeByAddress(null)
             }
         },
 
@@ -147,7 +151,7 @@ export default {
         },
 
         _pickObject(event, thoughtful = false) {
-            if (!this.raycaster) {
+            if (!this.raycaster || !this.content.nodeGroup) {
                 return null
             }
 
@@ -296,8 +300,14 @@ export default {
             this.scene.add(this.cameraController.camera)
             this.makeSkybox()
 
-            this.content = new MainScene(this.scene, this.cameraController.camera)
-            // this.content = new TrailTestScene(this.scene, this)
+            const mode = Config.Scene.DebugMode
+            if(mode === 'nodeobj') {
+                this.content = new NodeObjTestScene(this.scene, this.cameraController.camera)
+            } else if(mode === 'trail') {
+                this.content = new TrailTestScene(this.scene, this.cameraController.camera)
+            } else {
+                this.content = new MainScene(this.scene, this.cameraController.camera)
+            }
         },
 
         setSceneMode(mode) {

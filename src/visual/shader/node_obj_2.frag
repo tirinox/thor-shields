@@ -10,9 +10,10 @@ varying float vIsPerspective;
 #endif
 
 uniform float time;
-uniform float saturation;
 
+uniform float saturation;
 uniform float transitionShininess;
+uniform float rust;
 
 uniform vec3 color;
 
@@ -21,7 +22,7 @@ varying vec2 vUv;
 #define saturate(oo) clamp(oo, 0.0, 1.0)
 
 // Quality Settings
-#define MarchSteps 5
+#define MarchSteps 4
 // Scene Settings
 #define ExpPosition vec3(0.0)
 #define Radius 1.0
@@ -182,6 +183,16 @@ bool IntersectSphere(vec3 ro, vec3 rd, vec3 pos, float radius, out vec3 intersec
     return d >= 0.0;
 }
 
+vec4 doRust(vec4 col, float rust, vec2 uv) {
+    float colorAvg = 0.3333 * (col.r + col.g + col.g);
+    if(colorAvg < rust) {
+        float nr = snoise(vec3(uv.x * 5.0, uv.y * 5.0, 5.0 * colorAvg));
+        float ng = snoise(vec3(uv.x * 13.0, uv.y * 11.0, 5.0 * colorAvg));
+        col = vec4(nr, ng * nr, .0, col.a > 0. ? 1.0 : 0.0);
+    }
+    return col;
+}
+
 const float circleThickness = 0.15;
 const float circleRadius = 0.78;
 
@@ -203,6 +214,8 @@ void main()
         col = March(origin, rd);
     }
 
+    // After FX
+
     float d = length(p);
     if (saturation > 1.0) {
         //  1.0 - smoothstep(radius-borderThickness, radius, d);
@@ -212,11 +225,16 @@ void main()
 
     if(transitionShininess > 0.0) {
         vec4 shineColor = vec4(0.8, 0.9, 1.0, 1.0);
-        col += shineColor * transitionShininess * clamp(1.0 - d * 0.9, 0.0, 1.0);
+        col += shineColor * transitionShininess * clamp(1.0 - d * 0.9, 0.0, col.a);
+    }
+
+    if(rust > 0.0) {
+        col = doRust(col, rust, p);
     }
 
     gl_FragColor = col;
 
+    // Z buffer
     #if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )
     // Doing a strict comparison with == 1.0 can cause noise artifacts
     // on some platforms. See issue #17623.

@@ -23,10 +23,12 @@ export class NodeInfo {
         this.IPAddress = node.ip_address
         this.version = node.version
         this.slashPoints = +node.slash_points
-        this.jail = {
-            address: node.jail.node_address,
-            releaseHeight: +node.jail.release_height,
-            reason: node.jail.reason,
+        if(node.jail) {
+            this.jail = {
+                address: node.jail.node_address,
+                releaseHeight: +node.jail.release_height,
+                reason: node.jail.reason,
+            }
         }
         this.currentAward = thorToFloat(node.current_award)
 
@@ -38,24 +40,28 @@ export class NodeInfo {
             }
         }
 
-        this.preflightStatus = {
-            status: node.preflight_status.status,
-            reason: node.preflight_status.reason,
-            code: +node.preflight_status.code
+        if(node.preflight_status) {
+            this.preflightStatus = {
+                status: node.preflight_status.status,
+                reason: node.preflight_status.reason,
+                code: +node.preflight_status.code
+            }
         }
 
-        this.bondProviders = {
-            address: node.bond_providers['node_address'],
-            fee: (+node.bond_providers['node_operator_fee']) / 10000.0,
-            providers: []
-        }
+        if(node.bond_providers) {
+            this.bondProviders = {
+                address: node.bond_providers['node_address'],
+                fee: (+node.bond_providers['node_operator_fee']) / 10000.0,
+                providers: []
+            }
 
-        if (node.bond_providers.providers) {
-            for (let {bond_address, bond} of node.bond_providers.providers) {
-                this.bondProviders.providers.push({
-                    bond_address,
-                    bond: thorToFloat(bond)
-                })
+            if (node.bond_providers.providers) {
+                for (let {bond_address, bond} of node.bond_providers.providers) {
+                    this.bondProviders.providers.push({
+                        bond_address,
+                        bond: thorToFloat(bond)
+                    })
+                }
             }
         }
 

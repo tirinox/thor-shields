@@ -121,4 +121,8 @@ export class NodeSet {
         const blockDiff = topThorHeight - no
         return Date.now() - blockDiff * SEC_PER_BLOCK * 1000.0
     }
+
+    getChainHeightLag(node, chain) {
+        return (this.topHeights[chain] ?? 0) - (node.observeChains[chain] ?? 0)
+    }
 }

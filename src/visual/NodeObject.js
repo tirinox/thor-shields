@@ -50,6 +50,7 @@ export class NodeObject extends PhysicalObject {
         this._makeSphere()
         this._makeLabel()
 
+        this._reactingToSlash = false
         this._elevated = false
     }
 
@@ -137,12 +138,17 @@ export class NodeObject extends PhysicalObject {
 
     _makeMaterial() {
         // material
+
+        // fixme: debug 0.0
+        const initRust = Math.random()
+
         this.material = new THREE.ShaderMaterial({
             uniforms: {
                 "time": {value: Random.getRandomFloat(0.0, 100.0)},
                 "saturation": {value: 1.0},
                 "color": {value: this._getSphereColor()},
                 "transitionShininess": {value: 0.0},
+                "rust": {value: initRust},  // 0.0
             },
             vertexShader: StdVertexShader,
             fragmentShader: FragShader1,
@@ -244,9 +250,15 @@ export class NodeObject extends PhysicalObject {
         } else if(event.type === NodeEvent.EVENT_TYPE.VERSION) {
             this.reactVersion()
         }
+
+        // if(Math.random() > 0.8) {
+        //     this.reactSlash()
+        // }
     }
 
     reactChain() {
+        // update: node appearance according chain lag
+
         const chainReactionVelocity = 1.0 // 100
         // this.mesh.rotateZ(1.0)
         const pos = this.o.position.clone().normalize()
@@ -259,26 +271,54 @@ export class NodeObject extends PhysicalObject {
     }
 
     reactSlash() {
+        if(this._reactingToSlash || !this.material) {
+            return
+        }
+
         const slashForce = 100.0
         this.shootOut(slashForce)
         // this.velocity.set(Random.randomOnCircle(slashForce))
 
+        this._animateScale(0.82, 200, 600)
+
+        this._reactingToSlash = true
+
         const savedColor = this.material.uniforms.color.value.clone()
 
-        if (this.material) {
-            this.material.uniforms.color.value.set(SlashColor)
-            this.material.uniformsNeedUpdate = true
+        this.material.uniforms.color.value.set(SlashColor)
+        this.material.uniformsNeedUpdate = true
 
-            setTimeout(() => {
-                this.material.uniforms.color.value.set(savedColor)
-                this.material.uniformsNeedUpdate = true
-            }, 100)
-        }
+        setTimeout(() => {
+            this.material.uniforms.color.value.set(savedColor)
+            this.material.uniformsNeedUpdate = true
+            this._reactingToSlash = false
+        }, 100)
     }
 
     reactStatusChange(newStatus) {
         console.log(`New status ${this.node.status} -> ${newStatus}`)
         this._animateTransitionShininess()
+    }
+
+    _getRust() {
+
+    }
+
+    _animateScale(targetScaleOfNormal,
+                  durationIn = 1000,
+                  durationOut = 1000,
+                  easing =TWEEN.Easing.Sinusoidal.InOut ) {
+        const normalScale = this.calculateScale
+        const targetScale = targetScaleOfNormal * normalScale
+        new TWEEN.Tween(this.mesh.scale)
+            .to(new THREE.Vector3(targetScale, targetScale, targetScale), durationIn)
+            .easing(easing)
+            .start()
+            .chain(
+                new TWEEN.Tween(this.mesh.scale)
+                    .to(new THREE.Vector3(normalScale, normalScale, normalScale), durationOut)
+                    .easing(easing)
+            )
     }
 
     _animateTransitionShininess() {
@@ -297,16 +337,6 @@ export class NodeObject extends PhysicalObject {
                 .easing(easing)
         )
 
-        const normalScale = this.calculateScale
-        const bigScale = normalScale * 1.5
-        new TWEEN.Tween(this.mesh.scale)
-            .to(new THREE.Vector3(bigScale, bigScale, bigScale), durationIn)
-            .easing(easing)
-            .start()
-            .chain(
-                new TWEEN.Tween(this.mesh.scale)
-                    .to(new THREE.Vector3(normalScale, normalScale, normalScale), durationOut)
-                    .easing(easing)
-            )
+        this._animateScale(1.5, durationIn, durationOut)
     }
 }

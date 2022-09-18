@@ -1,14 +1,18 @@
 import * as THREE from "three";
 import {clearObject} from "@/helpers/3D";
 import {TrailTesting} from "@/visual/helpers/TrailTesting";
+import {dbgSimulateLoaded} from "@/helpers/EventTypes";
 
 export class TrailTestScene {
-    constructor(scene) {
+    constructor(scene, cameraController) {
         this.scene = scene
+        this.cameraController = cameraController
 
         this._makeSomeLight()
 
         this.trailTester = new TrailTesting(this.scene)
+
+        dbgSimulateLoaded()
     }
 
     _makeSomeLight() {

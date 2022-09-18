@@ -29,7 +29,7 @@ export const Config = {
     Effects: {
         Bloom: {
             Enabled: true,
-            Strength: 0.9,
+            Strength: 0.65,
             Threshold: 0.5,
             Radius: 1.2,
         }
@@ -55,7 +55,10 @@ export const Config = {
         },
     },
     Scene: {
+        DebugMode: 'nodeobj',
+
         InitialMode: IsProduction ? 'normal' : 'version', // todo: normal
+
         Background: {
             Enabled: IsProduction,  // todo: enable. disabled for better performance
         },
