@@ -31,6 +31,7 @@
                     v-if="nodeDetailsVisible"
                     :node="nodeToViewDetails"
                     :node-set="nodeSet"
+                    :is-left="nodeDetailsIsLeft"
                     @close="onCloseDetails">
                 </NodeDetailsWindow>
             </keep-alive>
@@ -82,6 +83,7 @@ export default {
             fullyLoaded: false,
 
             nodeDetailsVisible: false,
+            nodeDetailsIsLeft: true,
             nodeToViewDetails: new NodeInfo(),
             zoomedToNode: false,
 
@@ -101,6 +103,10 @@ export default {
             // event.target.blur();
         },
 
+        choseWindowSide(mouseEvent) {
+            this.nodeDetailsIsLeft = !(mouseEvent.clientX < window.innerWidth * 0.5)
+        },
+
         onMouseMove(event) {
             const x = event.clientX
             const y = event.clientY
@@ -116,13 +122,18 @@ export default {
             this.mouseEnterY = y
             this.cameraController.controls.rotate(dx * scale, dy * scale)
 
-            const pickedName = this._pickObject(event)?.name
-            this.content.nodeGroup.setElevatedNode(pickedName)
+            const pickIntersection = this._pickObject(event)
+            if(pickIntersection) {
+                const pickedName = pickIntersection?.object?.name
+                this.content.nodeGroup.setElevatedNode(pickedName)
 
-            if (!this.zoomedToNode) {
-                this.nodeDetailsVisible = !!pickedName
-                if (this.nodeDetailsVisible) {
-                    this.nodeToViewDetails = this.content.findNodeByAddress(pickedName)
+                this.choseWindowSide(event)
+
+                if (!this.zoomedToNode) {
+                    this.nodeDetailsVisible = !!pickedName
+                    if (this.nodeDetailsVisible) {
+                        this.nodeToViewDetails = this.content.findNodeByAddress(pickedName)
+                    }
                 }
             }
         },
@@ -150,22 +161,21 @@ export default {
                 console.log('Objects hit by the ray caster: ' + intersectedObjects.length)
             }
 
-            const namedObjects = _.filter(_.map(intersectedObjects, 'object'), o => o.name && o.name !== '')
+            const namedObjects = _.filter(intersectedObjects, o => o.object.name && o.object.name !== '')
             return namedObjects.length ? namedObjects[0] : null
         },
 
         onClick(event) {
-            console.log(event)
-            // fixme: cannot pick when globe is rotated geo mode
             const pickedObject = this._pickObject(event, true)
-            console.log(pickedObject)
-            if (pickedObject) {
-                const nodeAddress = pickedObject.name
+            if (pickedObject && pickedObject.object) {
+                const nodeAddress = pickedObject.object.name
                 if (nodeAddress && nodeAddress.startsWith('thor')) {
+                    this.choseWindowSide(event)
                     this._onPickNodeObject(nodeAddress)
                 }
             } else {
                 this.nodeDetailsVisible = false
+                this.zoomedToNode = false
                 this.cameraController.restoreCamera()
             }
         },

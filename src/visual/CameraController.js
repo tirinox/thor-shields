@@ -17,6 +17,11 @@ export class CameraController {
         this.controls.reset()
     }
 
+    projectToScreen(worldVector) {
+        this.camera.updateProjectionMatrix()
+        return worldVector.project(this.camera)
+    }
+
     _createCamera() {
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
             0.001, Config.Controls.Camera.Distance.Max * 2);

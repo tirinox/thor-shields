@@ -1,6 +1,6 @@
 <template>
     <Transition name="shrink">
-        <div class="window" @keyup.esc.prevent="close" tabindex="0" ref="modal">
+        <div :class="{'window window-left': isLeft, 'window window-right': !isLeft }" @keyup.esc.prevent="close" tabindex="0" ref="modal">
             <div class="close-button" @click="close" v-tippy content="Close it"></div>
             <h1>Node details</h1>
             <h2>
@@ -154,7 +154,8 @@ export default {
     emits: ['close'],
     props: [
         'node',
-        'nodeSet'
+        'nodeSet',
+        'isLeft'
     ],
     data() {
         return {}
@@ -240,7 +241,6 @@ export default {
 // todo: different variant for Portrait orientation
 .window {
     position: fixed;
-    left: 5%;
     top: 50%;
     transform: translate(0%, -50%);
 
@@ -255,6 +255,14 @@ export default {
     //max-width: 50vw;
 
     font-size: 10pt;
+}
+
+.window-left {
+    left: 5%;
+}
+
+.window-right {
+    right: 5%;
 }
 
 .close-button {
