@@ -146,7 +146,7 @@ export class NodeSet {
     }
 
     getChainHeightLagAllSeconds(node) {
-        const keys = _.keys(node.observeChains)
+        const keys = _.keys(this.topHeights)
         if(!keys.length) {
             return 0
         }

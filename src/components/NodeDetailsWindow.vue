@@ -106,11 +106,17 @@
                     </div>
                 </div>
 
-                <div class="prop-box" v-for="[chain, height] of Object.entries(node.observeChains)" :key="chain">
+                <div class="prop-box" v-for="[chain, height] of chainEntries" :key="chain">
                     <div class="category">{{ chain }}</div>
                     <div class="value">
                         <span :title="height" v-if="chainLag(chain)" class="chain-lag">
-                            🩸 {{ chainLag(chain) }} blocks behind!
+                            🩸
+                            <span v-if="height > 0">
+                                {{ chainLag(chain) }} blocks behind!
+                            </span>
+                            <span v-else>
+                                No sync at all
+                            </span>
                         </span>
                         <span v-else>
                             Up to date
@@ -130,6 +136,7 @@ import copy from "copy-to-clipboard";
 import {IPAddressInfoLoader, UNKNOWN} from "@/helpers/data/IPAddressInfo";
 import {DataStorage} from "@/helpers/data/Storage";
 import {NodeStatus} from "@/helpers/data/NodeInfo";
+import _ from "lodash";
 
 const STATUS_PROPS = {
     [NodeStatus.Active]: {
@@ -162,6 +169,11 @@ export default {
         return {}
     },
     computed: {
+        chainEntries() {
+            const keys = Object.keys(this.nodeSet.topHeights)
+            keys.sort()
+            return _.map(keys, chain => [chain, this.node.observeChains[chain] ?? 0])
+        },
         topThorHeight() {
             return DataStorage.lastBlock['THOR']
         },
