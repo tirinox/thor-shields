@@ -96,8 +96,10 @@ export class ModeVersion extends ModeBase {
                 let color
                 if(desc.comment === 'latest') {
                     color = '#41e9ff'
+                } else if(desc.comment === 'latest and active') {
+                    color = '#1dfc53'
                 } else if(desc.comment === 'active') {
-                    color = '#19ff52'
+                    color = '#16f14b'
                 } else if(desc.comment === 'interim') {
                     color = '#1cc245'
                     tag = ''
@@ -120,7 +122,7 @@ export class ModeVersion extends ModeBase {
                 }).t
 
                 if(!desc.isActive) {
-                    label.fillOpacity = 0.7
+                    label.fillOpacity = 0.1
                 }
                 if(color) {
                     label.color = color
