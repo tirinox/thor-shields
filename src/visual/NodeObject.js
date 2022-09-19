@@ -119,6 +119,10 @@ export class NodeObject extends PhysicalObject {
         this.o.add(this.mesh)
     }
 
+    get currentColor() {
+        return this.material.uniforms.color.value
+    }
+
     _makeSimpleSphere() {
         // simpleGeometry
         this.material = new THREE.MeshBasicMaterial({

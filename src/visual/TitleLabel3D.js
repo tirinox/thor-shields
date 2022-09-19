@@ -14,7 +14,6 @@ export class TitleLabel3D extends THREE.Object3D {
         t.fontSize = 10
         t.scale.set(scale, scale, scale)
         t.color = 0xFFFFFF
-        t.fillOpacity = 1.0 // 0.5
         t.anchorX = 'center'
         t.anchorY = 'middle'
         t.textAlign = 'center'
@@ -42,7 +41,7 @@ export class TitleLabel3D extends THREE.Object3D {
     }
 
     set opacity(o) {
-        this.t.material.opacity = o
+        this.t.fillOpacity = o * 255.0
     }
 
     get opacity() {
@@ -58,7 +57,7 @@ export class TitleLabel3D extends THREE.Object3D {
             .easing(this.easeType)
             .start()
 
-        new TWEEN.Tween(this.t.material)
+        new TWEEN.Tween(this)
             .to({opacity: 1.0}, this.animDuration)
             .easing(this.easeType)
             .start()
@@ -71,7 +70,7 @@ export class TitleLabel3D extends THREE.Object3D {
             .easing(this.easeType)
             .start()
 
-        new TWEEN.Tween(this.t.material)
+        new TWEEN.Tween(this)
             .to({opacity: 0.0}, expandedDuration * 0.5)
             .easing(this.easeType)
             .start().onComplete(() => {

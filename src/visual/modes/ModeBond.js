@@ -12,7 +12,7 @@ export class ModeBond extends ModeBase {
         this.force = Config.Physics.BaseForce
 
         this.center = new THREE.Vector3(0, 120)
-        this._noBondAttractor = new Attractor(this.center, this.force)
+        this._noBondAttractor = new Attractor(new THREE.Vector3(0, -2000, 0), this.force)
     }
 
     handleObject(physObj) {
@@ -98,7 +98,9 @@ export class ModeBond extends ModeBase {
             })
 
             if(!nodeObject.node.isActive) {
-                label.color = '#aaa'
+                label.color = '#999'
+            } else {
+                label.color = nodeObject.currentColor
             }
 
             return true

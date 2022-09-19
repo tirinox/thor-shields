@@ -55,8 +55,8 @@ export class ModeStatus extends ModeBase {
         const otherCount = nodeObj.length - (standbyCount + activeCount)
 
         this.makeLabel({text: 'Active', position: new THREE.Vector3(0, -500, 0), scale: 20})
-        this.makeLabel({text: 'Standby', position: new THREE.Vector3(-this._sideDistance, -420, 0), scale: 12})
-        this.makeLabel({text: 'Other', position: new THREE.Vector3(this._sideDistance, -420, 0), scale: 12})
+        this.makeLabel({text: 'Standby', position: new THREE.Vector3(-this._sideDistance, -420, 0), scale: 12}).opacity = 0.8
+        this.makeLabel({text: 'Other', position: new THREE.Vector3(this._sideDistance, -420, 0), scale: 12}).opacity = 0.8
 
         this.makeLabel({
             text: activeCount, position: new THREE.Vector3(0, -650, 0), scale: 10,

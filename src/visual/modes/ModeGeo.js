@@ -15,7 +15,7 @@ export class ModeGeo extends ModeBase {
         this.isFlat = false
 
         this.force = Config.Physics.BaseForce * 1.2
-        this._banishAttractor = new Attractor(new THREE.Vector3(0, 0, 0), this.force)
+        this._banishAttractor = new Attractor(new THREE.Vector3(0, -2000, 0), this.force)
 
         this._nameToAttractor = {}
         this._coordToAttractor = {}

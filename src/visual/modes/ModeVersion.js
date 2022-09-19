@@ -75,7 +75,7 @@ export class ModeVersion extends ModeBase {
         for (const [key, versionDesc] of entries) {
             const r = versionDesc.radius
             const attractor = new Attractor(new THREE.Vector3(x + r, 0, 0),
-                this.force, 0, 0, 0, versionDesc.radius)
+                this.force, 0, 0, 0, versionDesc.radius * 0.9)
             x += gap + r * 2
             this._attractorsByKey[key] = attractor
             for (const nodeObj of versionDesc.objects) {
@@ -122,7 +122,7 @@ export class ModeVersion extends ModeBase {
                 }).t
 
                 if(!desc.isActive) {
-                    label.fillOpacity = 0.9
+                    label.opacity = 0.9
                 }
                 if(color) {
                     label.color = color
