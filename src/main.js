@@ -5,7 +5,10 @@ import {library} from '@fortawesome/fontawesome-svg-core'
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
 
 /* import specific icons */
-import {faCopy, faArrowDownUpLock, faArrowRight} from '@fortawesome/free-solid-svg-icons'
+import {
+    faCopy, faArrowDownUpLock, faArrowRight,
+    faRotateRight,
+} from '@fortawesome/free-solid-svg-icons'
 
 import * as THREE from 'three';
 import {emitter} from "@/helpers/EventTypes";
@@ -22,7 +25,12 @@ if(!isWebGL2Supported()) {
 CameraControls.install({THREE});
 
 /* add icons to the library */
-library.add(faCopy, faArrowRight, faArrowDownUpLock)
+library.add(
+    faCopy,
+    faArrowRight,
+    faArrowDownUpLock,
+    faRotateRight
+)
 
 const app = createApp(App);
 app.component('font-awesome-icon', FontAwesomeIcon)

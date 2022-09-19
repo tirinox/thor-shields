@@ -13,4 +13,9 @@ module.exports = defineConfig({
         }
     },
     publicPath: '',
+
+    devServer: {
+        hot: true,
+        liveReload: true
+    }
 })

@@ -136,6 +136,10 @@ export const Config = {
         LogZBuffer: true,
         // LogZBuffer: false,
     },
+    SoftwareVersion: {
+        Enabled: true,
+        Interval: 60 * 1000, // ms
+    }
 }
 
 export const Colors = {

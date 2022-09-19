@@ -22,6 +22,9 @@
             <LoadingIndicator v-if="isLoading"></LoadingIndicator>
 
             <ControlPanel @mode-selected="setSceneMode" v-if="fullyLoaded"></ControlPanel>
+            <NewVersionPanel v-if="version.newDetected"
+                             :old-version="version.oldVersion"
+                             :new-version="version.newVersion"></NewVersionPanel>
         </div>
 
         <!-- UI -->
@@ -62,10 +65,12 @@ import _ from "lodash";
 import {shallowRef} from "vue";
 import {TrailTestScene} from "@/visual/TrailTestScene";
 import {NodeObjTestScene} from "@/visual/NodeObjTestScene";
+import {SoftwareVersionTracker} from "@/helpers/data/SoftwareVersion";
+import NewVersionPanel from "@/components/parts/NewVersionPanel";
 
 export default {
     name: 'MainScreen',
-    components: {LoadingIndicator, NodeDetailsWindow, ControlPanel, FPSCounter},
+    components: {NewVersionPanel, LoadingIndicator, NodeDetailsWindow, ControlPanel, FPSCounter},
     props: {},
 
     data() {
@@ -89,6 +94,12 @@ export default {
             zoomedToNode: false,
 
             nodeSet: shallowRef(),
+
+            version: {
+                newDetected: false,
+                oldVersion: '1',
+                newVersion: '2',
+            }
         }
     },
 
@@ -124,7 +135,7 @@ export default {
             this.cameraController.controls.rotate(dx * scale, dy * scale)
 
             const pickIntersection = this._pickObject(event)
-            if(pickIntersection) {
+            if (pickIntersection) {
                 const pickedName = pickIntersection?.object?.name
                 this.content.nodeGroup.setElevatedNode(pickedName)
 
@@ -136,7 +147,7 @@ export default {
                         this.nodeToViewDetails = this.content.findNodeByAddress(pickedName)
                     }
                 }
-            } else if(!this.zoomedToNode) {
+            } else if (!this.zoomedToNode) {
                 this.nodeDetailsVisible = false
                 // this.nodeToViewDetails = this.content.findNodeByAddress(null)
             }
@@ -245,7 +256,7 @@ export default {
 
             this.resizeRendererToDisplaySize(this.renderer)
             TWEEN.update()
-            if(this.$refs.fps) {
+            if (this.$refs.fps) {
                 this.$refs.fps.update(delta, this.scene)
             }
             this.cameraController.update(delta)
@@ -303,9 +314,9 @@ export default {
             this.makeSkybox()
 
             const mode = Config.Scene.DebugMode
-            if(mode === 'nodeobj') {
+            if (mode === 'nodeobj') {
                 this.content = new NodeObjTestScene(this.scene, this.cameraController.camera)
-            } else if(mode === 'trail') {
+            } else if (mode === 'trail') {
                 this.content = new TrailTestScene(this.scene, this.cameraController.camera)
             } else {
                 this.content = new MainScene(this.scene, this.cameraController.camera)
@@ -335,6 +346,12 @@ export default {
             this.nodeToViewDetails = new NodeInfo()
             this.cameraController.restoreCamera()
         },
+
+        onNewVersion(e) {
+            this.version.newDetected = true
+            this.version.oldVersion = e.oldVersion
+            this.version.newVersion = e.newVersion
+        }
     },
 
     mounted() {
@@ -349,13 +366,21 @@ export default {
         this.buildScene()
 
         this.raycaster = new THREE.Raycaster()
+
+        this.versionTracker = new SoftwareVersionTracker(emitter, Config.SoftwareVersion.Interval)
+        if (Config.SoftwareVersion.Enabled) {
+            this.versionTracker.run()
+        }
+
         emitter.on(EventTypes.FullyLoaded, this.onFullyLoaded)
         emitter.on(EventTypes.DataSourceTick, this.onDataArrived)
+        emitter.on(EventTypes.NewViewerVersion, this.onNewVersion)
 
         requestAnimationFrame(this.render);
     },
 
     unmounted() {
+        this.versionTracker.stop()
         this.content.dispose()
         this.cameraController.dispose()
         emitter.off(EventTypes.FullyLoaded)

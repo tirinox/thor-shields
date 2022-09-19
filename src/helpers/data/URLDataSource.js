@@ -41,7 +41,7 @@ export class URLDataSource {
     }
 
     toString() {
-        return `URLDataSource(${this.baseUrl}, ${this.period} sec)`
+        return `URLDataSource(${this.baseUrl}, ${this.period / 1000.} sec)`
     }
 
     get isRunning() {
