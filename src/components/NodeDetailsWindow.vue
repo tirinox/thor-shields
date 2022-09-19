@@ -92,6 +92,13 @@
                 </div>
 
                 <div class="prop-box">
+                    <div class="category">Bond providers</div>
+                    <div class="value">
+                        {{ node.bondProviders?.providers?.length }}
+                    </div>
+                </div>
+
+                <div class="prop-box">
                     <div class="category">🏆 Awards</div>
                     <div class="value">
                         {{ award }}
