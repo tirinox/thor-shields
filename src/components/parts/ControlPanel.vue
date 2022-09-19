@@ -65,6 +65,12 @@ export default {
     right: 4px;
 }
 
+@media (min-device-width:320px) and (max-device-width:768px) {
+    .control-panel {
+        bottom: 60px;
+    }
+}
+
 .button-selected {
     border-width: 2px;
     opacity: 1;
