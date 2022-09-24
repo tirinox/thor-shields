@@ -1,6 +1,6 @@
 <template>
     <div class="panel">
-        <div>The website update!</div>
+        <div>New version is available</div>
         <div class="details">
             <span class="old-version">{{ oldVersion }}</span>
             <font-awesome-icon icon="fa-solid fa-arrow-right" />
