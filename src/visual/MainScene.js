@@ -1,7 +1,7 @@
 import {NodeGroup} from "@/visual/NodeGroup";
 import {DebugNodeJuggler, NodeTracker} from "@/helpers/data/NodeTracker";
 import {NodeEvent} from "@/helpers/NodeEvent";
-import {LastBlockDataSource, NodeDataSource} from "@/helpers/data/URLDataSource";
+import {LastBlockDataSource, NetworkDataSource, NodeDataSource} from "@/helpers/data/URLDataSource";
 import {Config} from "@/config";
 import {clearObject} from "@/helpers/3D";
 import {emitter, EventTypes} from "@/helpers/EventTypes";
@@ -29,16 +29,33 @@ export class MainScene {
     }
 
     _runDataSource() {
-        const baseUrl = Config.DataSource.NodesURL
-        this.nodeDataSource = new NodeDataSource(baseUrl, Config.DataSource.Nodes.PollPeriod)
-        this.nodeDataSource.callback = this.handleData.bind(this)
-        this.nodeDataSource.run()
+        this._dataSources = []
 
-        this.lastBlockSource = new LastBlockDataSource(baseUrl, Config.DataSource.LastBlock.PollPeriod)
-        this.lastBlockSource.callback = (lastBlock) => {
+        const cfg = Config.DataSource
+
+        const nodeDataSource = new NodeDataSource(cfg.THORNodeURL, cfg.Nodes.PollPeriod)
+        nodeDataSource.callback = this.handleData.bind(this)
+        nodeDataSource.run()
+
+        const lastBlockSource = new LastBlockDataSource(cfg.THORNodeURL, cfg.LastBlock.PollPeriod)
+        lastBlockSource.callback = (lastBlock) => {
             DataStorage.lastBlock = lastBlock
         }
-        this.lastBlockSource.run()
+        lastBlockSource.run()
+
+        const networkSource = new NetworkDataSource(cfg.MidgardURL, cfg.Network.PollPeriod)
+        networkSource.callback = (networkInfo) => {
+            console.log(networkInfo)
+            if(DataStorage.lastBlock) {
+                emitter.emit(EventTypes.NodeChurnUpdate, {
+                    ...networkInfo,
+                    lastBlock: DataStorage.lastBlock
+                })
+            }
+        }
+        networkSource.run()
+
+        this._dataSources.push(nodeDataSource, lastBlockSource, networkSource)
     }
 
     handleData(nodes) {
@@ -47,7 +64,7 @@ export class MainScene {
             return
         }
 
-        if(!this._fullyLoaded) {
+        if (!this._fullyLoaded) {
             this._fullyLoaded = true
             emitter.emit(EventTypes.FullyLoaded)
         }
@@ -96,8 +113,11 @@ export class MainScene {
     }
 
     dispose() {
-        this.nodeDataSource.stop()
-        this.lastBlockSource.stop()
+        for(const source of this._dataSources) {
+            source.stop()
+        }
+        this._dataSources = []
+
         this.nodeGroup.dispose()
         clearObject(this.scene)
     }

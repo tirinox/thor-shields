@@ -5,9 +5,6 @@ import {Text} from 'troika-three-text'
 import {Colors, Config} from "@/config";
 import {PhysicalObject} from "@/helpers/physics/PhysicalObject";
 import StdVertexShader from '@/visual/shader/billboard.vert'
-// import StdVertexShader from '@/visual/shader/standard.vert'
-// import FragShader1 from '@/visual/shader/node_obj_3_rays.frag'
-// import FragShader1 from '@/visual/shader/node_obj_1.frag'
 import FragShader1 from '@/visual/shader/node_obj_2.frag'
 import {randFloat} from "three/src/math/MathUtils";
 import {clamp} from "lodash";
@@ -20,10 +17,7 @@ import TWEEN from "tween.js";
 const noCfg = Config.Scene.NodeObject
 const geomSize = noCfg.PlaneScale
 
-// const geometry = new THREE.SphereGeometry(noCfg.PlaneScale * 0.5, 10, 10)
 const geometry = new THREE.BoxGeometry(geomSize, geomSize, geomSize)
-// const geometry = new THREE.IcosahedronGeometry(noCfg.PlaneScale, 1)
-// const geometry = new THREE.PlaneGeometry(noCfg.PlaneScale, noCfg.PlaneScale)
 const simpleGeometry = new THREE.SphereGeometry(noCfg.PlaneScale * 0.5, 10, 10)
 
 const SlashColor = 0xff3300

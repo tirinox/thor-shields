@@ -56,13 +56,23 @@ export class URLDataSource {
         return this.baseUrl
     }
 
+    async _load() {
+        return await axios.get(this.url, {
+            headers: {
+                'Content-type': 'application/json'
+            }
+        })
+    }
+
+    async loadOnce() {
+        return await this.dataProcess(
+            await this._load()
+        )
+    }
+
     async _tick() {
         try {
-            const data = await axios.get(this.url, {
-                headers: {
-                    'Content-type': 'application/json'
-                }
-            })
+            const data = await this._load()
             if (this.callback) {
                 const result = await this.dataProcess(data.data)
                 this.callback(result)
@@ -112,5 +122,17 @@ export class LastBlockDataSource extends URLDataSource {
             chainHeights[chainItem['chain']] = +chainItem['last_observed_in']
         }
         return chainHeights
+    }
+}
+
+export class NetworkDataSource extends URLDataSource {
+    get url() {
+        return this.baseUrl + '/v2/network';
+    }
+
+    async dataProcess(rawData) {
+        return {
+            nextChurnHeight: +rawData['nextChurnHeight'],
+        }
     }
 }

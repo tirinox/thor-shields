@@ -4,7 +4,8 @@ export const EventTypes = {
     FullyLoaded: 'fully_loaded',
     DataSourceTick: 'data_source_tick',
     Activity: 'activity',
-    NewViewerVersion: 'new_viewer_version'
+    NewViewerVersion: 'new_viewer_version',
+    NodeChurnUpdate: 'node_churn_update',
 }
 
 export const emitter = mitt();

@@ -1,13 +1,12 @@
 const IsProduction = process.env.NODE_ENV !== 'development'
 console.log('Env = ', process.env.NODE_ENV)
 
-const Live = true
+// const Live = true
 
 export const Config = {
     DataSource: {
-        NodesURL: (Live ?
-            'https://thornode.ninerealms.com' :
-            'http://localhost:8080/data/samplenodes.json'),
+        THORNodeURL: 'https://thornode.ninerealms.com',
+        MidgardURL: 'https://midgard.ninerealms.com',
 
         Nodes: {
             PollPeriod: 3000.0, // msec
@@ -15,6 +14,10 @@ export const Config = {
 
         LastBlock: {
             PollPeriod: 10000.0, // msec
+        },
+
+        Network: {
+            PollPeriod: 60 * 1000.0,
         },
 
         ReactRandomDelay: 500.0, // msec
