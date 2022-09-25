@@ -66,6 +66,7 @@ export class NodeObject extends PhysicalObject {
             this.material.uniforms.saturation.value = this._elevated ? 1.5 : 1.0
             this.material.uniformsNeedUpdate = true
         }
+        this.friction = Config.Physics[v ? 'HoverFriction' : 'BaseFriction']
     }
 
     get elevated() {

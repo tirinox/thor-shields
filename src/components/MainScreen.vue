@@ -135,8 +135,9 @@ export default {
             this.cameraController.controls.rotate(dx * scale, dy * scale)
 
             const pickIntersection = this._pickObject(event)
+            let pickedName = ''
             if (pickIntersection) {
-                const pickedName = pickIntersection?.object?.name
+                pickedName = pickIntersection?.object?.name
                 this.content.nodeGroup.setElevatedNode(pickedName)
 
                 this.choseWindowSide(event)
@@ -151,6 +152,8 @@ export default {
                 this.nodeDetailsVisible = false
                 // this.nodeToViewDetails = this.content.findNodeByAddress(null)
             }
+
+            this.content.nodeGroup.setElevatedNode(pickedName)
         },
 
         onMouseEnter(event) {
