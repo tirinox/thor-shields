@@ -11,7 +11,7 @@ import {ModeBond} from "@/visual/modes/ModeBond";
 import {ModeGeo} from "@/visual/modes/ModeGeo";
 import * as THREE from "three";
 import _ from "lodash";
-// import {VisNetwork} from "@/visual/VisNetwork";
+
 
 export const NodeGroupModes = Object.freeze({
     Normal: 'normal',
@@ -138,11 +138,7 @@ export class NodeGroup extends Simulation {
 
     update(dt) {
         this._selectedModeHandler.update(dt)
-
         super.update(dt)
-
-        // this._visNet.update(dt)
-        // this._visNet.updatePositions(this.rBush, this.objectPositions)
     }
 
     updateFromCamera(camera) {
@@ -154,6 +150,9 @@ export class NodeGroup extends Simulation {
         clearObject(this.holder)
         for (const otherObj of this.physicalObjects) {
             otherObj.dispose()
+        }
+        for(const mode of Object.values(this._selector)) {
+            mode.dispose()
         }
     }
 

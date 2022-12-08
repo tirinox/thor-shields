@@ -13,9 +13,9 @@ export class NodeInfo {
 
         this.address = node.node_address
         this.status = node.status
-        this.bond = thorToFloat(node.bond)
+        this.bond = thorToFloat(node.total_bond)
         this.activeBlockHeight = +node.active_block_height
-        this.bondAddress = node.bond_address
+        this.bondAddress = node.node_operator_address
         this.statusSince = +node.status_since
         this.requestedToLeave = !!node.requested_to_leave
         this.forcedToLeave = !!node.forced_to_leave

@@ -34,7 +34,7 @@ export class NodeTracker {
 
         const keyTypeTable = {
             'slashPoints': EVENT_TYPES.SLASH,
-            'bond': EVENT_TYPES.BOND_CHANGE,
+            'total_bond': EVENT_TYPES.BOND_CHANGE,
             'IPAddress': EVENT_TYPES.IP_ADDRESS,
             'status': EVENT_TYPES.STATUS,
             'height': EVENT_TYPES.ACTIVE_BLOCK_HEIGHT,

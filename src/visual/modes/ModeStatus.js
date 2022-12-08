@@ -6,6 +6,7 @@ import _ from "lodash";
 import {AttractorShape} from "@/helpers/physics/AttractorShape";
 import {THORChainLogoShape} from "@/helpers/physics/TCLogoShape";
 import {NodeStatus} from "@/helpers/data/NodeInfo";
+import {NodeChurnTimer} from "@/visual/NodeChurnTimer";
 
 const ANY_STATUS = '*'
 
@@ -35,6 +36,10 @@ export class ModeStatus extends ModeBase {
                 new Attractor(new THREE.Vector3(this._sideDistance, 0, 0), force * 0.02),
             ],
         }
+
+        this.nodeChurnTimer = new NodeChurnTimer()
+        this.scene.add(this.nodeChurnTimer)
+        this.nodeChurnTimer.visible = false
     }
 
     handleObject(physObj) {
@@ -67,6 +72,7 @@ export class ModeStatus extends ModeBase {
         this.makeLabel({
             text: otherCount, position: new THREE.Vector3(this._sideDistance, -500, 0), scale: 6,
         })
+
 
         super.onEnter();
     }

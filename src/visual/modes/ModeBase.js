@@ -98,4 +98,6 @@ export class ModeBase {
     update(dt) {
         +dt
     }
+
+    dispose() {}
 }
