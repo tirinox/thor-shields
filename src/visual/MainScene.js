@@ -66,6 +66,7 @@ export class MainScene {
 
         if (!this._fullyLoaded) {
             this._fullyLoaded = true
+            console.log('[EV] Fully loaded!')
             emitter.emit(EventTypes.FullyLoaded)
         }
 

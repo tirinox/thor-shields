@@ -334,7 +334,7 @@ export default {
         },
 
         onFullyLoaded() {
-            console.log('fully loaded! removing loading screen...')
+            console.log('Removing loading screen...')
             this.isLoading = false
             this.fullyLoaded = true
         },

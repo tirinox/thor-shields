@@ -14,13 +14,14 @@ import _ from "lodash";
 
 
 export const NodeGroupModes = Object.freeze({
-    Normal: 'normal',
-    Status: 'status',
-    Provider: 'provider',
-    Version: 'version',
-    Bond: 'bond',
-    Geo: 'geo',
+    Normal: 'Normal',
+    Status: 'Status',
+    Provider: 'Provider',
+    Version: 'Version',
+    Bond: 'Bond',
+    Geo: 'Geo',
 })
+
 
 export class NodeGroup extends Simulation {
     constructor(parent) {
@@ -100,7 +101,7 @@ export class NodeGroup extends Simulation {
     }
 
     set mode(newMode) {
-        if(this._mode === newMode) {
+        if (this._mode === newMode) {
             return
         }
 
@@ -119,7 +120,7 @@ export class NodeGroup extends Simulation {
     }
 
     _updateObject(obj, delta) {
-        if(obj) {
+        if (obj) {
             this._selectedModeHandler.handleObject(obj)
             super._updateObject(obj, delta)
         }
@@ -151,13 +152,13 @@ export class NodeGroup extends Simulation {
         for (const otherObj of this.physicalObjects) {
             otherObj.dispose()
         }
-        for(const mode of Object.values(this._selector)) {
+        for (const mode of Object.values(this._selector)) {
             mode.dispose()
         }
     }
 
     setElevatedNode(name) {
-        for(const obj of this.physicalObjects) {
+        for (const obj of this.physicalObjects) {
             obj.elevated = (obj.name === name)
         }
     }

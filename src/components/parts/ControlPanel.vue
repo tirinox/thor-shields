@@ -11,7 +11,7 @@
 <script>
 
 import {NodeGroupModes} from "@/visual/NodeGroup";
-import {Config} from "@/config";
+import {capitalizeFirstLetter} from "@/helpers/String";
 
 export default {
     name: 'ControlPanel',
@@ -44,15 +44,26 @@ export default {
         },
 
         setSceneMode(value) {
-            this.selectedMode = value
-            this.$emit('mode-selected', value)
+            if (value in NodeGroupModes) {
+                this.selectedMode = value
+                this.$emit('mode-selected', value)
+                location.hash = value
+            } else {
+                console.error(`Unknown mode: ${value}`)
+            }
         },
+
+        setModeFromHash() {
+            const hash = location.hash
+            if (hash) {
+                const modeName = capitalizeFirstLetter(hash.substring(1))
+                this.setSceneMode(modeName)
+            }
+        }
     },
     mounted() {
-        if(Config.Scene.InitialMode && Config.Scene.InitialMode !== NodeGroupModes.Normal) {
-            setTimeout(() => this.setSceneMode(Config.Scene.InitialMode), 1000.0)
-        }
-    }
+        this.setModeFromHash()
+    },
 }
 
 </script>
@@ -65,7 +76,7 @@ export default {
     right: 4px;
 }
 
-@media (min-device-width:320px) and (max-device-width:768px) {
+@media (min-device-width: 320px) and (max-device-width: 768px) {
     .control-panel {
         bottom: 60px;
     }
