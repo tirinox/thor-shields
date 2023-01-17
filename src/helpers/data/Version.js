@@ -28,11 +28,27 @@ export class Version {
     }
 
     greater(v2) {
-        return this.x > v2.x || this.y > v2.y || this.z > v2.z
+        if(this.x > v2.x) {
+            return true;
+        } else if(this.x === v2.x) {
+            if(this.y > v2.y) {
+                return true;
+            } else if(this.y === v2.y) {
+                return this.z > v2.z;
+            }
+        }
     }
 
     less(v2) {
-        return this.x < v2.x || this.y < v2.y || this.z < v2.z
+        if(this.x < v2.x) {
+            return true;
+        } else if(this.x === v2.x) {
+            if(this.y < v2.y) {
+                return true;
+            } else if(this.y === v2.y) {
+                return this.z < v2.z;
+            }
+        }
     }
 
     equal(v2) {
