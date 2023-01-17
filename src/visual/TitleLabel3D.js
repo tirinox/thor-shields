@@ -32,6 +32,12 @@ export class TitleLabel3D extends THREE.Object3D {
         this.easeType = TWEEN.Easing.Back.Out
     }
 
+    updateText(newText) {
+        this.text = newText
+        this.t.text = newText
+        this.t.sync()
+    }
+
     set color(c) {
         this.t.color = c
     }

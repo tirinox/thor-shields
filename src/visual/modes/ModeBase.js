@@ -35,8 +35,13 @@ export class ModeBase {
 
         key = key || Random.generateId()
 
+        const label = this.findLabelByKey(key)
+        if(label && label.text !== text) {
+            console.log(`Updating label ${key} from ${label.text} to ${text}`)
+            label.updateText(text)
+        }
+
         if (moveIfExists) {
-            const label = this.findLabelByKey(key)
             if (label) {
                 new TWEEN.Tween(label.position)
                     .to(position, 1000.0)
@@ -82,8 +87,9 @@ export class ModeBase {
     }
 
     killLabelByKey(key) {
+        console.log(`Killing label ${key}.`)
         const label = this.findLabelByKey(key)
-        if (key) {
+        if (label) {
             label.animateOut(true)
             delete this._labelsHash[key]
         }

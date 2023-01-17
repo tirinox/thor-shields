@@ -91,42 +91,7 @@ export class ModeVersion extends ModeBase {
             affectedKeys.push(key)
             const attr = this._attractorsByKey[key]
             if (attr) {
-
-                let tag = '\n' + desc.comment
-                let color
-                if(desc.comment === 'latest') {
-                    color = '#41e9ff'
-                } else if(desc.comment === 'latest and active') {
-                    color = '#1dfc53'
-                } else if(desc.comment === 'active') {
-                    color = '#16f14b'
-                } else if(desc.comment === 'interim') {
-                    color = '#1cc245'
-                    tag = ''
-                }
-
-                let text
-                if(key === 'unknown') {
-                    text = 'Unknown'
-                } else {
-                    text = `v. ${key} (${desc.objects.length})${tag}`
-                }
-
-                const position = new THREE.Vector3(attr.position.x, attr.position.y - attr.relaxRadius * 1.1 - 30.0, 50.0)
-                // const position = new THREE.Vector3(attr.position.x, -300.0, 50.0)
-                const label = this.makeLabel({
-                    text,
-                    position,
-                    scale: 2.5,
-                    key
-                }).t
-
-                if(!desc.isActive) {
-                    label.opacity = 0.9
-                }
-                if(color) {
-                    label.color = color
-                }
+                this._putLabel(attr, key, desc);
             }
         }
 
@@ -134,10 +99,46 @@ export class ModeVersion extends ModeBase {
         _.forEach(keysToRemove, key => {
             this.killLabelByKey(key)
         })
-        if(keysToRemove.length) {
-            console.log(`Removing ${keysToRemove.length} version labels...`)
-        }
 
         this._previousKeys = affectedKeys
+    }
+
+    _putLabel(attr, key, desc) {
+        console.log(`Put a label for ${key}.`)
+
+        let tag = '\n' + desc.comment
+        let color
+        if(desc.comment === 'latest') {
+            color = '#41e9ff'
+        } else if(desc.comment === 'latest and active') {
+            color = '#1dfc53'
+        } else if(desc.comment === 'active') {
+            color = '#16f14b'
+        } else if(desc.comment === 'interim') {
+            color = '#1cc245'
+            tag = ''
+        }
+
+        let text
+        if(key === 'unknown') {
+            text = 'Unknown'
+        } else {
+            text = `v. ${key} (${desc.objects.length})${tag}`
+        }
+        const position = new THREE.Vector3(attr.position.x, attr.position.y - attr.relaxRadius * 1.1 - 30.0, 50.0)
+        // const position = new THREE.Vector3(attr.position.x, -300.0, 50.0)
+        const label = this.makeLabel({
+            text,
+            position,
+            scale: 2.5,
+            key
+        }).t
+
+        if (!desc.isActive) {
+            label.opacity = 0.9
+        }
+        if (color) {
+            label.color = color
+        }
     }
 }
